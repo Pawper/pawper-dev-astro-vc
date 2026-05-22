@@ -219,7 +219,6 @@ export default function CXHeader({
                             .find(([l]) => l.toLowerCase() === skill.toLowerCase());
                           return (
                             <CXPill key={skill} size="md"
-                              color={langEntry?.[1].color}
                               onClick={() => openModal(langEntry
                                 ? { kind: "skill", id: langEntry[0], color: langEntry[1].color, filterType: "language" }
                                 : { kind: "skill", id: skill, filterType: "topic" }

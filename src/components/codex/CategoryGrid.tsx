@@ -128,7 +128,7 @@ export default function CategoryGrid<T extends { id: string }>({
         </div>
       )}
 
-      <div className="cx-grid-2col" style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 14 }}>
+      <div className="cx-grid-2col" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(380px, 1fr))", gap: 14 }}>
         {filtered.length > 0
           ? filtered.map((item, i) => renderCard(item, i))
           : (
