@@ -4,3 +4,14 @@ node_modules/
 .env
 .env.*
 !.env.example
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# Claude
+.claude/
+
+# Content drafts / scratch
+src/content/logs-test/
+src/content/logs-drafts/
