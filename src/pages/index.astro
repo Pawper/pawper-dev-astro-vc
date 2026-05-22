@@ -1,0 +1,79 @@
+---
+import App from '../components/codex/App';
+import '../styles/global.css';
+import { getCollection } from 'astro:content';
+import type { Log } from '../types';
+
+const rawLogs = await getCollection('logs');
+const logsHtml: Record<string, string> = {};
+
+// First pass: collect raw entries with frontmatter series data
+const rawEntries = rawLogs.map((entry) => {
+  const id = entry.id.replace(/\.md$/, '');
+  const html = entry.rendered?.html ?? '';
+  logsHtml[id] = html;
+  const words = html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().split(' ').filter(Boolean).length;
+  const hook = entry.data.hook ?? (html.match(/<p[^>]*>([\s\S]*?)<\/p>/)?.[1].replace(/<[^>]+>/g, "").trim() || undefined);
+  return { id, title: entry.data.title, date: entry.data.date, kicker: entry.data.kicker, words, tags: entry.data.tags, image: entry.data.image, hook, devto: entry.data.devto, seriesRaw: entry.data.series };
+});
+
+// Group articles that belong to a series
+const seriesGroups = new Map<string, typeof rawEntries>();
+for (const e of rawEntries) {
+  if (e.seriesRaw) {
+    const g = seriesGroups.get(e.seriesRaw.name) ?? [];
+    g.push(e);
+    seriesGroups.set(e.seriesRaw.name, g);
+  }
+}
+
+// For each series group: sort by explicit part then by date, assign sequential parts
+// total = max(actual article count, any frontmatter-specified intended total)
+const assignedParts = new Map<string, number>(); // id -> computed part
+const seriesTotals = new Map<string, number>();   // name -> intended total
+
+for (const [name, members] of seriesGroups) {
+  members.sort((a, b) => {
+    const pa = a.seriesRaw?.part, pb = b.seriesRaw?.part;
+    if (pa != null && pb != null) return pa - pb;
+    if (pa != null) return -1;
+    if (pb != null) return 1;
+    return a.date.localeCompare(b.date);
+  });
+  members.forEach((m, i) => assignedParts.set(m.id, i + 1));
+
+  const latestEntry = members[members.length - 1];
+  const specifiedTotal = latestEntry.seriesRaw?.total ?? 0;
+  seriesTotals.set(name, Math.max(members.length, specifiedTotal));
+}
+
+const logs: Log[] = rawEntries.map((e) => ({
+  id: e.id,
+  title: e.title,
+  date: e.date,
+  kicker: e.kicker,
+  words: e.words,
+  tags: e.tags,
+  image: e.image,
+  hook: e.hook,
+  devto: e.devto,
+  series: e.seriesRaw
+    ? { name: e.seriesRaw.name, part: assignedParts.get(e.id)!, total: seriesTotals.get(e.seriesRaw.name)! }
+    : undefined,
+})).sort((a, b) => b.date.localeCompare(a.date));
+---
+
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Phillip Wessels — Full-Stack Developer. React, TypeScript, Node." />
+  <title>Phillip Wessels · CODEX</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+</head>
+<body>
+  <div id="app-root" style="min-height: 100dvh;">
+    <App client:only="react" logsHtml={logsHtml} logs={logs} />
+  </div>
+</body>
+</html>

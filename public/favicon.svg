@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 56 56">
+  <circle cx="28" cy="28" r="26" fill="rgba(255,255,255,0.8)" stroke="rgba(255,255,255,0.7)" stroke-width="1"/>
+  <circle cx="28" cy="28" r="20" fill="none" stroke="#2b8bff" stroke-width="2" stroke-dasharray="3 4" opacity="0.7"/>
+  <circle cx="28" cy="28" r="6" fill="#2b8bff"/>
+  <path d="M28 4 L34 14 L28 12 L22 14 Z" fill="#2b8bff" opacity="0.8"/>
+</svg>

@@ -1,0 +1,229 @@
+---
+// Resume page — source of truth for /resume and /resume.pdf
+---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Phillip Wessels — Resume</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<style is:global>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root { color-scheme: light; }
+  html, body {
+    background: #eeece7;
+    min-height: 100%;
+  }
+  body {
+    font-family: 'Jost', sans-serif;
+    font-size: 13.5px;
+    line-height: 1.6;
+    color: #1a1a1a;
+    padding: 3rem 2rem 5rem;
+  }
+  .page {
+    max-width: 780px;
+    margin: 0 auto;
+    background: #fff;
+    padding: 2.5rem 3rem;
+    box-shadow: 0 2px 24px rgba(0,0,0,0.10);
+  }
+  .name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 36px;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    line-height: 1.1;
+    color: #1a1a1a;
+  }
+  .title {
+    font-size: 11.5px;
+    font-weight: 400;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+    color: #666;
+    margin-top: 5px;
+  }
+  .contact {
+    font-size: 12px;
+    color: #666;
+    margin-top: 7px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 18px;
+  }
+  .contact a { color: #666; text-decoration: none; }
+  .contact a:hover { color: #1a1a1a; }
+  hr {
+    border: none;
+    border-top: 0.5px solid #d0d0d0;
+    margin: 18px 0;
+  }
+  .section-label {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #888;
+    margin-bottom: 10px;
+  }
+  .summary {
+    font-size: 13.5px;
+    color: #1a1a1a;
+    line-height: 1.75;
+    font-weight: 300;
+  }
+  .skills-grid {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 5px 18px;
+    font-size: 12.5px;
+  }
+  .skill-cat { font-weight: 500; color: #1a1a1a; white-space: nowrap; padding-top: 1px; }
+  .skill-val { color: #555; font-weight: 300; }
+  .job { margin-bottom: 22px; }
+  .job-company { font-weight: 500; font-size: 14px; color: #1a1a1a; }
+  .job-company-sub { font-weight: 300; font-size: 12px; color: #555; }
+  .job-title-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 2px 12px;
+    margin-top: 2px;
+    margin-bottom: 8px;
+  }
+  .job-title { font-size: 12.5px; color: #666; font-weight: 300; font-style: italic; }
+  .job-dates { font-size: 11.5px; color: #888; white-space: nowrap; }
+  ul { padding-left: 14px; }
+  li {
+    font-size: 13px;
+    font-weight: 300;
+    color: #1a1a1a;
+    margin-bottom: 5px;
+    line-height: 1.65;
+  }
+  li::marker { color: #aaa; font-size: 10px; }
+  .sub-role {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 0.5px solid #e0e0e0;
+  }
+  .edu-line {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 2px 12px;
+    font-size: 13px;
+  }
+  .edu-degree { font-weight: 500; color: #1a1a1a; }
+  .edu-year { font-size: 11.5px; color: #888; }
+  .edu-school { color: #666; font-weight: 300; font-size: 12.5px; margin-top: 2px; }
+
+  @media print {
+    @page { margin: 0.75in 0.85in; size: letter; }
+    html, body { background: #fff; padding: 0; }
+    .page { box-shadow: none; padding: 0; max-width: 100%; font-size: 11.5px; }
+    .name { font-size: 30px; }
+    li { margin-bottom: 3px; }
+    .job { margin-bottom: 16px; }
+    a { color: #666 !important; text-decoration: none !important; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+<div class="name">Phillip Wessels</div>
+<div class="title">Solutions Engineer &nbsp;&middot;&nbsp; Platform Architect &nbsp;&middot;&nbsp; Agentic Systems Builder<br>AI × Human Flourishing &nbsp;&middot;&nbsp; Wellness Coach in Training</div>
+<div class="contact">
+  <span>phillip.a.wessels@gmail.com</span>
+  <span>408-644-6963</span>
+  <a href="https://pawper.dev">pawper.dev</a>
+  <a href="https://github.com/pawper">github.com/pawper</a>
+  <span>San Francisco, CA</span>
+</div>
+
+<hr>
+
+<div class="section-label">Summary</div>
+<p class="summary">Platform architect and AI-augmented developer with 12 years building systems at the intersection of web technology, API integration, and business operations. Designed and delivered a full-stack WordPress CMS from the ground up; built REST API endpoints, a TBO API integration layer, and a PowerShell reporting platform serving two departments and cross-functional stakeholders. Now expanding into agentic AI systems and multi-agent orchestration as a core technical discipline. Parallel to the technical track, pursuing professional certification in positive psychology and wellness coaching — engaging the intersection of human agency and agentic systems.</p>
+
+<hr>
+
+<div class="section-label">Skills</div>
+<div class="skills-grid">
+  <span class="skill-cat">Platform &amp; CMS</span><span class="skill-val">WordPress (CPTs, taxonomies, Toolset, Elementor, REST API), PHP</span>
+  <span class="skill-cat">Languages</span><span class="skill-val">JavaScript, React, SQL, PowerShell, Python, Node.js</span>
+  <span class="skill-cat">APIs &amp; Integration</span><span class="skill-val">REST API design &amp; implementation, TBO API, JSON, Postman</span>
+  <span class="skill-cat">DevOps &amp; Tooling</span><span class="skill-val">Git/GitHub, Docker, WSL/Linux, Netlify, Cloudinary, Windows Task Scheduler</span>
+  <span class="skill-cat">AI &amp; Agentic</span><span class="skill-val">Claude (Code/Cowork), ChatGPT (Codex), GitHub Copilot, OpenClaw, CLAUDE.md/AGENTS.md, Skills</span>
+  <span class="skill-cat">Operations</span><span class="skill-val">Zoho Desk, Excel/VBA, Smartsheet, technical documentation &amp; training</span>
+  <span class="skill-cat">Coaching</span><span class="skill-val">PERMA framework for flourishing, VIA Inventory of Strengths, Positive Interventions</span>
+</div>
+
+<hr>
+
+<div class="section-label">Experience</div>
+
+<div class="job">
+  <div class="job-company">Classic Vacations <span class="job-company-sub">(Expedia Group, acquired by TBO)</span></div>
+  <div class="job-title-row">
+    <span class="job-title">Web Producer / Web Platform Architect</span>
+    <span class="job-dates">Oct 2022 – May 2026</span>
+  </div>
+  <ul>
+    <li>Architected and implemented a custom WordPress CMS from the ground up — custom post types, taxonomies, relational content models (Toolset), JetMenu megamenu, and Elementor page templates — serving thousands of destination, hotel, and itinerary pages used daily by 6+ editors across Marketing and Solutions</li>
+    <li>Built a REST API endpoint delivering destination images to client travel statements: hierarchical lookup with parent fallback, custom image sizing, Toolset custom fields for external location IDs, and a coverage-reporting view coordinated with Marketing for gap resolution</li>
+    <li>Engineered a TBO API integration layer on hotel property pages — custom import UI with live JSON store, per-field content-source toggles between internal and third-party data, and a photo gallery — enabling real-time content switching without developer intervention</li>
+    <li>Owned all templated product and taxonomy pages; designed full content architecture for destination, hotel, and itinerary content types site-wide</li>
+    <li>Reduced Marketing dependency on developers for content publishing through structured CMS design, enabling self-service page creation for 6+ non-technical editors</li>
+    <li>Leveraged AI coding assistance (ChatGPT, Copilot, Claude) as a core development practice; explicitly recognized by management for incorporating AI into workflow</li>
+  </ul>
+
+  <div class="sub-role">
+    <div class="job-title-row">
+      <span class="job-title">Product Operations Admin — QA &amp; Training</span>
+      <span class="job-dates">Feb 2019 – Oct 2022</span>
+    </div>
+    <ul>
+      <li>Designed and deployed a centralized reporting automation platform — consolidating hundreds of individual scheduled tasks into a maintainable PowerShell + SQL + Windows Task Scheduler system generating recurring QA, booking, and operational reports for two teams and cross-departmental stakeholders</li>
+      <li>Took over and corrected production-critical SQL queries (originally broken by another team) powering QA and booking-travel reports; documented and maintained the query library</li>
+      <li>Built a custom Excel VBA add-in that turned a neglected CSV report (source of recurring financial loss) into a one-click pivot table dashboard, driving consistent adoption</li>
+      <li>Engineered PowerShell scripts replacing a multi-step error-prone manual process with a single automated workflow; successfully advocated for the software update required to enable it</li>
+      <li>Led team adoption of GitHub for version control, replacing email-based code sharing and manual backups; trained new hires and authored process and workflow documentation</li>
+    </ul>
+  </div>
+
+  <div class="sub-role">
+    <div class="job-title-row">
+      <span class="job-title">Product Operations Admin <span style="font-style: normal; font-weight: 300; font-size: 11.5px; color: #aaa;">· contracted via Volt Workforce Solutions, Oct 2013 – Jul 2014</span></span>
+      <span class="job-dates">Oct 2013 – Feb 2019</span>
+    </div>
+    <ul>
+      <li>Supported product contracting operations through QA review, data entry, copy editing, and Excel-based reporting.</li>
+    </ul>
+  </div>
+</div>
+
+<hr>
+
+<div class="section-label">Education</div>
+<div class="edu-line">
+  <span class="edu-degree">B.A., Special Major — Interactive Intermedia</span>
+  <span class="edu-year">2008–2011, 2013</span>
+</div>
+<div class="edu-school">California State University, Fresno</div>
+
+<div class="edu-line" style="margin-top: 10px;">
+  <span class="edu-degree">Positive Psychology: Martin E. P. Seligman's Visionary Science</span>
+  <span class="edu-year">Feb 2026</span>
+</div>
+<div class="edu-school">University of Pennsylvania (Coursera) · Credential ID PTEV8VSOB4IV</div>
+
+</div>
+</body>
+</html>
