@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef, useState } from "react";
 import { SERVICES } from "../../data/content";
 import FormField from "../shared/FormField";
 import Readout from "../shared/Readout";
@@ -43,22 +43,46 @@ export function CXContactFooter({ sent }: { sent: boolean }) {
 }
 
 export default function CXContactCombo({ onSent, onService }: CXContactComboProps) {
+  const formRef = useRef<HTMLFormElement>(null);
+  const [error, setError] = useState(false);
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setError(false);
+    const data = new FormData(formRef.current!);
+    const body = new URLSearchParams({
+      "form-name": "contact",
+      name:    data.get("name")    as string,
+      email:   data.get("email")   as string,
+      subject: data.get("subject") as string,
+      message: data.get("message") as string,
+    });
+    try {
+      const res = await fetch("/", { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: body.toString() });
+      if (res.ok) { onSent(); } else { setError(true); }
+    } catch { setError(true); }
+  }
+
   return (
     <div className="cx-contact-main-grid" style={{ display: "grid", gridTemplateColumns: "1.1fr 1fr", gap: 28 }}>
       <form
+        ref={formRef}
         id="contact-form"
-        onSubmit={(e) => { e.preventDefault(); onSent(); }}
+        name="contact"
+        onSubmit={handleSubmit}
         style={{ display: "flex", flexDirection: "column", gap: 12 }}
       >
+        <input type="hidden" name="form-name" value="contact" />
         <p style={{ fontSize: 15, lineHeight: 1.55, color: "var(--ink-soft)", margin: 0, textWrap: "pretty" } as React.CSSProperties}>
           The fastest way to reach me is email — read within 48 hours,
           replied to within 72. I can take on one freelance client at a time,
           and currently have one slot open.
         </p>
-        <FormField label="Identifier"    placeholder="Your name" />
-        <FormField label="Return address" placeholder="you@somewhere.dev" />
-        <FormField label="Subject"       placeholder="What's on your mind?" />
-        <FormField label="Transmission"  placeholder="A few sentences is plenty…" multiline />
+        <FormField name="name"    label="Identifier"    placeholder="Your name" />
+        <FormField name="email"   label="Return address" placeholder="you@somewhere.dev" />
+        <FormField name="subject" label="Subject"        placeholder="What's on your mind?" />
+        <FormField name="message" label="Transmission"   placeholder="A few sentences is plenty…" multiline />
+        {error && <span className="pw-mono" style={{ fontSize: 11, color: "var(--color-error, #e05c5c)", letterSpacing: "0.1em" }}>TRANSMISSION FAILED · TRY AGAIN</span>}
         <span className="pw-mono" style={{ fontSize: 11, color: "var(--ink-mute)", letterSpacing: "0.16em", marginTop: 4 }}>
           ENCRYPTED · END-TO-END
         </span>

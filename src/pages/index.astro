@@ -72,6 +72,13 @@ const logs: Log[] = rawEntries.map((e) => ({
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
 </head>
 <body>
+  <!-- Hidden form lets Netlify's build bot register the contact form for processing -->
+  <form name="contact" data-netlify="true" hidden>
+    <input type="text"  name="name" />
+    <input type="email" name="email" />
+    <input type="text"  name="subject" />
+    <textarea name="message"></textarea>
+  </form>
   <div id="app-root" style="min-height: 100dvh;">
     <App client:only="react" logsHtml={logsHtml} logs={logs} />
   </div>
