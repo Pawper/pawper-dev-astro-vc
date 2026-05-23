@@ -203,7 +203,7 @@ export default function DCSkills({ openModal }: DCSkillsProps) {
   const topicMax = topics[0]?.value ?? 1;
 
   return (
-    <div className="cx-skills-top-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+    <div className="cx-skills-top-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))", gap: 16 }}>
 
       {/* Language Distribution — full width */}
       <CXCard style={{ gridColumn: "1 / -1", padding: 20, borderRadius: 14, display: "flex", flexDirection: "column", gap: 14 }}>

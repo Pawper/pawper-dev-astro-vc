@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import CXCard from "../CXCard";
-import CXPill from "../CXPill";
-import { PROJECTS, LOGS, EXPERIENCES } from "../../../data/content";
+import { PROJECTS, LOGS, EXPERIENCES, canonicalizeSkill } from "../../../data/content";
+import CollapsiblePills from "../CollapsiblePills";
+import type { PillItem } from "../CollapsiblePills";
 import type { Endorsement } from "../../../data/content";
 import endorsementsData from "../../../data/endorsements.json";
 
@@ -11,6 +12,7 @@ import type { ModalSibling } from "../../../types";
 import MixedGrid from "../MixedGrid";
 import Tap from "../../shared/Tap";
 import { soundClick, soundHover } from "../../../context/SoundContext";
+import EndorsementQuote from "../EndorsementQuote";
 
 const WEEKS = 52;
 const CELL = 9;
@@ -49,7 +51,7 @@ function getLangDistPct(langName: string): string | null {
 
 type Match = { kind: "language"; color: string } | { kind: "topic" } | null;
 function matchSkill(name: string): Match {
-  const lower = name.toLowerCase();
+  const lower = canonicalizeSkill(name).toLowerCase();
   for (const p of PROJECTS) {
     const langEntry = Object.entries(p.languages).find(([l]) => l.toLowerCase() === lower);
     if (langEntry) return { kind: "language", color: langEntry[1].color };
@@ -89,8 +91,8 @@ export default function DCSkillGrid({ tag, filterType = "topic", onOpen, onOpenE
   const logSiblings: ModalSibling[] = logs.map(a => ({ kind: "log", id: a.id }));
   const total = projects.length + logs.length;
 
-  const experiences = EXPERIENCES.filter((e) => e.skills?.some((s) => s.toLowerCase() === lower));
-  const endorsements = allEndorsements.filter((e) => e.skills?.some((s) => s.toLowerCase() === lower));
+  const experiences = EXPERIENCES.filter((e) => e.skills?.some((s) => canonicalizeSkill(s).toLowerCase() === lower));
+  const endorsements = allEndorsements.filter((e) => e.skills?.some((s) => canonicalizeSkill(s).toLowerCase() === lower));
 
   // Derive years from actual skill-relevant commit/log dates, not pushedAt
   const allYears = new Set<number>();
@@ -469,9 +471,7 @@ export default function DCSkillGrid({ tag, filterType = "topic", onOpen, onOpenE
                   />
                 )}
                 <div style={{ display: "block", padding: "14px 16px 16px" }}>
-                  <p style={{ fontSize: 12, lineHeight: 1.7, color: "var(--ink)", margin: 0, fontStyle: "italic" }}>
-                    "{e.pullQuote ?? e.quote}"
-                  </p>
+                  <EndorsementQuote quote={e.quote} pullQuote={e.pullQuote} />
                   <div style={{ fontSize: 11, color: "var(--ink-soft)", marginTop: 8 }}>
                     <span style={{ marginRight: 5, color: "var(--ink-mute)" }}>—</span>
                     <span style={{ fontWeight: 600 }}>{e.name}</span>
@@ -479,28 +479,15 @@ export default function DCSkillGrid({ tag, filterType = "topic", onOpen, onOpenE
                     {e.org  && <span style={{ color: "var(--ink-mute)" }}> · {e.org}</span>}
                   </div>
                   {(e.skills?.length ?? 0) > 0 && (() => {
-                    const pill = (e.skills ?? []).filter((s) => matchSkill(s) !== null);
+                    const pill: PillItem[] = (e.skills ?? [])
+                      .filter((s) => matchSkill(s) !== null)
+                      .map((s) => {
+                        const canonical = canonicalizeSkill(s);
+                        const match = matchSkill(s)!;
+                        return { key: s, label: canonical, onClick: () => onOpenSkill?.(canonical, match.kind === "language" ? "language" : "topic", match.kind === "language" ? match.color : undefined) };
+                      });
                     const plain = (e.skills ?? []).filter((s) => matchSkill(s) === null);
-                    return (
-                      <div onClick={(e) => e.stopPropagation()} style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 5, marginTop: 8 }}>
-                        {pill.map((skill) => {
-                          const match = matchSkill(skill)!;
-                          return (
-                            <CXPill key={skill} size="sm"
-                              onClick={() => { onOpenSkill?.(skill, match.kind === "language" ? "language" : "topic", match.kind === "language" ? match.color : undefined); }}>
-                              {skill}
-                            </CXPill>
-                          );
-                        })}
-                        {pill.length > 0 && plain.length > 0 && <span style={{ color: "var(--ink-mute)", fontSize: 11, lineHeight: 1 }}>•</span>}
-                        {plain.map((s, i) => (
-                          <React.Fragment key={s}>
-                            {i > 0 && <span style={{ color: "var(--ink-mute)", fontSize: 11, lineHeight: 1 }}>•</span>}
-                            <span className="pw-mono" style={{ fontSize: 10, color: "var(--ink-mute)", letterSpacing: "0.04em" }}>{s}</span>
-                          </React.Fragment>
-                        ))}
-                      </div>
-                    );
+                    return <div style={{ marginTop: 8 }}><CollapsiblePills pills={pill} plain={plain} size="sm" /></div>;
                   })()}
                 </div>
               </CXCard>
@@ -534,28 +521,15 @@ export default function DCSkillGrid({ tag, filterType = "topic", onOpen, onOpenE
                 <div style={{ fontSize: 16, fontWeight: 600 }}>{exp.title}</div>
                 <div style={{ fontSize: 13, color: "var(--ink-soft)", marginTop: 2 }}>{exp.description}</div>
                 {(exp.skills?.length ?? 0) > 0 && (() => {
-                  const pill = exp.skills!.filter((s) => matchSkill(s) !== null);
+                  const pill: PillItem[] = exp.skills!
+                    .filter((s) => matchSkill(s) !== null)
+                    .map((s) => {
+                      const canonical = canonicalizeSkill(s);
+                      const match = matchSkill(s)!;
+                      return { key: s, label: canonical, color: match.kind === "language" ? match.color : undefined, onClick: () => onOpenSkill?.(canonical, match.kind === "language" ? "language" : "topic", match.kind === "language" ? match.color : undefined) };
+                    });
                   const plain = exp.skills!.filter((s) => matchSkill(s) === null);
-                  return (
-                    <div onClick={(e) => e.stopPropagation()} style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 5, marginTop: 8 }}>
-                      {pill.map((skill) => {
-                        const match = matchSkill(skill)!;
-                        return (
-                          <CXPill key={skill} size="sm"
-                            onClick={() => { onOpenSkill?.(skill, match.kind === "language" ? "language" : "topic", match.kind === "language" ? match.color : undefined); }}>
-                            {skill}
-                          </CXPill>
-                        );
-                      })}
-                      {pill.length > 0 && plain.length > 0 && <span style={{ color: "var(--ink-mute)", fontSize: 11, lineHeight: 1 }}>•</span>}
-                      {plain.map((s, i) => (
-                        <React.Fragment key={s}>
-                          {i > 0 && <span style={{ color: "var(--ink-mute)", fontSize: 11, lineHeight: 1 }}>•</span>}
-                          <span className="pw-mono" style={{ fontSize: 10, color: "var(--ink-mute)", letterSpacing: "0.04em" }}>{s}</span>
-                        </React.Fragment>
-                      ))}
-                    </div>
-                  );
+                  return <div style={{ marginTop: 8 }}><CollapsiblePills pills={pill} plain={plain} size="sm" /></div>;
                 })()}
               </div>
               <span style={{ fontSize: 13, color: "var(--ink-mute)", alignSelf: "start", paddingTop: 2 }}>{exp.organization}</span>

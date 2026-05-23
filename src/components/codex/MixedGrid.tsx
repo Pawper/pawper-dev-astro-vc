@@ -89,7 +89,7 @@ export default function MixedGrid({
         </div>
       )}
       {gridFiltered.length > 0 ? (
-        <div className="cx-grid-2col" style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 14 }}>
+        <div className="cx-grid-2col" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(380px, 1fr))", gap: 14 }}>
           {gridFiltered.map((item, i) =>
             item.type === "project" ? (
               <CXProjectCard

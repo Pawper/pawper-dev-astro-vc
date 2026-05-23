@@ -7,6 +7,8 @@ export default function DCResume() {
       position: "relative",
       overflow: "visible",
       paddingRight: 406,  // 350px image + 28px gap + 28px card padding
+      maxWidth: 975,
+      marginInline: "auto",
     }}>
       <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
         <div>

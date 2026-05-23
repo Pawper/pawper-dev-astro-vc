@@ -1,18 +1,19 @@
-import React from "react";
-import { EXPERIENCES, PROJECTS, LOGS } from "../../../data/content";
+import { EXPERIENCES, PROJECTS, LOGS, canonicalizeSkill } from "../../../data/content";
+import CollapsiblePills from "../CollapsiblePills";
+import type { PillItem } from "../CollapsiblePills";
 import type { Endorsement } from "../../../data/content";
 import type { ModalState } from "../../../types";
 import endorsementsData from "../../../data/endorsements.json";
 import CXCard from "../CXCard";
-import CXPill from "../CXPill";
 import { SidebarTagGroups } from "./DCDetailSidebar";
+import EndorsementQuote from "../EndorsementQuote";
 import { soundClick, soundHover } from "../../../context/SoundContext";
 
 const allEndorsements = endorsementsData as Endorsement[];
 
 type Match = { kind: "language"; color: string } | { kind: "topic" } | null;
 function matchSkill(name: string): Match {
-  const lower = name.toLowerCase();
+  const lower = canonicalizeSkill(name).toLowerCase();
   for (const p of PROJECTS) {
     const langEntry = Object.entries(p.languages).find(([l]) => l.toLowerCase() === lower);
     if (langEntry) return { kind: "language", color: langEntry[1].color };
@@ -71,51 +72,31 @@ export default function DCExperience({ id, openModal }: Props) {
             const plainSkills = (e.skills ?? []).filter((s) => matchSkill(s) === null);
             return (
               <CXCard key={e.id} className="cx-endorsement-card" style={{
-                borderRadius: 14, display: "flex", flexDirection: "row",
-                overflow: "hidden", position: "relative",
+                borderRadius: 14, overflow: "hidden", position: "relative", paddingLeft: 20,
               }}>
                 {e.photo && (
                   <img
                     src={e.photo} alt={e.name} className="cx-endorsement-photo"
-                    style={{ width: 200, flexShrink: 0, alignSelf: "stretch", objectFit: "cover", objectPosition: "center top" }}
+                    style={{ float: "left", width: 144, height: 144, objectFit: "cover", objectPosition: "center top", borderRadius: "40px 8px 40px 8px", margin: "20px 18px 4px 0" }}
                   />
                 )}
-                <div className="cx-endorsement-content" style={{ flex: 1, padding: "18px 20px", display: "flex", flexDirection: "column", gap: 10 }}>
-                  <p style={{ fontSize: 14, lineHeight: 1.7, color: "var(--ink)", margin: 0, fontStyle: "italic" }}>
-                    "{e.pullQuote ?? e.quote}"
-                  </p>
-                  <div style={{ fontSize: 12, color: "var(--ink-soft)" }}>
+                <div className="cx-endorsement-content" style={{ padding: "18px 20px 18px 0" }}>
+                  <EndorsementQuote quote={e.quote} pullQuote={e.pullQuote} />
+                  <div style={{ fontSize: 12, color: "var(--ink-soft)", marginBottom: 10 }}>
                     <span style={{ marginRight: 5, color: "var(--ink-mute)" }}>—</span>
                     <span style={{ fontWeight: 600 }}>{e.name}</span>
                     {e.role && <span style={{ color: "var(--ink-mute)" }}> · {e.role}</span>}
                     {e.org  && <span style={{ color: "var(--ink-mute)" }}> · {e.org}</span>}
                   </div>
                   {(pillSkills.length > 0 || plainSkills.length > 0) && (
-                    <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 5, marginTop: "auto" }}>
-                      {pillSkills.map((skill) => {
-                        const match = matchSkill(skill)!;
-                        return (
-                          <CXPill key={skill} size="md"
-                            onClick={() => openModal(match.kind === "language"
-                              ? { kind: "skill", id: skill, filterType: "language", color: match.color }
-                              : { kind: "skill", id: skill, filterType: "topic" }
-                            )}>
-                            {skill}
-                          </CXPill>
-                        );
-                      })}
-                      {pillSkills.length > 0 && plainSkills.length > 0 && (
-                        <span style={{ color: "var(--ink-mute)", fontSize: 11, lineHeight: 1 }}>•</span>
-                      )}
-                      {plainSkills.map((s, i) => (
-                        <React.Fragment key={s}>
-                          {i > 0 && <span style={{ color: "var(--ink-mute)", fontSize: 11, lineHeight: 1 }}>•</span>}
-                          <span className="pw-mono" style={{ fontSize: 11, color: "var(--ink-soft)", letterSpacing: "0.04em" }}>{s}</span>
-                        </React.Fragment>
-                      ))}
-                    </div>
+                    <CollapsiblePills
+                      size="md"
+                      pills={pillSkills.map((s): PillItem => { const canonical = canonicalizeSkill(s); const match = matchSkill(s)!; return { key: s, label: canonical, onClick: () => openModal(match.kind === "language" ? { kind: "skill", id: canonical, filterType: "language", color: match.color } : { kind: "skill", id: canonical, filterType: "topic" }) }; })}
+                      plain={plainSkills}
+                    />
                   )}
                 </div>
+                <div style={{ clear: "both" }} />
               </CXCard>
             );
           })}

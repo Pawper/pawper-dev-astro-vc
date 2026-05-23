@@ -61,7 +61,7 @@ export default function DCTraining({ openModal }: Props) {
   const items = EXPERIENCES.filter((e) => e.featured);
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: 12, maxWidth: 975, marginInline: "auto", width: "100%" }}>
       {items.map((item) => (
         <Tap
           key={item.id}

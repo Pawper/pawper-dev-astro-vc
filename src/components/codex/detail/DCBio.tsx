@@ -21,7 +21,7 @@ export function DCBioFooter({ selectEntry }: DCBioFooterProps) {
 
 export default function DCBio({ onService }: { onService: (entryId: string) => void }) {
   return (
-    <div className="cx-bio-grid" style={{ display: "grid", gridTemplateColumns: "1fr 280px", gap: 28 }}>
+    <div className="cx-bio-grid" style={{ display: "grid", gridTemplateColumns: "1fr 280px", gap: 28, maxWidth: "calc(65ch + 28px + 280px)", marginInline: "auto", width: "100%" }}>
       <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
         <p style={{ fontSize: 18, lineHeight: 1.55, color: "var(--ink)", margin: 0, textWrap: "pretty" } as React.CSSProperties}>
           {PROFILE.intro}

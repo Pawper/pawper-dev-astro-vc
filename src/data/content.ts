@@ -147,13 +147,12 @@ export const EXPERIENCES: Experience[] = [
     description: "PERMA framework, VIA Strengths Inventory, Positive Interventions. Credential ID: PTEV8VSOB4IV.",
     featured: true,
     skills: ["Positive Psychology", "PERMA", "VIA Strengths", "Wellness Coaching"],
-    endorsementIds: ["nina-rossi", "priya-patel"],
     certificationImage: "https://res.cloudinary.com/dr1sonbsi/image/upload/c_crop,h_924,w_1194/v1779398667/pawper.dev/Certifications/CERTIFICATE_LANDING_PAGE_PTEV8VSOB4IV_ti3klv.jpg",
     certificationUrl: "https://www.coursera.org/account/accomplishments/verify/PTEV8VSOB4IV",
   },
   {
     id: "classic-vacations-architect-2022",
-    title: "Web Producer / Platform Architect",
+    title: "Web Producer",
     organization: "Classic Vacations",
     period: "2022–2026",
     category: "employment",
@@ -168,7 +167,7 @@ export const EXPERIENCES: Experience[] = [
     ],
     featured: true,
     skills: ["WordPress", "PHP", "JavaScript", "TypeScript", "REST APIs"],
-    endorsementIds: ["samantha-lee", "linda-park", "jessica-lee", "robert-evans"],
+    endorsementIds: ["lauren-brown"],
   },
   {
     id: "classic-vacations-qa-2019",
@@ -186,7 +185,6 @@ export const EXPERIENCES: Experience[] = [
     ],
     featured: true,
     skills: ["PowerShell", "SQL", "Excel/VBA"],
-    endorsementIds: ["david-kim"],
   },
   {
     id: "classic-vacations-admin-2013",
@@ -389,7 +387,21 @@ export const SKILL_ALIASES: Record<string, string[]> = {
   "CSS Grid":      ["grid"],
   "Accessibility": ["a11y"],
   "Type-safety":   ["types"],
+  "React":         ["react.js"],
+  "CSS":           ["cascading style sheets", "cascading style sheets (css)"],
+  "REST APIs":     ["apis", "api"],
+  "Writing":       ["copy editing", "copyediting", "copy-editing"],
+  "Design":        ["web design", "ux", "user experience", "user experience (ux)"],
+  "Testing":       ["quality assurance", "qa"],
 };
+
+export function canonicalizeSkill(name: string): string {
+  const lower = name.toLowerCase();
+  for (const [canonical, aliases] of Object.entries(SKILL_ALIASES)) {
+    if (aliases.some((a) => a.toLowerCase() === lower)) return canonical;
+  }
+  return name;
+}
 
 export const BACKDROPS: Record<string, string> = {
   alpine: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=2400&q=80",
