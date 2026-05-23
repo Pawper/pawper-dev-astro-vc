@@ -1,0 +1,67 @@
+---
+import { getCollection } from 'astro:content';
+import ogImagesRaw from '../../data/og-images.json';
+
+const ogImages = ogImagesRaw as Record<string, string>;
+
+export async function getStaticPaths() {
+  const logs = await getCollection('logs');
+  return logs.map((entry) => {
+    const slug = entry.id.replace(/\.md$/, '');
+    return {
+      params: { slug },
+      props: {
+        title: entry.data.title,
+        kicker: entry.data.kicker,
+        hook: entry.data.hook ?? '',
+        slug,
+      },
+    };
+  });
+}
+
+const { title, kicker, hook, slug } = Astro.props;
+const ogImage = ogImages[slug] ?? '';
+const siteUrl = Astro.site?.toString().replace(/\/$/, '') ?? 'https://pawper.dev';
+const pageUrl = `${siteUrl}/l/${slug}`;
+const description = hook || `${kicker} — ${title}`;
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{title} · Phillip Wessels / CODEX</title>
+  <meta name="description" content={description} />
+  <link rel="canonical" href={pageUrl} />
+
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content={pageUrl} />
+  <meta property="og:title" content={title} />
+  <meta property="og:description" content={description} />
+  <meta property="og:site_name" content="pawper.dev · CODEX" />
+  {ogImage && <meta property="og:image" content={ogImage} />}
+  {ogImage && <meta property="og:image:width" content="1200" />}
+  {ogImage && <meta property="og:image:height" content="630" />}
+  {ogImage && <meta property="og:image:alt" content={title} />}
+
+  <meta name="twitter:card" content={ogImage ? 'summary_large_image' : 'summary'} />
+  <meta name="twitter:title" content={title} />
+  <meta name="twitter:description" content={description} />
+  {ogImage && <meta name="twitter:image" content={ogImage} />}
+  {ogImage && <meta name="twitter:image:alt" content={title} />}
+
+  <script is:inline define:vars={{ slug }}>
+    window.location.replace('/?modal=log&id=' + slug);
+  </script>
+
+  <style>
+    body { font-family: monospace; background: #0e0e12; color: #f0f0f0; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
+    a { color: #4ecca3; }
+  </style>
+</head>
+<body>
+  <p>Redirecting… <a href={`/?modal=log&id=${slug}`}>Click here if not redirected.</a></p>
+</body>
+</html>
