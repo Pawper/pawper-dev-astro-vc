@@ -1,6 +1,8 @@
 ---
 import { getCollection } from 'astro:content';
+import ogImagesRaw from '../../data/og-images.json';
 
+const ogImages = ogImagesRaw as Record<string, string>;
 const slugify = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 
 export async function getStaticPaths() {
@@ -30,6 +32,7 @@ const { name, parts, kicker, hook, slug } = Astro.props;
 const siteUrl = Astro.site?.toString().replace(/\/$/, '') ?? 'https://pawper.dev';
 const pageUrl = `${siteUrl}/ls/${slug}`;
 const description = hook || `${parts}-part ${kicker.toLowerCase()} series — ${name}`;
+const ogImage = ogImages[`series/${slug}`] ?? '';
 ---
 
 <!DOCTYPE html>
@@ -46,10 +49,15 @@ const description = hook || `${parts}-part ${kicker.toLowerCase()} series — ${
   <meta property="og:title" content={name} />
   <meta property="og:description" content={description} />
   <meta property="og:site_name" content="pawper.dev · CODEX" />
+  {ogImage && <meta property="og:image" content={ogImage} />}
+  {ogImage && <meta property="og:image:width" content="1200" />}
+  {ogImage && <meta property="og:image:height" content="630" />}
+  {ogImage && <meta property="og:image:alt" content={name} />}
 
-  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:card" content={ogImage ? 'summary_large_image' : 'summary'} />
   <meta name="twitter:title" content={name} />
   <meta name="twitter:description" content={description} />
+  {ogImage && <meta name="twitter:image" content={ogImage} />}
 
   <script is:inline define:vars={{ slug }}>
     window.location.replace('/?modal=series&id=' + slug);

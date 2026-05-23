@@ -244,16 +244,16 @@ function ModalFooterButtons({ modal, proj, primaryHex, secondaryHex, isDark, onN
     const shareUrl = `https://pawper.dev/l/${modal.id}`;
     return (
       <div className="cx-btn-row" style={{ position: "absolute", bottom: 7, right: 24, display: "flex", gap: 8, zIndex: 20, alignItems: "flex-end" }}>
-        {log?.devto && <CXBtn num="01" label="Read on Dev.to" href={log.devto} primary bgHex={primaryHex} isDark={isDark} />}
         <SharePopover
           shareUrl={shareUrl}
           title={log?.title ?? ""}
-          num={log?.devto ? "02" : "01"}
+          num="01"
           primaryHex={primaryHex}
           secondaryHex={secondaryHex}
           isDark={isDark}
-          hasPrimary={!!log?.devto}
+          hasPrimary={false}
         />
+        {log?.devto && <CXBtn num="02" label="Read on Dev.to" href={log.devto} bgHex={secondaryHex} isDark={isDark} />}
       </div>
     );
   }
