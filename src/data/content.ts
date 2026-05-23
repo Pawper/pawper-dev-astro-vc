@@ -322,9 +322,10 @@ export function getPrimaryColor(p: Project): string {
 }
 
 export function getProjectsForCategory(catId: string): Project[] {
-  if (!catId || catId === "featured") return PROJECTS.filter((p) => p.categories?.includes("featured"));
-  if (catId === "latest") return [...PROJECTS].sort((a, b) => b.pushedAt.localeCompare(a.pushedAt));
-  return PROJECTS.filter((p) => p.categories?.includes(catId));
+  const byRecent = (a: Project, b: Project) => b.pushedAt.localeCompare(a.pushedAt);
+  if (!catId || catId === "featured") return PROJECTS.filter((p) => p.categories?.includes("featured")).sort(byRecent);
+  if (catId === "latest") return [...PROJECTS].sort(byRecent);
+  return PROJECTS.filter((p) => p.categories?.includes(catId)).sort(byRecent);
 }
 
 export const LOGS: Log[] = [];
