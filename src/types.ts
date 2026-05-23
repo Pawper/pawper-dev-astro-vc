@@ -39,7 +39,7 @@ export interface View {
   entry?: string;
 }
 
-export type ModalSibling = { kind: "project" | "log"; id: string };
+export type ModalSibling = { kind: "project" | "log" | "media"; id: string; label?: string };
 
 export interface ModalState {
   kind: "project" | "log" | "skill" | "series" | "search" | "experience" | "media";

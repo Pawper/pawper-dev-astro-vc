@@ -255,7 +255,7 @@ export default function CXModal({ modal, previousModal, onClose, onBack, onNavig
   function goSibling(sib: typeof siblings[number], dir: "left" | "right") {
     slideDir.current = dir;
     soundClick();
-    onSiblingNav({ kind: sib.kind, id: sib.id, siblings });
+    onSiblingNav({ kind: sib.kind, id: sib.id, label: sib.label, siblings });
   }
 
   useEffect(() => {
@@ -478,7 +478,7 @@ export default function CXModal({ modal, previousModal, onClose, onBack, onNavig
           {modal.kind === "log" && (
             <ContentModalLayout
               body={
-                <DCLog id={modal.id} html={logsHtml[modal.id] ?? ''} onOpenMedia={(src, alt) => onNavigate({ kind: "media", id: src, label: alt })} onOpenLog={(targetId) => {
+                <DCLog id={modal.id} html={logsHtml[modal.id] ?? ''} onOpenMedia={(src, alt, siblings) => onNavigate({ kind: "media", id: src, label: alt, siblings })} onOpenLog={(targetId) => {
                     const target = LOGS.find(a => a.id === targetId);
                     const sibs = target?.series
                       ? LOGS.filter(a => a.series?.name === target.series?.name)

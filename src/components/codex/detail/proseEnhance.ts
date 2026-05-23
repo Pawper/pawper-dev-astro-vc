@@ -13,7 +13,7 @@ export interface ProseOptions {
   onOpenLog?: (id: string) => void;
   onOpenSeries?: (slug: string) => void;
   onOpenService?: (service: string) => void;
-  onOpenMedia?: (src: string, alt: string) => void;
+  onOpenMedia?: (src: string, alt: string, siblings?: Array<{ kind: "media"; id: string; label?: string }>) => void;
 }
 
 // ── Series card — matches CXSeriesPanel front card ──────────────────────────
@@ -456,9 +456,13 @@ export function enhanceProse(el: HTMLElement, opts: ProseOptions = {}): () => vo
 
   // Images — clickable to open media viewer
   if (opts.onOpenMedia) {
-    el.querySelectorAll<HTMLImageElement>("img").forEach((img) => {
+    const imgs = Array.from(el.querySelectorAll<HTMLImageElement>("img"))
+      .filter(img => !img.classList.contains("cx-endorsement-photo"));
+    const mediaSiblings: Array<{ kind: "media"; id: string; label?: string }> | undefined =
+      imgs.length > 1 ? imgs.map(img => ({ kind: "media" as const, id: img.src, label: img.alt || undefined })) : undefined;
+    imgs.forEach((img) => {
       img.style.cursor = "zoom-in";
-      img.addEventListener("click", () => { opts.onOpenMedia!(img.src, img.alt); });
+      img.addEventListener("click", () => { opts.onOpenMedia!(img.src, img.alt, mediaSiblings); });
     });
   }
 
