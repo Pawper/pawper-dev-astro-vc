@@ -13,6 +13,8 @@ series:
 
 If you're a web developer on Windows, Windows Subsystem for Linux (WSL) is essential. This tutorial walks you through understanding what WSL is, why you should use it, and how to install and configure it for development.
 
+> **Note: This guide is for Windows only.** If you're on macOS, you already have a Unix-based terminal, so you can skip this tutorial and move on to the next one in the series.
+
 ## Do I really need WSL?
 
 Short answer: **Yes, if you're doing web development on Windows.**
@@ -43,6 +45,21 @@ WSL gives you a Linux shell and command-line tools, but it doesn't run a full gr
 
 ---
 
+## 💻 Install Windows Terminal (Recommended)
+
+Windows Terminal is Microsoft's modern terminal application. Instead of using the default Windows PowerShell or cmd.exe, Windows Terminal provides a cleaner, more customizable experience with multiple tabs, themes, and seamless WSL integration.
+
+**What's a Terminal?** As explained in [FAQ: Operating Systems, Terminals & Shells](https://pawper.dev/?v=entry&cat=logs&entry=latest&modal=log&id=intro-to-operating-systems-terminals-shells-faq-4agm), a terminal is the application that runs a shell (the command-line interpreter). Windows Terminal is the container app, while Bash/Zsh/PowerShell are the shells inside it. See that FAQ for deeper explanation.
+
+**Install from Microsoft Store:**
+1. Open the Microsoft Store (search "Microsoft Store" in the Windows Start menu)
+2. Search for "Windows Terminal"
+3. Click "Install"
+
+That's it! Once installed, Windows Terminal is ready to use. You'll use it to run the WSL installation command in the next section. After WSL is installed, Windows Terminal will automatically recognize Ubuntu as an available shell profile.
+
+---
+
 ## 💻 Install WSL
 
 These instructions are for **Windows 10 (Build 19041+) or Windows 11**.
@@ -57,9 +74,14 @@ If you need to update, go to Settings → System → About → Windows Update.
 
 ### Step 2: Enable WSL
 
-Open **PowerShell as Administrator** (right-click → "Run as Administrator") and run:
+Open **Windows Terminal as Administrator**:
+1. Right-click the Windows Terminal icon (in Start menu or taskbar)
+2. Select "Run as Administrator"
+3. You may see a prompt asking "Do you want to allow this app to make changes?" — click "Yes"
 
-```powershell
+Once Windows Terminal opens with admin privileges, you'll see a command prompt. Regardless of which shell it displays (PowerShell, cmd.exe, or another), the `wsl --install` command works in any of them. Simply paste or type:
+
+```
 wsl --install
 ```
 
@@ -76,7 +98,13 @@ WSL requires a system restart. Do this now.
 
 ### Step 4: Complete Ubuntu Setup
 
-After restarting, Ubuntu will launch automatically. You'll be prompted to create a username and password:
+After restarting, Ubuntu may launch automatically, or you may need to launch it manually:
+
+**If Ubuntu launches automatically:** You'll see a terminal window prompt you to create a username and password. Skip to the next section.
+
+**If Ubuntu doesn't launch automatically:** Open Windows Terminal, click the dropdown arrow in the toolbar, and select "Ubuntu" to launch the setup.
+
+Either way, you'll see a setup prompt:
 
 ```
 Installing, this may take a few minutes...
@@ -89,7 +117,7 @@ Retype new password: [confirm password]
 
 Choose a simple username (e.g., `dev` or your first name). **Remember this password** — you'll need it for administrative tasks in WSL.
 
-[log:guide-password-management-cybersecurity-beginners](log:guide-password-management-cybersecurity-beginners)
+https://pawper.dev/?v=entry&cat=logs&entry=latest&modal=log&id=guide-password-management-cybersecurity-beginners
 
 ### Step 5: Verify Installation
 
@@ -110,9 +138,18 @@ lsb_release -a
 You should see Ubuntu information.
 
 > **Sources / additional material:**
+>
 > https://docs.microsoft.com/en-us/windows/wsl/install
+>
 > https://docs.microsoft.com/en-us/windows/wsl/about
+>
 > https://docs.microsoft.com/en-us/windows/wsl/setup/environment
+
+### Step 6: Configure Windows Terminal for Ubuntu
+
+Now that WSL and Ubuntu are installed, you can use Windows Terminal to access your Linux environment. Open Windows Terminal and you'll see a dropdown arrow in the top toolbar — click it and select "Ubuntu" to launch your WSL bash shell.
+
+**Set Ubuntu as Default (Optional):** If you want Ubuntu to open automatically when you launch Windows Terminal, go to Settings (Ctrl+,), find "Startup" in the left sidebar, and set "Default profile" to "Ubuntu".
 
 ---
 
