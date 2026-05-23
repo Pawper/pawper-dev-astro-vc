@@ -98,6 +98,140 @@ function toAccessibleText(hex: string, isDark: boolean, minRatio = 4.5): string 
 }
 
 
+function ShareIcon() {
+  return (
+    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
+      <polyline points="16 6 12 2 8 6"/>
+      <line x1="12" y1="2" x2="12" y2="15"/>
+    </svg>
+  );
+}
+
+function SharePopover({ shareUrl, title, num, primaryHex, secondaryHex, isDark, hasPrimary }: {
+  shareUrl: string; title: string; num: string;
+  primaryHex: string; secondaryHex: string; isDark: boolean; hasPrimary: boolean;
+}) {
+  const [open, setOpen] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const [mobile, setMobile] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const check = () => setMobile(window.innerWidth < 640);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
+
+  useEffect(() => {
+    if (!open) return;
+    const handler = (e: MouseEvent) => {
+      if (!ref.current?.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [open]);
+
+  const copy = () => {
+    navigator.clipboard.writeText(shareUrl).catch(() => {});
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const liUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`;
+  const xUrl  = `https://twitter.com/intent/tweet?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(title)}`;
+  const rgb   = hexToRgb(primaryHex);
+
+  const popoverStyle: React.CSSProperties = mobile ? {
+    position: "fixed", bottom: 64, left: 12, right: 12,
+    padding: "16px",
+    background: isDark ? "rgba(18, 20, 28, 0.98)" : "rgba(238, 241, 248, 0.98)",
+    border: `1px solid rgba(${rgb}, 0.22)`,
+    borderRadius: 16,
+    boxShadow: "0 -4px 40px rgba(0,0,0,0.5)",
+    display: "flex", flexDirection: "column", gap: 12,
+    zIndex: 200,
+    backdropFilter: "blur(16px)",
+  } : {
+    position: "absolute", bottom: "calc(100% + 10px)", right: 0,
+    padding: "14px 16px",
+    background: isDark ? "rgba(18, 20, 28, 0.97)" : "rgba(238, 241, 248, 0.97)",
+    border: `1px solid rgba(${rgb}, 0.22)`,
+    borderRadius: 14,
+    boxShadow: "0 8px 40px rgba(0,0,0,0.45)",
+    display: "flex", flexDirection: "column", gap: 10,
+    minWidth: 284, zIndex: 30,
+    backdropFilter: "blur(12px)",
+  };
+
+  return (
+    <div ref={ref} style={{ position: "relative" }}>
+      {open && mobile && (
+        <div
+          onClick={() => setOpen(false)}
+          style={{ position: "fixed", inset: 0, zIndex: 199 }}
+        />
+      )}
+      {open && (
+        <div style={popoverStyle}>
+          <div style={{
+            display: "flex", alignItems: "center", gap: 8,
+            background: `rgba(${rgb}, 0.06)`,
+            border: `1px solid rgba(${rgb}, 0.14)`,
+            borderRadius: 8, padding: "8px 10px",
+          }}>
+            <span className="pw-mono" style={{
+              flex: 1, fontSize: 11, color: "var(--ink-mute)",
+              overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
+              direction: "rtl", textAlign: "left",
+            }}>
+              {shareUrl}
+            </span>
+            <Tap onClick={copy} style={{
+              fontSize: 10, letterSpacing: "0.08em", flexShrink: 0,
+              padding: "3px 8px", borderRadius: 5,
+              fontFamily: "var(--font-mono)",
+              color: copied ? primaryHex : "var(--ink-soft)",
+              background: copied ? `rgba(${rgb}, 0.15)` : `rgba(${rgb}, 0.08)`,
+              transition: "color 0.2s, background 0.2s",
+            }}>
+              {copied ? "✓ COPIED" : "COPY"}
+            </Tap>
+          </div>
+          <div style={{ display: "flex", gap: 8 }}>
+            {[{ label: "LinkedIn", href: liUrl }, { label: "X / Twitter", href: xUrl }].map(({ label, href }) => (
+              <a
+                key={label} href={href} target="_blank" rel="noopener noreferrer"
+                onClick={() => setOpen(false)}
+                style={{
+                  flex: 1, textAlign: "center", textDecoration: "none",
+                  fontSize: 11, letterSpacing: "0.1em", fontFamily: "var(--font-mono)",
+                  padding: mobile ? "10px" : "6px 10px", borderRadius: 8,
+                  color: "var(--ink-soft)",
+                  background: `rgba(${rgb}, 0.08)`,
+                  border: `1px solid rgba(${rgb}, 0.14)`,
+                }}
+              >
+                {label}
+              </a>
+            ))}
+          </div>
+        </div>
+      )}
+      <CXBtn
+        num={num}
+        label="Share"
+        primary={!hasPrimary}
+        bgHex={hasPrimary ? secondaryHex : primaryHex}
+        isDark={isDark}
+        icon={<ShareIcon />}
+        onClick={() => { soundClick(); setOpen(o => !o); }}
+      />
+    </div>
+  );
+}
+
 function ModalFooterButtons({ modal, proj, primaryHex, secondaryHex, isDark, onNavigateToService }: {
   modal: ModalState; proj?: ReturnType<typeof PROJECTS.find>;
   primaryHex: string; secondaryHex: string; isDark: boolean;
@@ -107,10 +241,19 @@ function ModalFooterButtons({ modal, proj, primaryHex, secondaryHex, isDark, onN
 
   if (modal.kind === "log") {
     const log = LOGS.find(l => l.id === modal.id);
-    if (!log?.devto) return null;
+    const shareUrl = `https://pawper.dev/l/${modal.id}`;
     return (
-      <div className="cx-btn-row" style={{ position: "absolute", bottom: 7, right: 24, display: "flex", gap: 8, zIndex: 20 }}>
-        <CXBtn num="01" label="Read on Dev.to" href={log.devto} primary bgHex={primaryHex} isDark={isDark} />
+      <div className="cx-btn-row" style={{ position: "absolute", bottom: 7, right: 24, display: "flex", gap: 8, zIndex: 20, alignItems: "flex-end" }}>
+        {log?.devto && <CXBtn num="01" label="Read on Dev.to" href={log.devto} primary bgHex={primaryHex} isDark={isDark} />}
+        <SharePopover
+          shareUrl={shareUrl}
+          title={log?.title ?? ""}
+          num={log?.devto ? "02" : "01"}
+          primaryHex={primaryHex}
+          secondaryHex={secondaryHex}
+          isDark={isDark}
+          hasPrimary={!!log?.devto}
+        />
       </div>
     );
   }
