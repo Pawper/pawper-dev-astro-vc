@@ -3,9 +3,9 @@ import { getCollection } from 'astro:content';
 import ogImagesRaw from '../../data/og-images.json';
 
 const ogImages = ogImagesRaw as Record<string, string>;
-const slugify = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 
 export async function getStaticPaths() {
+  const slugify = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
   const logs = await getCollection('logs');
 
   const seriesMap = new Map<string, { name: string; parts: number; kicker: string; hook?: string }>();
