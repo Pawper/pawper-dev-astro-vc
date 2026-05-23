@@ -84,7 +84,7 @@ export default function CXContactCombo({ onSent, onService }: CXContactComboProp
         <FormField name="message" label="Transmission"   placeholder="A few sentences is plenty…" multiline />
         {error && <span className="pw-mono" style={{ fontSize: 11, color: "var(--color-error, #e05c5c)", letterSpacing: "0.1em" }}>TRANSMISSION FAILED · TRY AGAIN</span>}
         <span className="pw-mono" style={{ fontSize: 11, color: "var(--ink-mute)", letterSpacing: "0.16em", marginTop: 4 }}>
-          ENCRYPTED · END-TO-END
+          SENT SECURELY · HTTPS
         </span>
       </form>
 
