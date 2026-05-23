@@ -283,8 +283,15 @@ function ModalFooterButtons({ modal, proj, primaryHex, secondaryHex, isDark, onN
     ) || LOGS.some(a => a.tags?.some(t => t.toLowerCase() === modal.id.toLowerCase()))
   );
 
+  const seriesHasDevto = modal.kind === "series" &&
+    LOGS.some(l => l.series && slugify(l.series.name) === modal.id && !!l.devto);
+  const seriesName = modal.kind === "series"
+    ? ([...new Set(LOGS.filter(a => a.series).map(a => a.series!.name))]
+        .find(n => slugify(n) === modal.id) ?? modal.id)
+    : "";
+
   return (
-    <div className="cx-btn-row" style={{ position: "absolute", bottom: 7, right: 24, display: "flex", gap: 8, zIndex: 20 }}>
+    <div className="cx-btn-row" style={{ position: "absolute", bottom: 7, right: 24, display: "flex", gap: 8, zIndex: 20, alignItems: "flex-end" }}>
       {modal.kind === "project" && proj && (
         <>
           {proj.webURL
@@ -299,8 +306,19 @@ function ModalFooterButtons({ modal, proj, primaryHex, secondaryHex, isDark, onN
       {skillHasContent && (
         <CXBtn num="02" label="Full GH activity" href={ghHref} bgHex={secondaryHex} isDark={isDark} />
       )}
+      {modal.kind === "series" && seriesHasDevto && (
+        <CXBtn num="02" label="Series on dev.to" href={`https://dev.to/pawper/series/${modal.id}`} bgHex={secondaryHex} isDark={isDark} />
+      )}
       {modal.kind === "series" && (
-        <CXBtn num="02" label="dev.to" href="https://dev.to/pawper" bgHex={secondaryHex} isDark={isDark} />
+        <SharePopover
+          shareUrl={`https://pawper.dev/ls/${modal.id}`}
+          title={seriesName}
+          num={seriesHasDevto ? "03" : "02"}
+          primaryHex={primaryHex}
+          secondaryHex={secondaryHex}
+          isDark={isDark}
+          hasPrimary={true}
+        />
       )}
     </div>
   );

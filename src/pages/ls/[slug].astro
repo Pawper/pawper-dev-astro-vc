@@ -1,0 +1,66 @@
+---
+import { getCollection } from 'astro:content';
+
+const slugify = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+
+export async function getStaticPaths() {
+  const logs = await getCollection('logs');
+
+  const seriesMap = new Map<string, { name: string; parts: number; kicker: string; hook?: string }>();
+  for (const log of logs) {
+    if (!log.data.series) continue;
+    const name = log.data.series.name;
+    const slug = slugify(name);
+    const existing = seriesMap.get(slug);
+    seriesMap.set(slug, {
+      name,
+      parts: Math.max(existing?.parts ?? 0, log.data.series.part ?? 1),
+      kicker: log.data.kicker,
+      hook: existing?.hook ?? log.data.hook,
+    });
+  }
+
+  return Array.from(seriesMap.entries()).map(([slug, { name, parts, kicker, hook }]) => ({
+    params: { slug },
+    props: { name, parts, kicker, hook: hook ?? '', slug },
+  }));
+}
+
+const { name, parts, kicker, hook, slug } = Astro.props;
+const siteUrl = Astro.site?.toString().replace(/\/$/, '') ?? 'https://pawper.dev';
+const pageUrl = `${siteUrl}/ls/${slug}`;
+const description = hook || `${parts}-part ${kicker.toLowerCase()} series — ${name}`;
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{name} · Phillip Wessels / CODEX</title>
+  <meta name="description" content={description} />
+  <link rel="canonical" href={pageUrl} />
+
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content={pageUrl} />
+  <meta property="og:title" content={name} />
+  <meta property="og:description" content={description} />
+  <meta property="og:site_name" content="pawper.dev · CODEX" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content={name} />
+  <meta name="twitter:description" content={description} />
+
+  <script is:inline define:vars={{ slug }}>
+    window.location.replace('/?modal=series&id=' + slug);
+  </script>
+
+  <style>
+    body { font-family: monospace; background: #0e0e12; color: #f0f0f0; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
+    a { color: #4ecca3; }
+  </style>
+</head>
+<body>
+  <p>Redirecting… <a href={`/?modal=series&id=${slug}`}>Click here if not redirected.</a></p>
+</body>
+</html>
