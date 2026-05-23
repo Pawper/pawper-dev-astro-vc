@@ -6,7 +6,7 @@ tags: ["Git", "PowerShell", "Bash", "Mentoring"]
 hook: "Hello! This is the first in a series of FAQ posts for beginner web developers. I hope this format is..."
 devto: "https://dev.to/pawper/intro-to-operating-systems-terminals-shells-faq-4agm"
 series:
-  name: "Foundations FAQ"
+  name: "Foundations of Digital Agency"
   part: 1
   total: 2
 ---

@@ -6,7 +6,7 @@ tags: ["Git", "JavaScript", "DX", "Mentoring"]
 hook: "Everything you need to know to get started with VS Code: useful context to the world's most popular..."
 devto: "https://dev.to/pawper/faq-editors-ides-vs-code-3fp0"
 series:
-  name: "Foundations FAQ"
+  name: "Foundations of Digital Agency"
   part: 2
   total: 2
 ---
