@@ -16,6 +16,9 @@ node_modules/
 src/content/logs-test/
 src/content/logs-drafts/
 
-# Build-generated data (regenerated from Airtable/GitHub on each build)
+# Build-generated data (regenerated from Airtable/GitHub/Cloudinary on each build)
 src/data/projects.json
 src/data/endorsements.json
+src/data/resume-assets.json
+public/resume.pdf
+public/resume-preview.png

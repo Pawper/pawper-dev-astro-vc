@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import type { View, ModalState } from "../../types";
 import { CX_INDEX, PROJECT_CATEGORIES, LOG_CATEGORIES, DEFAULT_PROJECT_CAT } from "../../data/content";
+import resumeAssets from "../../data/resume-assets.json";
 import CXBtn, { RssIcon } from "./CXBtn";
 import CXSectionFrame from "./CXSectionFrame";
 import CXLanding from "./CXLanding";
@@ -142,7 +143,7 @@ export default function CXMain({ view, selectEntry, selectCategory, setView, set
             : view.cat === "personnel" && view.entry === "resume"
             ? (
               <div className="cx-btn-row" style={{ display: "flex", gap: 8 }}>
-                <CXBtn num="01" label="Download PDF" href="/resume.pdf" download primary icon={<span className="cx-btn-icon">↓</span>} />
+                <CXBtn num="01" label="Download PDF" href={resumeAssets.pdfUrl} download primary icon={<span className="cx-btn-icon">↓</span>} />
                 <CXBtn num="02" label="Open in Browser" href="/resume" />
               </div>
             )

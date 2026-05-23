@@ -1,4 +1,5 @@
 import { soundHover, soundClick } from "../../../context/SoundContext";
+import resumeAssets from "../../../data/resume-assets.json";
 
 export default function DCResume() {
   return (
@@ -35,7 +36,7 @@ export default function DCResume() {
         maskImage: "linear-gradient(to bottom, black 50%, transparent 85%)",
       }}>
         <img
-          src="/resume-preview.png"
+          src={resumeAssets.previewUrl}
           alt="Resume preview"
           style={{ width: "100%", display: "block" }}
           onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
