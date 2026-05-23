@@ -290,7 +290,7 @@ export default function CXModal({ modal, previousModal, onClose, onBack, onNavig
                        : modal.kind === "skill"      ? (modal.filterType === "language" && modal.color ? modal.color : "#c8d4e4")
                        : modal.kind === "search"     ? "#c8d4e4"
                        : modal.kind === "experience" ? "#e84455"
-                       : modal.kind === "media"      ? "#2b8bff"
+                       : modal.kind === "media"      ? LOG_CAT.accent
                        : LOG_CAT.accent;
   const secondaryColor = modal.kind === "project"
     ? (primaryColor !== _topLangColor ? _topLangColor : (_langs[1]?.color ?? primaryColor))
