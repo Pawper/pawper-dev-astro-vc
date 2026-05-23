@@ -1,5 +1,6 @@
 ---
 title: "Installing Terminal & WSL (Windows Subsystem for Linux)"
+devto: "https://dev.to/pawper/installing-terminal-wsl-windows-subsystem-for-linux-1e0k"
 date: "2026.05.23"
 kicker: "Tutorial"
 tags: ["WSL", "Bash"]
