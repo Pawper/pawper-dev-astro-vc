@@ -49,7 +49,7 @@ function extractHeadings(html: string): Array<{ text: string; anchorId: string }
   const clean = (s: string) => s.replace(/<[^>]+>/g, "").replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").trim();
 
   // New GitHub API format: markdown-heading wrapper + user-content- anchor id
-  const newRe = /class="markdown-heading"[^>]*><h([23])[^>]*>([\s\S]*?)<\/h\1>[\s\S]*?id="(user-content-[^"]*)"/g;
+  const newRe = /class="markdown-heading"[^>]*><h(2)[^>]*>([\s\S]*?)<\/h\1>[\s\S]*?id="(user-content-[^"]*)"/g;
   let m: RegExpExecArray | null;
   while ((m = newRe.exec(html)) !== null) {
     const text = clean(m[2]);
@@ -58,7 +58,7 @@ function extractHeadings(html: string): Array<{ text: string; anchorId: string }
   if (headings.length) return headings;
 
   // Old GitHub API format: plain <h2 dir="auto"> with no anchor ids
-  const oldRe = /<h([23])[^>]*>([\s\S]*?)<\/h\1>/g;
+  const oldRe = /<h(2)[^>]*>([\s\S]*?)<\/h\1>/g;
   while ((m = oldRe.exec(html)) !== null) {
     const text = clean(m[2]);
     if (text) headings.push({ text, anchorId: text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") });

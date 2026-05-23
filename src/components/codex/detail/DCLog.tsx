@@ -20,7 +20,7 @@ interface DCLogProps {
 
 export function extractHeadings(html: string): Array<{ text: string; anchorId: string }> {
   const headings: Array<{ text: string; anchorId: string }> = [];
-  const re = /<h([23])\s[^>]*id="([^"]+)"[^>]*>([\s\S]*?)<\/h\1>/g;
+  const re = /<h(2)\s[^>]*id="([^"]+)"[^>]*>([\s\S]*?)<\/h\1>/g;
   let m: RegExpExecArray | null;
   while ((m = re.exec(html)) !== null) {
     const text = m[3].replace(/<[^>]+>/g, "").trim();
