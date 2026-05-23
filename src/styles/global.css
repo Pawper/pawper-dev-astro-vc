@@ -809,7 +809,6 @@ html, body {
 }
 
 .cx-modal-sidebar { padding-right: 0; }
-.cx-sidebar--overflow .cx-sidebar-toc { position: sticky; top: 14px; }
 .cx-mobile-toc { display: none; }
 .cx-mobile-series { display: none; }
 

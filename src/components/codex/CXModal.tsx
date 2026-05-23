@@ -165,7 +165,7 @@ function ModalFooterButtons({ modal, proj, primaryHex, secondaryHex, isDark, onN
 
 function ContentModalLayout({ body, sidebar }: { body: React.ReactNode; sidebar: React.ReactNode }) {
   const sidebarRef = useRef<HTMLDivElement>(null);
-  const [overflows, setOverflows] = useState(false);
+  const [stickyTop, setStickyTop] = useState(0);
 
   useLayoutEffect(() => {
     const el = sidebarRef.current;
@@ -176,7 +176,9 @@ function ContentModalLayout({ body, sidebar }: { body: React.ReactNode; sidebar:
         scroller = scroller.parentElement;
       }
       const containerH = scroller ? scroller.clientHeight : window.innerHeight;
-      setOverflows(el.scrollHeight > containerH);
+      // Negative top lets the sidebar scroll up by the overflow amount before sticking,
+      // ensuring the TOC at the bottom lands at the viewport's bottom edge when stuck.
+      setStickyTop(-Math.max(0, el.scrollHeight - containerH + 14));
     };
     check();
     const ro = new ResizeObserver(check);
@@ -192,8 +194,8 @@ function ContentModalLayout({ body, sidebar }: { body: React.ReactNode; sidebar:
       </div>
       <div
         ref={sidebarRef}
-        className={`cx-modal-sidebar${overflows ? " cx-sidebar--overflow" : ""}`}
-        style={{ width: 230, flexShrink: 0, padding: "14px 0 58px", display: "flex", alignSelf: "flex-start", position: overflows ? "static" : "sticky", top: overflows ? undefined : 0 }}
+        className="cx-modal-sidebar"
+        style={{ width: 230, flexShrink: 0, padding: "14px 0 58px", display: "flex", alignSelf: "flex-start", position: "sticky", top: stickyTop }}
       >
         {sidebar}
       </div>
