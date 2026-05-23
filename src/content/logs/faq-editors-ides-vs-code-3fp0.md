@@ -100,7 +100,7 @@ Here are some settings that I recommend:
 }
 ```
 You can create settings specific to a certain project as well. Just create a `.vscode` directory at the top level, and inside it create a `settings.json` file. Any specific settings here will override those settings within VS Code's main settings.json.
-![Image description](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/rjor2xf2ui82ffch7m98.png)
+![JavaScript React Language Mode](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/rjor2xf2ui82ffch7m98.png)
 Here you can see that since this is a React project, I am setting all JavaScript files (`.js`) to be associated with the JavaScript React language mode (`"javascriptreact"`). The icons update as well to the React icon.
  
 ---
