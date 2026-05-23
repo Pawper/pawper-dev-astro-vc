@@ -143,7 +143,7 @@ export default function CXMain({ view, selectEntry, selectCategory, setView, set
             : view.cat === "personnel" && view.entry === "resume"
             ? (
               <div className="cx-btn-row" style={{ display: "flex", gap: 8 }}>
-                <CXBtn num="01" label="Download PDF" href={resumeAssets.pdfUrl} download primary icon={<span className="cx-btn-icon">↓</span>} />
+                <CXBtn num="01" label="Download PDF" href={resumeAssets.pdfUrl.replace("/raw/upload/", "/raw/upload/fl_attachment/")} primary icon={<span className="cx-btn-icon">↓</span>} />
                 <CXBtn num="02" label="Open in Browser" href="/resume" />
               </div>
             )
