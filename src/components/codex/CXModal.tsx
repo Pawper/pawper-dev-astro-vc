@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import CXScrollable from "../shared/CXScrollable";
 import type { ModalState, Theme } from "../../types";
 import { LOG_CAT } from "../../data/content";
@@ -164,12 +164,37 @@ function ModalFooterButtons({ modal, proj, primaryHex, secondaryHex, isDark, onN
 }
 
 function ContentModalLayout({ body, sidebar }: { body: React.ReactNode; sidebar: React.ReactNode }) {
+  const sidebarRef = useRef<HTMLDivElement>(null);
+  const [overflows, setOverflows] = useState(false);
+
+  useLayoutEffect(() => {
+    const el = sidebarRef.current;
+    if (!el) return;
+    const check = () => {
+      let scroller: Element | null = el.parentElement;
+      while (scroller && !scroller.hasAttribute("data-overlayscrollbars-viewport")) {
+        scroller = scroller.parentElement;
+      }
+      const containerH = scroller ? scroller.clientHeight : window.innerHeight;
+      setOverflows(el.scrollHeight > containerH);
+    };
+    check();
+    const ro = new ResizeObserver(check);
+    ro.observe(el);
+    window.addEventListener("resize", check);
+    return () => { ro.disconnect(); window.removeEventListener("resize", check); };
+  }, []);
+
   return (
     <div className="cx-modal-body" style={{ display: "flex", paddingLeft: 17, paddingRight: 30, gap: 12 }}>
       <div className="cx-modal-content" style={{ flex: 1, minWidth: 0, padding: "14px 0 100px" }}>
         {body}
       </div>
-      <div className="cx-modal-sidebar" style={{ width: 230, flexShrink: 0, padding: "14px 0 58px", display: "flex", alignSelf: "flex-start", position: "sticky", top: 0 }}>
+      <div
+        ref={sidebarRef}
+        className={`cx-modal-sidebar${overflows ? " cx-sidebar--overflow" : ""}`}
+        style={{ width: 230, flexShrink: 0, padding: "14px 0 58px", display: "flex", alignSelf: "flex-start", position: overflows ? "static" : "sticky", top: overflows ? undefined : 0 }}
+      >
         {sidebar}
       </div>
     </div>
