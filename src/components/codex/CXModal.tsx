@@ -1,4 +1,4 @@
-import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import CXScrollable from "../shared/CXScrollable";
 import type { ModalState, Theme } from "../../types";
 import { LOG_CAT } from "../../data/content";
@@ -333,47 +333,62 @@ function ContentModalLayout({ body, sidebar }: { body: React.ReactNode; sidebar:
   const baseTopRef = useRef(0);
   const currentTopRef = useRef(0);
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     const el = sidebarRef.current;
     if (!el) return;
+
     const applyTop = (v: number) => { el.style.top = `${v}px`; };
-    const check = () => {
-      let scroller: Element | null = el.parentElement;
-      while (scroller && !scroller.hasAttribute("data-overlayscrollbars-viewport")) {
-        scroller = scroller.parentElement;
+    let scrollerEl: Element | null = null;
+    let scrollCleanup: (() => void) | null = null;
+
+    function findScroller(): Element | null {
+      let node: Element | null = el.parentElement;
+      while (node && !node.hasAttribute("data-overlayscrollbars-viewport")) {
+        node = node.parentElement;
       }
-      const containerH = scroller ? scroller.clientHeight : window.innerHeight;
+      return node;
+    }
+
+    function updateBase() {
+      const containerH = scrollerEl ? scrollerEl.clientHeight : window.innerHeight;
       const newBase = -Math.max(0, el.scrollHeight - containerH + 14);
       baseTopRef.current = newBase;
-      currentTopRef.current = newBase;
-      applyTop(newBase);
-    };
-    check();
-    const ro = new ResizeObserver(check);
-    ro.observe(el);
-    window.addEventListener("resize", check);
-
-    let scroller: Element | null = el.parentElement;
-    while (scroller && !scroller.hasAttribute("data-overlayscrollbars-viewport")) {
-      scroller = scroller.parentElement;
-    }
-    if (!scroller) return () => { ro.disconnect(); window.removeEventListener("resize", check); };
-    const scrollerEl = scroller;
-    let last = scrollerEl.scrollTop;
-    const onScroll = () => {
-      const cur = scrollerEl.scrollTop;
-      const delta = cur - last;
-      currentTopRef.current = Math.max(baseTopRef.current, Math.min(0, currentTopRef.current - delta));
+      currentTopRef.current = Math.max(newBase, Math.min(0, currentTopRef.current));
       applyTop(currentTopRef.current);
-      last = cur;
-    };
-    scrollerEl.addEventListener("scroll", onScroll, { passive: true });
+    }
 
-    return () => {
-      ro.disconnect();
-      window.removeEventListener("resize", check);
-      scrollerEl.removeEventListener("scroll", onScroll);
-    };
+    function bindScroller(scroller: Element) {
+      scrollerEl = scroller;
+      updateBase();
+      let last = scroller.scrollTop;
+      const onScroll = () => {
+        const cur = scroller.scrollTop;
+        const delta = cur - last;
+        currentTopRef.current = Math.max(baseTopRef.current, Math.min(0, currentTopRef.current - delta));
+        applyTop(currentTopRef.current);
+        last = cur;
+      };
+      scroller.addEventListener("scroll", onScroll, { passive: true });
+      scrollCleanup = () => scroller.removeEventListener("scroll", onScroll);
+    }
+
+    const ro = new ResizeObserver(updateBase);
+    ro.observe(el);
+    window.addEventListener("resize", updateBase);
+
+    const found = findScroller();
+    if (found) {
+      bindScroller(found);
+      return () => { ro.disconnect(); window.removeEventListener("resize", updateBase); scrollCleanup?.(); };
+    }
+
+    // OverlayScrollbars may not have set the attribute yet — wait for it
+    const mo = new MutationObserver(() => {
+      const scroller = findScroller();
+      if (scroller) { mo.disconnect(); bindScroller(scroller); }
+    });
+    mo.observe(document.body, { subtree: true, attributes: true, attributeFilter: ["data-overlayscrollbars-viewport"] });
+    return () => { mo.disconnect(); ro.disconnect(); window.removeEventListener("resize", updateBase); scrollCleanup?.(); };
   }, []);
 
   return (
