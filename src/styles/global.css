@@ -632,6 +632,7 @@ html, body {
   color: var(--ink-soft);
 }
 .pw-article-body p { margin: 0; }
+.pw-article-body blockquote { margin: 0; padding: 4px 0 4px 16px; border-left: 3px solid var(--section-accent); color: var(--ink-soft); font-style: italic; }
 .pw-article-body a { overflow-wrap: break-word; word-break: break-word; }
 .pw-article-body hr { width: 100%; border: none; border-top: 1px solid rgba(255,255,255,0.1); margin: 4px 0; }
 .pw-article-body img { max-width: 100%; max-height: 60vh; width: auto; height: auto; display: block; margin: 0 auto; border-radius: 8px; }
