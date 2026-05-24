@@ -144,10 +144,11 @@ async function main() {
   const articleId = match.id;
   console.log(`✅  Found article ID: ${articleId}`);
 
-  // Build payload
+  // Build payload — strip trailing backslashes (CommonMark hard-break syntax) since dev.to renders newlines natively
+  const devtoBody = body.replace(/\\\n/g, "<br>\n");
   const localSlug = path.basename(filePath, ".md");
   const canonicalUrl = `https://pawper.dev/l/${localSlug}`;
-  const article = { title, body_markdown: body, tags, canonical_url: canonicalUrl };
+  const article = { title, body_markdown: devtoBody, tags, canonical_url: canonicalUrl };
   if (series) article.series = series;
   const payload = JSON.stringify({ article });
 
