@@ -633,7 +633,7 @@ html, body {
 }
 .pw-article-body p { margin: 0; }
 .pw-article-body a { overflow-wrap: break-word; word-break: break-word; }
-.pw-article-body img { max-width: 100%; height: auto; }
+.pw-article-body img { max-width: 100%; max-height: 60vh; width: auto; height: auto; display: block; margin: 0 auto; border-radius: 8px; }
 .pw-article-body a {
   color: var(--acc-blue-deep);
   text-decoration: underline;
