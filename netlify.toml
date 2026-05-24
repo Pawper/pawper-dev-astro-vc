@@ -5,3 +5,13 @@
 [build.environment]
   NODE_VERSION = "22"
   PUPPETEER_CACHE_DIR = "/opt/build/cache/puppeteer"
+
+[[redirects]]
+  from = "/l/faq-editors-ides-vs-code-3fp0"
+  to   = "/l/editors-ides-installing-vs-code"
+  status = 301
+
+[[redirects]]
+  from = "/l/intro-to-operating-systems-terminals-shells-faq-4agm"
+  to   = "/l/operating-systems-terminals-shells"
+  status = 301

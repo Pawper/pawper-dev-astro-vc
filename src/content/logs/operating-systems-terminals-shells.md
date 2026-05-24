@@ -1,5 +1,5 @@
 ---
-title: "FAQ: Operating Systems, Terminals & Shells"
+title: "Operating Systems, Terminals & Shells"
 date: "2022.02.02"
 kicker: "Tutorial"
 tags: ["Git", "PowerShell", "Bash", "Mentoring"]

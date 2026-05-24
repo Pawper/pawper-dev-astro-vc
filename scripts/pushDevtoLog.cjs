@@ -110,6 +110,7 @@ async function main() {
 
   console.log(`📄  ${title}`);
   console.log(`🔗  ${devto}`);
+  console.log(`🌐  Canonical: https://pawper.dev/l/${path.basename(filePath, ".md")}`);
   console.log(`🏷️   Tags: ${tags.join(", ") || "(none)"}`);
   if (series) console.log(`📚  Series: ${series}`);
   console.log("");
@@ -144,7 +145,9 @@ async function main() {
   console.log(`✅  Found article ID: ${articleId}`);
 
   // Build payload
-  const article = { title, body_markdown: body, tags };
+  const localSlug = path.basename(filePath, ".md");
+  const canonicalUrl = `https://pawper.dev/l/${localSlug}`;
+  const article = { title, body_markdown: body, tags, canonical_url: canonicalUrl };
   if (series) article.series = series;
   const payload = JSON.stringify({ article });
 

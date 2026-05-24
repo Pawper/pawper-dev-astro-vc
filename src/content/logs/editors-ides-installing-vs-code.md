@@ -1,5 +1,5 @@
 ---
-title: "FAQ: Editors, IDEs & VS Code"
+title: "Editors, IDEs & Installing VS Code"
 date: "2022.02.04"
 kicker: "Tutorial"
 tags: ["Git", "JavaScript", "DX", "Mentoring"]
