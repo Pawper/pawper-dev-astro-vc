@@ -330,26 +330,50 @@ function ModalFooterButtons({ modal, proj, primaryHex, secondaryHex, isDark, onN
 
 function ContentModalLayout({ body, sidebar }: { body: React.ReactNode; sidebar: React.ReactNode }) {
   const sidebarRef = useRef<HTMLDivElement>(null);
-  const [stickyTop, setStickyTop] = useState(0);
+  const baseTopRef = useRef(0);
+  const currentTopRef = useRef(0);
 
   useLayoutEffect(() => {
     const el = sidebarRef.current;
     if (!el) return;
+    const applyTop = (v: number) => { el.style.top = `${v}px`; };
     const check = () => {
       let scroller: Element | null = el.parentElement;
       while (scroller && !scroller.hasAttribute("data-overlayscrollbars-viewport")) {
         scroller = scroller.parentElement;
       }
       const containerH = scroller ? scroller.clientHeight : window.innerHeight;
-      // Negative top lets the sidebar scroll up by the overflow amount before sticking,
-      // ensuring the TOC at the bottom lands at the viewport's bottom edge when stuck.
-      setStickyTop(-Math.max(0, el.scrollHeight - containerH + 14));
+      const newBase = -Math.max(0, el.scrollHeight - containerH + 14);
+      baseTopRef.current = newBase;
+      currentTopRef.current = newBase;
+      applyTop(newBase);
     };
     check();
     const ro = new ResizeObserver(check);
     ro.observe(el);
     window.addEventListener("resize", check);
-    return () => { ro.disconnect(); window.removeEventListener("resize", check); };
+
+    let scroller: Element | null = el.parentElement;
+    while (scroller && !scroller.hasAttribute("data-overlayscrollbars-viewport")) {
+      scroller = scroller.parentElement;
+    }
+    if (!scroller) return () => { ro.disconnect(); window.removeEventListener("resize", check); };
+    const scrollerEl = scroller;
+    let last = scrollerEl.scrollTop;
+    const onScroll = () => {
+      const cur = scrollerEl.scrollTop;
+      const delta = cur - last;
+      currentTopRef.current = Math.max(baseTopRef.current, Math.min(0, currentTopRef.current - delta));
+      applyTop(currentTopRef.current);
+      last = cur;
+    };
+    scrollerEl.addEventListener("scroll", onScroll, { passive: true });
+
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("resize", check);
+      scrollerEl.removeEventListener("scroll", onScroll);
+    };
   }, []);
 
   return (
@@ -360,7 +384,7 @@ function ContentModalLayout({ body, sidebar }: { body: React.ReactNode; sidebar:
       <div
         ref={sidebarRef}
         className="cx-modal-sidebar"
-        style={{ width: 230, flexShrink: 0, padding: "14px 0 58px", display: "flex", alignSelf: "flex-start", position: "sticky", top: stickyTop }}
+        style={{ width: 230, flexShrink: 0, padding: "14px 0 58px", display: "flex", alignSelf: "flex-start", position: "sticky", top: 0 }}
       >
         {sidebar}
       </div>

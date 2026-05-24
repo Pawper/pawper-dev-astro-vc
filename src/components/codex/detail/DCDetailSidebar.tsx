@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from "react";
 import Tap from "../../shared/Tap";
 import CXPill from "../CXPill";
 import { SKILLS } from "../../../data/content";
@@ -53,8 +54,31 @@ interface SidebarTOCProps {
 export function SidebarTOC({ headings, label, accentColor = "var(--section-deep)" }: SidebarTOCProps) {
   if (!headings.length) return null;
 
+  const [activeIdx, setActiveIdx] = useState(0);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    let scroller: Element | null = containerRef.current?.parentElement ?? null;
+    while (scroller && !scroller.hasAttribute("data-overlayscrollbars-viewport")) {
+      scroller = scroller.parentElement;
+    }
+    if (!scroller) return;
+    const scrollerEl = scroller;
+    const onScroll = () => {
+      const scrollerTop = scrollerEl.getBoundingClientRect().top;
+      let next = 0;
+      for (let i = 0; i < headings.length; i++) {
+        const el = document.getElementById(headings[i].anchorId);
+        if (el && el.getBoundingClientRect().top - scrollerTop <= 80) next = i;
+      }
+      setActiveIdx(next);
+    };
+    scrollerEl.addEventListener("scroll", onScroll, { passive: true });
+    return () => scrollerEl.removeEventListener("scroll", onScroll);
+  }, [headings]);
+
   return (
-    <div className="pw-glass-dim cx-sidebar-toc" style={{ padding: 16, borderRadius: 14, display: "flex", flexDirection: "column", gap: 4 }}>
+    <div ref={containerRef} className="pw-glass-dim cx-sidebar-toc" style={{ padding: 16, borderRadius: 14, display: "flex", flexDirection: "column", gap: 4 }}>
       <div className="pw-eyebrow" style={{ color: accentColor, marginBottom: 6 }}>{label}</div>
       {headings.map(({ text, anchorId }, i) => (
         <Tap
@@ -72,9 +96,9 @@ export function SidebarTOC({ headings, label, accentColor = "var(--section-deep)
             }
             el?.scrollIntoView({ behavior: "smooth", block: "start" });
           }}
-          style={{ fontSize: 13, color: "var(--ink-soft)", padding: "5px 8px", display: "flex", gap: 8, alignItems: "baseline" }}
+          style={{ fontSize: 13, color: i === activeIdx ? accentColor : "var(--ink-soft)", padding: "5px 8px", display: "flex", gap: 8, alignItems: "baseline", transition: "color 0.15s" }}
         >
-          <span className="pw-mono" style={{ color: "var(--ink-mute)", fontSize: 11, flexShrink: 0 }}>{String(i + 1).padStart(2, "0")}</span>
+          <span className="pw-mono" style={{ color: i === activeIdx ? accentColor : "var(--ink-mute)", fontSize: 11, flexShrink: 0, transition: "color 0.15s" }}>{String(i + 1).padStart(2, "0")}</span>
           <span>{text}</span>
         </Tap>
       ))}
