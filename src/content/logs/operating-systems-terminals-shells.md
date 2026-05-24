@@ -3,7 +3,7 @@ title: "Operating Systems, Terminals & Shells"
 date: "2022.02.02"
 kicker: "Tutorial"
 tags: ["Git", "PowerShell", "Bash", "Mentoring"]
-hook: "Hello! This is the first in a series of FAQ posts for beginner web developers. I hope this format is..."
+hook: "Before you build anything, understand what's underneath: operating systems, the command line, and why Windows/Mac/Linux are different (and the same). This foundation matters."
 devto: "https://dev.to/pawper/intro-to-operating-systems-terminals-shells-faq-4agm"
 series:
   name: "Foundations of Digital Agency"
@@ -11,10 +11,16 @@ series:
   total: 2
 ---
 
-Hello! This is the first in a series of FAQ posts for beginner web developers. I hope this format is helpful!
+Welcome to **Foundations of Digital Agency**—a series built for anyone who wants to seize the tools and technology reshaping opportunity. You don't need permission. You don't need a computer science degree. You just need a cogntivie foundation and some scaffolding assembled from simple ideas. Once you have that sense of structure in mind, you can frame technology within it, move through it and build on top of it. Sound complicated? Language is magic. Once you start reading and applying it, the pieces -- mental models -- fall into place.
+
+This tutorial starts that process. You'll learn why operating systems matter, what terminals and shells are, and why a Windows developer and a Mac developer can follow the same instructions without confusion. These concepts aren't optional—they're the vocabulary you need to navigate, troubleshoot, and build confidently.
+
+So, get excited: this knowledge removes barriers. Once you understand these fundamentals, everything that comes next makes sense. You're not intimidated by strange commands or mysterious jargon. You recognize the patterns. You truly own the technology. That's agency.
+
+Let's get started.
 
 ## What is UNIX? 
-  UNIX is the ancestor of many modern operating systems (OSs). In 1969 at Bell Laboraties, Ken Thompson starting developing UNIX OS in PDP-7 computer assembly language. Dennis Ritchie joined Thompson and invented the C programming language. Then they rewrote UNIX in C, allowing different computers to run the code. UNIX also included user management and hierarchical file systems. Bell Labs released the first version of UNIX, Version 6 (V6), in 1976. Its design philosophy emphasizes small modular programs that can be used in combination for complex tasks:
+  UNIX is the ancestor of many modern operating systems (OSs), like macOS and Linux. In 1969 at Bell Laboraties, Ken Thompson starting developing UNIX OS in PDP-7 computer assembly language. Dennis Ritchie joined Thompson and invented the C programming language. Then they rewrote UNIX in C, allowing different computers to run the code. UNIX also included user management and hierarchical file systems. Bell Labs released the first version of UNIX, Version 6 (V6), in 1976. Its design philosophy emphasizes small modular programs that can be used in combination for complex tasks:
   * Write programs that do one thing and do it well.
   * Write programs to work together.
   * Write programs to handle text streams, because that is a universal interface.
@@ -41,7 +47,10 @@ You can, but WSL requires fewer resources (CPU, memory, and storage) than a full
 A terminal is a program that runs a shell. There are many terminal applications, one being the Windows Terminal, another the integrated terminal in VS Code.
 
 ## What is a shell?
-A shell is an interpreter for command line language. Common shells include Bash and Zsh for UNIX-based operating systems, and PowerShell for Windows. Note: You cannot run UNIX-based commands through PowerShell, but there are many aliases matching UNIX-based commands which map to PowerShell cmdlets.
+A shell is an interpreter for command line language. Common shells include Bash and Zsh for UNIX-based operating systems, and PowerShell for Windows. Note: You cannot run UNIX-based commands through PowerShell, but there are many aliases matching UNIX-based commands which map to PowerShell cmdlets (that just means you kind of can... kind of).
+
+## What is a CLI?
+A CLI is a **Command Line Interface**—any interface where you interact with a computer using text commands instead of clicking buttons. The terminal is the application; the shell is the interpreter; but CLI is the broader concept: communicating with software by typing commands. When you use Bash, PowerShell, or Zsh, you're using a CLI. When you run `npm install` or `git commit`, you're using a CLI. CLIs are powerful because they let you express complex instructions precisely and automate tasks through scripts. Many development tools—especially agentic AI tools like Claude Code—live entirely in the CLI.
 
 ## Are Bash and PowerShell just shells?
 The same names are used to refer to the shells' scripting languages as well.
@@ -55,7 +64,32 @@ Zsh (Z shell) is a Unix shell that is largely compatible with Bash but adds many
 ## What is PowerShell 7?
 PowerShell 7 is the current cross-platform (Windows, Linux, and macOS), open-source version of PowerShell. It is the successor to both Windows PowerShell (which remains at version 5.1 and is built into Windows) and PowerShell Core (versions 6.x, a transitional release). PowerShell 7 is what you should install if you want to use PowerShell on macOS or Linux, or want the latest features on Windows.
 
-> Sources / additional material:
-> https://www.itprotoday.com/windows-78/nt-vsunix-one-substantially-better 
-> https://docs.microsoft.com/en-us/windows/wsl/about 
+---
+
+## You Now Have the Foundation
+
+You understand operating systems. You know terminals and shells. You recognize that macOS and Linux speak the same language—UNIX—while Windows is fundamentally different, but that tools like WSL let you bridge that gap. You're not confused by terminology anymore.
+
+This knowledge is power. In the next tutorials in this series, you'll further grow it, and start using the tools of the trade:
+
+- **Editors, IDEs & Installing VS Code** — Understanding your tools and setting up your editor
+- **Installing Terminal & WSL** — Setting up a development environment on Windows\
+  (Windows only; macOS users skip this)
+- **Using VS Code with WSL** — Configuring your editor for development\
+  (Windows only; macOS users skip this)
+- **Using the Terminal in VS Code** — Mastering the command line where your work happens\
+  (all platforms going forward)
+- And more, building toward full capability
+
+**Note:** If you're on macOS, you already have a Unix-based terminal (bash/zsh) built in. You'll skip the Windows-specific setup articles and move straight to using the editor and terminal.
+
+**Why This Matters for AI-Assisted Development:** Comfort with the terminal and command line is a **prerequisite** for using agentic AI tools like [Claude Code](https://www.anthropic.com/product/claude-code) and [OpenClaw](https://github.com/openclaw/openclaw). These tools live in your terminal see your codebase, edit files, run commands, and handle version control—but they're not perfect, and you'll need to understand the fundamentals of CLIs.
+
+With each step you'll grow the understanding to navigate confidently, make informed decisions, and see the world opportunistically -- through the eyes of someone who possesses the technology.
+
+> Sources / additional material: \
+> https://www.itprotoday.com/windows-78/nt-vsunix-one-substantially-better \
+> https://docs.microsoft.com/en-us/windows/wsl/about \
 > https://www.udemy.com/course/the-linux-command-line-bootcamp/
+
+_This article was revised & expanded with AI for the purpose of providing practical information. I have reviewed it for accuracy and edited it appropriately._
