@@ -145,44 +145,21 @@ export default function DCActivity({ openModal }: DCActivityProps) {
         {/* Heatmap card */}
         <CXCard style={{ padding: 20, borderRadius: 14, display: "flex", flexDirection: "column", gap: 14 }}>
           {/* Header */}
-          <div style={{ display: "flex", alignItems: "flex-start", gap: 8 }}>
-            <div className="cx-skill-activity-meta" style={{ display: "flex", alignItems: "baseline", gap: 10, flexShrink: 1, minWidth: 0 }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+            {/* Row 1: title + stats + year filter */}
+            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
               <div style={{ fontSize: 17, fontWeight: 600, flexShrink: 0 }}>Activity</div>
-              <span className="pw-mono" style={{ fontSize: 10, color: "var(--ink-mute)", letterSpacing: "0.1em", textTransform: "uppercase" }}>
+              <span className="pw-mono cx-skill-activity-meta" style={{ fontSize: 10, color: "var(--ink-mute)", letterSpacing: "0.1em", textTransform: "uppercase", flex: 1, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                 {[
                   filteredProjectItems.length ? `${filteredProjectItems.length} PROJECT${filteredProjectItems.length !== 1 ? "S" : ""}` : "",
                   filteredLogItems.length     ? `${filteredLogItems.length} LOG${filteredLogItems.length !== 1 ? "S" : ""}` : "",
                   filteredCommits             ? `${filteredCommits} COMMIT${filteredCommits !== 1 ? "S" : ""}` : "",
                 ].filter(Boolean).join(" · ")}
               </span>
-            </div>
-
-            <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 8 }}>
-              {selectedDate && (
-                <>
-                  <span className="pw-mono" style={{
-                    fontSize: 10, padding: "5px 10px", borderRadius: 2,
-                    background: "rgba(var(--section-rgb), 0.55)", color: "rgba(0,0,0,0.82)",
-                    fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", whiteSpace: "nowrap",
-                  }}>
-                    {new Date(selectedDate + "T12:00:00").toLocaleDateString("en", { weekday: "short", month: "short", day: "numeric", year: "numeric" }).toUpperCase()}
-                  </span>
-                  <Tap as="button"
-                    onClick={() => { soundClick(); setSelectedDate(null); }}
-                    className="pw-mono cx-proj-btn"
-                    style={{
-                      fontSize: 10, padding: "5px 10px", borderRadius: 2,
-                      background: "rgba(255,255,255,0.08)", color: "var(--ink-mute)",
-                      fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase",
-                      border: "none", cursor: "pointer", transition: "background .15s, color .15s",
-                    }}
-                  >clear ×</Tap>
-                </>
-              )}
 
               {showYearTabs && (
                 <div
-                  style={{ position: "relative" }}
+                  style={{ position: "relative", flexShrink: 0 }}
                   onMouseEnter={() => setYearHovered(true)}
                   onMouseLeave={() => setYearHovered(false)}
                 >
@@ -235,6 +212,29 @@ export default function DCActivity({ openModal }: DCActivityProps) {
                 </div>
               )}
             </div>
+
+            {/* Row 2: selected date badge + clear (only when a date is active) */}
+            {selectedDate && (
+              <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                <span className="pw-mono" style={{
+                  fontSize: 10, padding: "5px 10px", borderRadius: 2,
+                  background: "rgba(var(--section-rgb), 0.55)", color: "rgba(0,0,0,0.82)",
+                  fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", whiteSpace: "nowrap",
+                }}>
+                  {new Date(selectedDate + "T12:00:00").toLocaleDateString("en", { weekday: "short", month: "short", day: "numeric", year: "numeric" }).toUpperCase()}
+                </span>
+                <Tap as="button"
+                  onClick={() => { soundClick(); setSelectedDate(null); }}
+                  className="pw-mono cx-proj-btn"
+                  style={{
+                    fontSize: 10, padding: "5px 10px", borderRadius: 2,
+                    background: "rgba(255,255,255,0.08)", color: "var(--ink-mute)",
+                    fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase",
+                    border: "none", cursor: "pointer", transition: "background .15s, color .15s",
+                  }}
+                >clear ×</Tap>
+              </div>
+            )}
           </div>
 
           {/* Heatmap — centered */}
@@ -308,7 +308,8 @@ export default function DCActivity({ openModal }: DCActivityProps) {
       {cellTooltip && createPortal(
         <div className="pw-mono" style={{
           position: "fixed",
-          left: cellTooltip.x + 14,
+          left: cellTooltip.x <= window.innerWidth / 2 ? cellTooltip.x + 14 : undefined,
+          right: cellTooltip.x > window.innerWidth / 2 ? window.innerWidth - cellTooltip.x + 14 : undefined,
           top: cellTooltip.y - 48,
           zIndex: 9999,
           pointerEvents: "none",
