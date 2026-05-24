@@ -27,19 +27,28 @@ function blip({ freq = 880, dur = 0.06, type = "sine" as OscillatorType, vol = 0
   if (!_enabled) return;
   const ctx = ensureCtx();
   if (!ctx || !_master) return;
-  if (ctx.state === "suspended") ctx.resume();
-  const o = ctx.createOscillator();
-  const g = ctx.createGain();
-  o.type = type;
-  o.frequency.value = freq;
-  o.connect(g);
-  g.connect(_master);
-  const t = ctx.currentTime;
-  g.gain.setValueAtTime(0, t);
-  g.gain.linearRampToValueAtTime(vol, t + 0.005);
-  g.gain.exponentialRampToValueAtTime(0.001, t + dur + decay);
-  o.start(t);
-  o.stop(t + dur + decay + 0.02);
+
+  const schedule = () => {
+    if (!_master) return;
+    const o = ctx.createOscillator();
+    const g = ctx.createGain();
+    o.type = type;
+    o.frequency.value = freq;
+    o.connect(g);
+    g.connect(_master);
+    const t = ctx.currentTime;
+    g.gain.setValueAtTime(0, t);
+    g.gain.linearRampToValueAtTime(vol, t + 0.005);
+    g.gain.exponentialRampToValueAtTime(0.001, t + dur + decay);
+    o.start(t);
+    o.stop(t + dur + decay + 0.02);
+  };
+
+  if (ctx.state !== "running") {
+    ctx.resume().then(schedule).catch(() => {});
+  } else {
+    schedule();
+  }
 }
 
 // Two-tone Trek-ish chirp
