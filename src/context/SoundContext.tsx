@@ -7,7 +7,9 @@ let _ctx: AudioContext | null = null;
 let _master: GainNode | null = null;
 let _humOsc: OscillatorNode | null = null;
 let _humGain: GainNode | null = null;
+let _enabled = false;
 
+// Only creates the context — never call outside a user gesture.
 function ensureCtx(): AudioContext | null {
   if (_ctx) return _ctx;
   try {
@@ -15,16 +17,17 @@ function ensureCtx(): AudioContext | null {
     _master = _ctx.createGain();
     _master.gain.value = 0.22;
     _master.connect(_ctx.destination);
+    // Context born inside a user gesture → already running; start hum immediately.
+    if (_enabled) startHum();
   } catch {
     return null;
   }
   return _ctx;
 }
 
-let _enabled = false;
-
 function blip({ freq = 880, dur = 0.06, type = "sine" as OscillatorType, vol = 0.4, decay = 0.05 }) {
   if (!_enabled) return;
+  // ensureCtx() is only ever called from blip() → always inside a click/touch handler.
   const ctx = ensureCtx();
   if (!ctx || !_master) return;
 
@@ -91,9 +94,9 @@ export function soundSurface() {
 
 function startHum() {
   if (_humOsc || !_enabled) return;
-  const ctx = ensureCtx();
-  if (!ctx || !_master) return;
-  if (ctx.state === "suspended") ctx.resume();
+  // Use existing context only — never create one here (would be outside a user gesture).
+  const ctx = _ctx;
+  if (!ctx || !_master || ctx.state !== "running") return;
   _humOsc = ctx.createOscillator();
   _humGain = ctx.createGain();
   _humOsc.type = "sine";
@@ -138,11 +141,11 @@ const SoundContext = createContext<SoundContextValue>({
 });
 
 export function SoundProvider({ children }: { children: React.ReactNode }) {
-  const [enabled, setEnabled] = useState(false);
-
-  useEffect(() => {
-    if (localStorage.getItem("pw-sound") === "1") setEnabled(true);
-  }, []);
+  // Read localStorage synchronously so the initial value is correct — avoids
+  // a false→true effect cycle that would call setAudioEnabled(false) first.
+  const [enabled, setEnabled] = useState(() =>
+    typeof window !== "undefined" && localStorage.getItem("pw-sound") === "1"
+  );
 
   useEffect(() => {
     setAudioEnabled(enabled);
