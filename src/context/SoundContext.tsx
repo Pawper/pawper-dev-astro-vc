@@ -132,10 +132,18 @@ export function SoundProvider({ children }: { children: React.ReactNode }) {
   const [enabled, setEnabled] = useState(false);
 
   useEffect(() => {
+    if (localStorage.getItem("pw-sound") === "1") setEnabled(true);
+  }, []);
+
+  useEffect(() => {
     setAudioEnabled(enabled);
   }, [enabled]);
 
-  const toggle = () => setEnabled((prev) => !prev);
+  const toggle = () => setEnabled((prev) => {
+    const next = !prev;
+    localStorage.setItem("pw-sound", next ? "1" : "0");
+    return next;
+  });
 
   return (
     <SoundContext.Provider value={{ enabled, toggle }}>

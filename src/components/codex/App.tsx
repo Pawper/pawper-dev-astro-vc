@@ -58,12 +58,25 @@ function AppInner({ logsHtml }: Pick<AppProps, "logsHtml">) {
   const { enabled: soundOn, toggle: soundToggle } = useSound();
   const [theme, setTheme] = useState<Theme>("dark");
   useEffect(() => {
+    const saved = localStorage.getItem("pw-theme") as Theme | null;
     const mq = window.matchMedia("(prefers-color-scheme: dark)");
+    if (saved === "dark" || saved === "light") {
+      setTheme(saved);
+      return;
+    }
     setTheme(mq.matches ? "dark" : "light");
     const handler = (e: MediaQueryListEvent) => setTheme(e.matches ? "dark" : "light");
     mq.addEventListener("change", handler);
     return () => mq.removeEventListener("change", handler);
   }, []);
+
+  function toggleTheme() {
+    setTheme((t) => {
+      const next = t === "light" ? "dark" : "light";
+      localStorage.setItem("pw-theme", next);
+      return next;
+    });
+  }
   const init = useState(parseUrl)[0];
   const [view, setView] = useState<View>(init?.view ?? { kind: "home" });
   const [openCats, setOpenCats] = useState<Record<string, boolean>>(
@@ -356,7 +369,7 @@ function AppInner({ logsHtml }: Pick<AppProps, "logsHtml">) {
             onResume={() => { setView({ kind: "entry", cat: "personnel", entry: "resume" }); setOpenCats(onlyCatOpen("personnel")); setHeaderExpanded(false); soundNav(); }}
             onService={(entryId) => { setView({ kind: "entry", cat: "services", entry: entryId }); setOpenCats(onlyCatOpen("services")); setHeaderExpanded(false); soundNav(); }}
             theme={theme}
-            onThemeToggle={() => setTheme((t) => (t === "light" ? "dark" : "light"))}
+            onThemeToggle={toggleTheme}
             openModal={openModal}
             onMenuOpen={isMobile ? () => setNavOpen(true) : undefined}
           />
@@ -439,7 +452,7 @@ function AppInner({ logsHtml }: Pick<AppProps, "logsHtml">) {
               const active = kind === "sound" ? soundOn : theme === "light";
               const bg = `rgba(var(--section-rgb), ${active ? 0.80 : 0.45})`;
               return (
-                <button key={kind} onClick={kind === "sound" ? soundToggle : () => setTheme((t) => t === "light" ? "dark" : "light")}
+                <button key={kind} onClick={kind === "sound" ? soundToggle : toggleTheme}
                   style={{ width: 22, height: 22, borderRadius: "3px 0 0 3px", border: "none", cursor: "pointer", background: bg, color: "black", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, padding: 0, transition: "background .2s" }}>
                   {kind === "sound"
                     ? <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
