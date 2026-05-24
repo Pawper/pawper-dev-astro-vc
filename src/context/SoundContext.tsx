@@ -25,10 +25,12 @@ function ensureCtx(): AudioContext | null {
   return _ctx;
 }
 
-function blip({ freq = 880, dur = 0.06, type = "sine" as OscillatorType, vol = 0.4, decay = 0.05 }) {
+function blip({ freq = 880, dur = 0.06, type = "sine" as OscillatorType, vol = 0.4, decay = 0.05, lazy = false }) {
   if (!_enabled) return;
-  // ensureCtx() is only ever called from blip() → always inside a click/touch handler.
-  const ctx = ensureCtx();
+  // lazy=true (hover): use existing context only — mouseenter isn't a trusted
+  // user activation so creating one here would land it in suspended state.
+  // lazy=false (click/touch): create context if needed — always inside a gesture.
+  const ctx = lazy ? _ctx : ensureCtx();
   if (!ctx || !_master) return;
 
   const schedule = () => {
@@ -61,7 +63,7 @@ export function soundClick() {
 }
 
 export function soundHover() {
-  blip({ freq: 2000, dur: 0.02, vol: 0.12, decay: 0.04, type: "triangle" });
+  blip({ freq: 2000, dur: 0.02, vol: 0.12, decay: 0.04, type: "triangle", lazy: true });
 }
 
 export function soundOpen() {
