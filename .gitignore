@@ -19,5 +19,6 @@ src/content/logs-drafts/
 # Build-generated data (regenerated from Airtable/GitHub/Cloudinary on each build)
 src/data/projects.json
 src/data/endorsements.json
+src/data/devto-series.json
 public/resume.pdf
 public/resume-preview.png

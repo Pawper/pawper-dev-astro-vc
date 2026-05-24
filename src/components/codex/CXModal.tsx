@@ -14,6 +14,9 @@ import { soundClick } from "../../context/SoundContext";
 import CXBtn, { RssIcon } from "./CXBtn";
 import { PROJECTS, LOGS, EXPERIENCES, slugify, getPrimaryColor } from "../../data/content";
 import { contrastText } from "./CXPill";
+import devtoSeriesRaw from "../../data/devto-series.json";
+
+const DEVTO_SERIES = devtoSeriesRaw as Record<string, number>;
 
 function hexToRgba(hex: string, alpha: number): string {
   const r = parseInt(hex.slice(1, 3), 16);
@@ -283,8 +286,9 @@ function ModalFooterButtons({ modal, proj, primaryHex, secondaryHex, isDark, onN
     ) || LOGS.some(a => a.tags?.some(t => t.toLowerCase() === modal.id.toLowerCase()))
   );
 
+  const seriesDevtoId = modal.kind === "series" ? (DEVTO_SERIES[modal.id] ?? null) : null;
   const seriesHasDevto = modal.kind === "series" &&
-    LOGS.some(l => l.series && slugify(l.series.name) === modal.id && !!l.devto);
+    (seriesDevtoId !== null || LOGS.some(l => l.series && slugify(l.series.name) === modal.id && !!l.devto));
   const seriesName = modal.kind === "series"
     ? ([...new Set(LOGS.filter(a => a.series).map(a => a.series!.name))]
         .find(n => slugify(n) === modal.id) ?? modal.id)
@@ -307,7 +311,7 @@ function ModalFooterButtons({ modal, proj, primaryHex, secondaryHex, isDark, onN
         <CXBtn num="02" label="Full GH activity" href={ghHref} bgHex={secondaryHex} isDark={isDark} />
       )}
       {modal.kind === "series" && seriesHasDevto && (
-        <CXBtn num="02" label="Series on dev.to" href={`https://dev.to/pawper/series/${modal.id}`} bgHex={secondaryHex} isDark={isDark} />
+        <CXBtn num="02" label="Series on dev.to" href={seriesDevtoId ? `https://dev.to/pawper/series/${seriesDevtoId}` : `https://dev.to/pawper`} bgHex={secondaryHex} isDark={isDark} />
       )}
       {modal.kind === "series" && (
         <SharePopover
