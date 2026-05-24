@@ -731,6 +731,13 @@ html, body {
   overflow-x: auto;
   margin: 0;
 }
+@media (pointer: fine) {
+  .pw-article-body pre::-webkit-scrollbar { height: 4px; }
+  .pw-article-body pre::-webkit-scrollbar-track { background: transparent; }
+  .pw-article-body pre::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 999px; }
+  .pw-article-body pre::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.28); }
+  .pw-article-body pre { scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.15) transparent; }
+}
 .pw-artboard[data-theme="dark"] .pw-article-body pre {
   background: rgba(0, 0, 0, 0.35);
 }

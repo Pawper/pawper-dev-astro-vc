@@ -466,6 +466,62 @@ export function enhanceProse(el: HTMLElement, opts: ProseOptions = {}): () => vo
     });
   }
 
+  // Code blocks — copy button
+  el.querySelectorAll<HTMLPreElement>("pre").forEach((pre) => {
+    if (pre.querySelector(".pw-copy-btn")) return; // already enhanced
+    pre.style.position = "relative";
+
+    const ICON_COPY = `<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="8" height="8" rx="1.5"/><path d="M2 10V2h8"/></svg>`;
+    const ICON_CHECK = `<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="2.5 7.5 5.5 10.5 11.5 4"/></svg>`;
+
+    const btn = document.createElement("button");
+    btn.className = "pw-copy-btn";
+    btn.innerHTML = ICON_COPY;
+    btn.title = "Copy";
+    btn.style.cssText = `
+      position: absolute; top: 8px; right: 8px;
+      width: 28px; height: 28px; border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(255,255,255,0.07); color: rgba(255,255,255,0.4);
+      border: 1px solid rgba(255,255,255,0.1);
+      cursor: pointer; transition: background 0.15s, color 0.15s, border-color 0.15s;
+      padding: 0;
+    `;
+
+    btn.addEventListener("mouseenter", () => {
+      if (btn.dataset.copied) return;
+      btn.style.background = "rgba(255,255,255,0.13)";
+      btn.style.color = "rgba(255,255,255,0.7)";
+    });
+    btn.addEventListener("mouseleave", () => {
+      if (btn.dataset.copied) return;
+      btn.style.background = "rgba(255,255,255,0.07)";
+      btn.style.color = "rgba(255,255,255,0.4)";
+    });
+
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const code = pre.querySelector("code");
+      if (!code) return;
+      navigator.clipboard.writeText(code.textContent ?? "").then(() => {
+        btn.dataset.copied = "1";
+        btn.innerHTML = ICON_CHECK;
+        btn.style.color = "rgba(63,191,122,0.9)";
+        btn.style.background = "rgba(63,191,122,0.1)";
+        btn.style.borderColor = "rgba(63,191,122,0.3)";
+        setTimeout(() => {
+          delete btn.dataset.copied;
+          btn.innerHTML = ICON_COPY;
+          btn.style.color = "rgba(255,255,255,0.4)";
+          btn.style.background = "rgba(255,255,255,0.07)";
+          btn.style.borderColor = "rgba(255,255,255,0.1)";
+        }, 1800);
+      });
+    });
+
+    pre.appendChild(btn);
+  });
+
   // Hover sound — only when entering from outside the target
   const handler = (e: MouseEvent) => {
     const card = (e.target as Element).closest("a, .pw-prose-ref");
