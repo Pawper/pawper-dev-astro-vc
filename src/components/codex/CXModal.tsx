@@ -457,7 +457,8 @@ export default function CXModal({ modal, previousModal, onClose, onBack, onNavig
   }, [prevSib, nextSib]);
 
   function handleTouchStart(e: React.TouchEvent) {
-    if ((e.target as Element).closest(".cx-media-image-area")) return;
+    const mediaArea = (e.target as Element).closest(".cx-media-image-area");
+    if (mediaArea?.getAttribute("data-zoomed") === "true") return;
     let node: Element | null = e.target as Element;
     while (node && !node.classList.contains("pw-glass-hi")) {
       const ox = window.getComputedStyle(node).overflowX;

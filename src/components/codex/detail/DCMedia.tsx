@@ -43,10 +43,12 @@ export default function DCMedia({ src, alt }: DCMediaProps) {
 
   useEffect(() => {
     setPan(zoom <= ZOOM_MIN ? [0, 0] : clamped(panRef.current[0], panRef.current[1], zoom));
+    if (containerRef.current) containerRef.current.dataset.zoomed = zoom > ZOOM_MIN ? "true" : "false";
   }, [zoom]);
 
-  function zoomIn()  { setZoom(z => Math.min(ZOOM_MAX, parseFloat((z + ZOOM_STEP).toFixed(2)))); }
-  function zoomOut() { setZoom(z => Math.max(ZOOM_MIN, parseFloat((z - ZOOM_STEP).toFixed(2)))); }
+  function zoomIn()    { setZoom(z => Math.min(ZOOM_MAX, parseFloat((z + ZOOM_STEP).toFixed(2)))); }
+  function zoomOut()   { setZoom(z => Math.max(ZOOM_MIN, parseFloat((z - ZOOM_STEP).toFixed(2)))); }
+  function zoomReset() { setZoom(ZOOM_MIN); }
 
   function onMouseDown(e: React.MouseEvent) {
     if (zoomRef.current <= ZOOM_MIN) return;
@@ -204,6 +206,20 @@ export default function DCMedia({ src, alt }: DCMediaProps) {
         display: "flex", justifyContent: "center", alignItems: "center",
         gap: 8, zIndex: 20,
       }}>
+        <Tap
+          onClick={zoomReset}
+          title="Reset zoom"
+          className="cx-media-btn"
+          style={{ ...btnStyle, opacity: zoom <= ZOOM_MIN ? 0.25 : 1, pointerEvents: zoom <= ZOOM_MIN ? "none" : "auto" }}
+        >
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M2 8a6 6 0 1 0 1.5-3.9"/>
+            <polyline points="2 3 2 8 7 8"/>
+          </svg>
+        </Tap>
+
+        <div style={{ width: 1, height: 24, background: "rgba(255,255,255,0.12)", margin: "0 4px" }} />
+
         <Tap
           onClick={zoomOut}
           title="Zoom out"
