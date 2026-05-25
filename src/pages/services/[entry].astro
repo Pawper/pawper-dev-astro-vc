@@ -1,0 +1,53 @@
+---
+import { SERVICES } from '../../data/content';
+
+export function getStaticPaths() {
+  const entries = [
+    { id: 'overview', label: 'Services Overview', desc: 'Web development, consulting, coaching, and more — from Phillip Wessels, Platform Architect.' },
+    ...SERVICES.map((s) => ({ id: s.id, label: s.label, desc: s.kicker })),
+  ];
+  return entries.map((e) => ({
+    params: { entry: e.id },
+    props: { label: e.label, desc: e.desc },
+  }));
+}
+
+const { entry } = Astro.params;
+const { label, desc } = Astro.props;
+const siteUrl = Astro.site?.toString().replace(/\/$/, '') ?? 'https://pawper.dev';
+const pageUrl = `${siteUrl}/services/${entry}`;
+const redirectUrl = `/?v=entry&cat=services&entry=${entry}`;
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{label} · Phillip Wessels / CODEX</title>
+  <meta name="description" content={desc} />
+  <link rel="canonical" href={pageUrl} />
+
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content={pageUrl} />
+  <meta property="og:title" content={`${label} · Phillip Wessels / CODEX`} />
+  <meta property="og:description" content={desc} />
+  <meta property="og:site_name" content="pawper.dev · CODEX" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content={`${label} · Phillip Wessels / CODEX`} />
+  <meta name="twitter:description" content={desc} />
+
+  <script is:inline define:vars={{ redirectUrl }}>
+    window.location.replace(redirectUrl);
+  </script>
+
+  <style>
+    body { font-family: monospace; background: #0e0e12; color: #f0f0f0; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
+    a { color: #4ecca3; }
+  </style>
+</head>
+<body>
+  <p>Redirecting… <a href={redirectUrl}>Click here if not redirected.</a></p>
+</body>
+</html>

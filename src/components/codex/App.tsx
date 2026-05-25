@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useIsMobile } from "../../hooks/useIsMobile";
 import type { View, ModalState, Theme, Log } from "../../types";
-import { BACKDROPS, CX_INDEX, PROJECTS, LOGS, EXPERIENCES, PROJECT_CATEGORIES, DEFAULT_PROJECT_CAT, getProjectsForCategory, LOG_CATEGORIES, DEFAULT_LOG_CAT, getLogsForCategory, initLogs } from "../../data/content";
+import { BACKDROPS, CX_INDEX, PROJECTS, LOGS, EXPERIENCES, SKILLS, PROJECT_CATEGORIES, DEFAULT_PROJECT_CAT, getProjectsForCategory, LOG_CATEGORIES, DEFAULT_LOG_CAT, getLogsForCategory, initLogs } from "../../data/content";
 import { SoundProvider, soundNav, soundOpen, soundClick, soundDive, useSound } from "../../context/SoundContext";
 import Backdrop from "../shared/Backdrop";
 import CXHeader from "./CXHeader";
@@ -14,42 +14,112 @@ interface AppProps {
   logs: Log[];
 }
 
+function statePath(v: View, m: ModalState | null): string {
+  if (m) {
+    switch (m.kind) {
+      case "log":        return `/l/${m.id}`;
+      case "series":     return `/ls/${m.id}`;
+      case "project":    return `/p/${m.id}`;
+      case "experience": return `/xp/${m.id}`;
+      case "skill": {
+        const base = `/skill/${encodeURIComponent(m.id.replace(/\//g, "-"))}`;
+        return m.filterType ? `${base}?ft=${m.filterType}` : base;
+      }
+      default:           return statePath(v, null);
+    }
+  }
+  if (v.kind === "home" || !v.cat) return "/";
+  switch (v.cat) {
+    case "projects": return v.entry && v.entry !== DEFAULT_PROJECT_CAT ? `/projects/${v.entry}` : "/projects";
+    case "logs":     return v.entry && v.entry !== DEFAULT_LOG_CAT     ? `/logs/${v.entry}`     : "/logs";
+    case "personnel":return v.entry && v.entry !== "bio"               ? `/about/${v.entry}`    : "/about";
+    case "services": return v.entry && v.entry !== "overview"          ? `/services/${v.entry}` : "/services";
+    case "contact":  return "/contact";
+    default:         return "/";
+  }
+}
+
 function parseUrl() {
   if (typeof window === "undefined") return null;
+
+  const pathname = location.pathname;
   const p = new URLSearchParams(location.search);
-  const v = p.get("v");
-  const cat = p.get("cat") ?? undefined;
-  const entry = p.get("entry") ?? undefined;
-  const mk = p.get("modal") as ModalState["kind"] | null;
-  const id = p.get("id");
-  const ft = p.get("ft") as ModalState["filterType"];
+  const parts = pathname.split("/").filter(Boolean);
 
-  const view: View = (v === "grid" || v === "entry") && cat
-    ? { kind: v, cat, entry }
-    : { kind: "home" };
-
+  let view: View = { kind: "home" };
   const modalStack: ModalState[] = [];
-  if (mk && id) {
-    const m: ModalState = { kind: mk, id, filterType: ft ?? undefined };
-    if (mk === "skill" && ft === "language") {
-      const le = PROJECTS.flatMap(proj => Object.entries(proj.languages))
-        .find(([l]) => l.toLowerCase() === id.toLowerCase());
-      if (le) m.color = le[1].color;
+
+  // Path-based routing
+  if (parts.length > 0) {
+    const seg0 = parts[0];
+    const seg1 = parts[1];
+    if (seg0 === "projects") {
+      view = { kind: "entry", cat: "projects", entry: seg1 ?? DEFAULT_PROJECT_CAT };
+    } else if (seg0 === "logs") {
+      view = { kind: "entry", cat: "logs", entry: seg1 ?? DEFAULT_LOG_CAT };
+    } else if (seg0 === "about") {
+      view = { kind: "entry", cat: "personnel", entry: seg1 ?? "bio" };
+    } else if (seg0 === "services") {
+      view = { kind: "entry", cat: "services", entry: seg1 ?? "overview" };
+    } else if (seg0 === "contact") {
+      view = { kind: "entry", cat: "contact", entry: "all" };
+    } else if (seg0 === "p" && seg1) {
+      modalStack.push({ kind: "project", id: seg1, siblings: PROJECTS.map(proj => ({ kind: "project" as const, id: proj.id })) });
+    } else if (seg0 === "l" && seg1) {
+      modalStack.push({ kind: "log", id: seg1, siblings: LOGS.map(a => ({ kind: "log" as const, id: a.id })) });
+    } else if (seg0 === "ls" && seg1) {
+      modalStack.push({ kind: "series", id: seg1 });
+    } else if (seg0 === "skill" && seg1) {
+      const slug = decodeURIComponent(seg1);
+      // Reverse-map URL slug (slashes replaced with dashes) back to original skill label
+      const id = SKILLS.flatMap(g => g.items).find(item => item.replace(/\//g, "-") === slug) ?? slug;
+      const ft = p.get("ft") as ModalState["filterType"];
+      const m: ModalState = { kind: "skill", id, filterType: ft ?? undefined };
+      if (ft === "language") {
+        const le = PROJECTS.flatMap(proj => Object.entries(proj.languages))
+          .find(([l]) => l.toLowerCase() === id.toLowerCase());
+        if (le) m.color = le[1].color;
+      }
+      modalStack.push(m);
+    } else if (seg0 === "xp" && seg1) {
+      modalStack.push({ kind: "experience", id: seg1 });
     }
-    if (mk === "project") m.siblings = PROJECTS.map(proj => ({ kind: "project" as const, id: proj.id }));
-    if (mk === "log") m.siblings = LOGS.map(a => ({ kind: "log" as const, id: a.id }));
-    modalStack.push(m);
+  }
+
+  // Query-param fallback (gateway redirects land here with ?v=entry&cat=... or ?modal=...)
+  if (parts.length === 0) {
+    const v = p.get("v");
+    const cat = p.get("cat") ?? undefined;
+    const entry = p.get("entry") ?? undefined;
+    const mk = p.get("modal") as ModalState["kind"] | null;
+    const id = p.get("id");
+    const ft = p.get("ft") as ModalState["filterType"];
+
+    if ((v === "grid" || v === "entry") && cat) {
+      view = { kind: v, cat, entry };
+    }
+    if (mk && id) {
+      const m: ModalState = { kind: mk, id, filterType: ft ?? undefined };
+      if (mk === "skill" && ft === "language") {
+        const le = PROJECTS.flatMap(proj => Object.entries(proj.languages))
+          .find(([l]) => l.toLowerCase() === id.toLowerCase());
+        if (le) m.color = le[1].color;
+      }
+      if (mk === "project") m.siblings = PROJECTS.map(proj => ({ kind: "project" as const, id: proj.id }));
+      if (mk === "log") m.siblings = LOGS.map(a => ({ kind: "log" as const, id: a.id }));
+      modalStack.push(m);
+    }
   }
 
   const openCats: Record<string, boolean> = {
-    personnel: !cat || cat === "personnel",
-    services: cat === "services",
-    projects: cat === "projects",
-    logs: cat === "logs",
-    contact: cat === "contact",
+    personnel: !view.cat || view.cat === "personnel",
+    services: view.cat === "services",
+    projects: view.cat === "projects",
+    logs: view.cat === "logs",
+    contact: view.cat === "contact",
   };
 
-  return { view, modalStack, openCats, headerExpanded: true };
+  return { view, modalStack, openCats, headerExpanded: view.kind === "home" };
 }
 
 function AppInner({ logsHtml }: Pick<AppProps, "logsHtml">) {
@@ -231,19 +301,7 @@ function AppInner({ logsHtml }: Pick<AppProps, "logsHtml">) {
     }
     if (viewChanged) _suppressViewPush.current = false;
 
-    const p = new URLSearchParams();
-    if (view.kind !== "home") {
-      p.set("v", view.kind);
-      if (view.cat) p.set("cat", view.cat);
-      if (view.entry && view.kind === "entry") p.set("entry", view.entry);
-    }
-    if (modal) {
-      p.set("modal", modal.kind);
-      p.set("id", modal.id);
-      if (modal.filterType) p.set("ft", modal.filterType);
-    }
-    const qs = p.toString();
-    history.replaceState(history.state, "", qs ? `?${qs}` : location.pathname);
+    history.replaceState(history.state, "", statePath(view, modal));
   }, [view, modal]);
 
   useEffect(() => {

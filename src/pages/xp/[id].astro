@@ -1,0 +1,53 @@
+---
+import { EXPERIENCES } from '../../data/content';
+
+export function getStaticPaths() {
+  return EXPERIENCES.map((e) => ({
+    params: { id: e.id },
+    props: {
+      title: e.title,
+      organization: e.organization,
+      description: e.description,
+    },
+  }));
+}
+
+const { id } = Astro.params;
+const { title, organization, description } = Astro.props;
+const siteUrl = Astro.site?.toString().replace(/\/$/, '') ?? 'https://pawper.dev';
+const pageUrl = `${siteUrl}/xp/${id}`;
+const ogTitle = `${title} · ${organization}`;
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{ogTitle} · Phillip Wessels / CODEX</title>
+  <meta name="description" content={description} />
+  <link rel="canonical" href={pageUrl} />
+
+  <meta property="og:type" content="profile" />
+  <meta property="og:url" content={pageUrl} />
+  <meta property="og:title" content={ogTitle} />
+  <meta property="og:description" content={description} />
+  <meta property="og:site_name" content="pawper.dev · CODEX" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content={ogTitle} />
+  <meta name="twitter:description" content={description} />
+
+  <script is:inline define:vars={{ id }}>
+    window.location.replace('/?modal=experience&id=' + encodeURIComponent(id));
+  </script>
+
+  <style>
+    body { font-family: monospace; background: #0e0e12; color: #f0f0f0; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
+    a { color: #4ecca3; }
+  </style>
+</head>
+<body>
+  <p>Redirecting… <a href={`/?modal=experience&id=${encodeURIComponent(id)}`}>Click here if not redirected.</a></p>
+</body>
+</html>

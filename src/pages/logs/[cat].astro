@@ -1,0 +1,60 @@
+---
+import { getCollection } from 'astro:content';
+import { slugify } from '../../data/content';
+
+export async function getStaticPaths() {
+  const logs = await getCollection('logs');
+  const kickers = [...new Set(logs.map((l) => l.data.kicker).filter(Boolean))];
+
+  const cats = [
+    { id: 'latest', label: 'Latest' },
+    { id: 'series', label: 'Series' },
+    ...kickers.map((k) => ({ id: slugify(k), label: k })),
+  ];
+
+  return cats.map((cat) => ({
+    params: { cat: cat.id },
+    props: { label: cat.label },
+  }));
+}
+
+const { cat } = Astro.params;
+const { label } = Astro.props;
+const siteUrl = Astro.site?.toString().replace(/\/$/, '') ?? 'https://pawper.dev';
+const pageUrl = `${siteUrl}/logs/${cat}`;
+const description = `${label} — writing and notes from Phillip Wessels.`;
+const redirectUrl = `/?v=entry&cat=logs&entry=${cat}`;
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{label} · Logs · Phillip Wessels / CODEX</title>
+  <meta name="description" content={description} />
+  <link rel="canonical" href={pageUrl} />
+
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content={pageUrl} />
+  <meta property="og:title" content={`${label} · Logs · Phillip Wessels / CODEX`} />
+  <meta property="og:description" content={description} />
+  <meta property="og:site_name" content="pawper.dev · CODEX" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content={`${label} · Logs · Phillip Wessels / CODEX`} />
+  <meta name="twitter:description" content={description} />
+
+  <script is:inline define:vars={{ redirectUrl }}>
+    window.location.replace(redirectUrl);
+  </script>
+
+  <style>
+    body { font-family: monospace; background: #0e0e12; color: #f0f0f0; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
+    a { color: #4ecca3; }
+  </style>
+</head>
+<body>
+  <p>Redirecting… <a href={redirectUrl}>Click here if not redirected.</a></p>
+</body>
+</html>

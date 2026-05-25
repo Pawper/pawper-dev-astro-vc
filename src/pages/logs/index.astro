@@ -1,0 +1,37 @@
+---
+const siteUrl = Astro.site?.toString().replace(/\/$/, '') ?? 'https://pawper.dev';
+const pageUrl = `${siteUrl}/logs`;
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Logs · Phillip Wessels / CODEX</title>
+  <meta name="description" content="Writing, notes, and dispatches from Phillip Wessels — Platform Architect & Developer." />
+  <link rel="canonical" href={pageUrl} />
+
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content={pageUrl} />
+  <meta property="og:title" content="Logs · Phillip Wessels / CODEX" />
+  <meta property="og:description" content="Writing, notes, and dispatches from Phillip Wessels — Platform Architect & Developer." />
+  <meta property="og:site_name" content="pawper.dev · CODEX" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Logs · Phillip Wessels / CODEX" />
+  <meta name="twitter:description" content="Writing, notes, and dispatches from Phillip Wessels — Platform Architect & Developer." />
+
+  <script is:inline>
+    window.location.replace('/?v=entry&cat=logs&entry=latest');
+  </script>
+
+  <style>
+    body { font-family: monospace; background: #0e0e12; color: #f0f0f0; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
+    a { color: #4ecca3; }
+  </style>
+</head>
+<body>
+  <p>Redirecting… <a href="/?v=entry&cat=logs&entry=latest">Click here if not redirected.</a></p>
+</body>
+</html>

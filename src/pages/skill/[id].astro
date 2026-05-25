@@ -1,0 +1,50 @@
+---
+import { SKILLS } from '../../data/content';
+
+export function getStaticPaths() {
+  const items = SKILLS.flatMap((g) => g.items);
+  return items.map((item) => ({
+    params: { id: item.replace(/\//g, '-') }, // slashes → dashes for URL safety
+    props: { skill: item },
+  }));
+}
+
+const { id } = Astro.params;
+const { skill } = Astro.props;
+const siteUrl = Astro.site?.toString().replace(/\/$/, '') ?? 'https://pawper.dev';
+const pageUrl = `${siteUrl}/skill/${id}`;
+const description = `Projects and experience with ${skill} — Phillip Wessels, Platform Architect.`;
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{skill} · Phillip Wessels / CODEX</title>
+  <meta name="description" content={description} />
+  <link rel="canonical" href={pageUrl} />
+
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content={pageUrl} />
+  <meta property="og:title" content={`${skill} · Phillip Wessels / CODEX`} />
+  <meta property="og:description" content={description} />
+  <meta property="og:site_name" content="pawper.dev · CODEX" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content={`${skill} · Phillip Wessels / CODEX`} />
+  <meta name="twitter:description" content={description} />
+
+  <script is:inline define:vars={{ id }}>
+    window.location.replace('/?modal=skill&id=' + encodeURIComponent(id));
+  </script>
+
+  <style>
+    body { font-family: monospace; background: #0e0e12; color: #f0f0f0; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
+    a { color: #4ecca3; }
+  </style>
+</head>
+<body>
+  <p>Redirecting… <a href={`/?modal=skill&id=${encodeURIComponent(id)}`}>Click here if not redirected.</a></p>
+</body>
+</html>
