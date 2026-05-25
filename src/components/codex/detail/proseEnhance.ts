@@ -15,6 +15,7 @@ export interface ProseOptions {
   onOpenSeries?: (slug: string) => void;
   onOpenService?: (service: string) => void;
   onOpenMedia?: (src: string, alt: string, siblings?: Array<{ kind: "media"; id: string; label?: string }>) => void;
+  noThumb?: string[];
 }
 
 // ── Series card — matches CXSeriesPanel front card ──────────────────────────
@@ -378,67 +379,129 @@ interface OgData {
 
 const ogLinkCache = ogLinkCacheRaw as Record<string, OgData>;
 
-function createLinkCard(href: string, og: OgData): HTMLAnchorElement {
-  let domain = og.domain ?? "";
+function makeExternalArrow(): HTMLSpanElement {
+  const arrow = document.createElement("span");
+  arrow.textContent = "↗";
+  arrow.className = "cx-btn-icon";
+  arrow.style.cssText = "position: absolute; top: 10px; right: 12px; font-family: var(--font-mono); font-size: 12px; font-weight: 700; letter-spacing: 0.08em; color: var(--section-accent); opacity: 0.5; pointer-events: none;";
+  return arrow;
+}
+
+function createLinkCard(href: string, og: OgData | null): HTMLAnchorElement {
+  let domain = og?.domain ?? "";
   if (!domain) { try { domain = new URL(href).hostname.replace(/^www\./, ""); } catch {} }
 
+  // No OG title — card with just favicon + lowercase green URL, no eyebrow/title chrome
+  if (!og?.title) {
+    let displayUrl = href;
+    try {
+      const u = new URL(href);
+      const path = u.pathname.replace(/\/$/, "");
+      displayUrl = u.hostname.replace(/^www\./, "") + (path || "");
+    } catch {}
+    const link = document.createElement("a");
+    link.href = href;
+    link.target = "_blank";
+    link.rel = "noopener noreferrer";
+    link.className = "pw-glass-dim cx-card pw-url-card pw-prose-ref";
+    link.style.cssText = "position: relative; border-radius: 16px; border-left: 4px solid var(--section-accent); overflow: hidden; display: flex; align-items: center; gap: 6px; padding: 10px 14px; text-decoration: none; margin: 4px 0 12px;";
+    const fav = document.createElement("img");
+    fav.src = `https://www.google.com/s2/favicons?domain=${encodeURIComponent(domain)}&sz=16`;
+    fav.alt = "";
+    fav.style.cssText = "width: 12px; height: 12px; flex-shrink: 0; opacity: 0.7; display: inline; margin: 0; border-radius: 2px;";
+    fav.addEventListener("error", () => { fav.style.display = "none"; });
+    const txt = document.createElement("span");
+    txt.style.cssText = "color: var(--section-accent); font-size: 13px; font-family: var(--font-mono, monospace);";
+    txt.textContent = displayUrl;
+    link.appendChild(fav);
+    link.appendChild(txt);
+    link.appendChild(makeExternalArrow());
+    return link;
+  }
+
+  const hasThumb = !!og?.image;
+
+  // Outer <a> — mirrors CXCard with thumbnail: pw-glass-dim cx-card cx-card-has-thumb
   const el = document.createElement("a");
   el.href = href;
   el.target = "_blank";
   el.rel = "noopener noreferrer";
-  el.className = "pw-url-card pw-prose-ref";
+  el.className = `pw-glass-dim cx-card${hasThumb ? " cx-card-has-thumb" : ""} pw-url-card pw-prose-ref`;
+  el.style.cssText = `
+    position: relative;
+    border-radius: 16px;
+    border-left: 4px solid var(--section-accent);
+    overflow: hidden;
+    display: flex;
+    text-decoration: none;
+    color: inherit;
+    margin: 4px 0 12px;
+    ${hasThumb ? "min-height: 142px;" : ""}
+  `;
 
-  const body = document.createElement("div");
-  body.className = "pw-url-card-body";
-
-  const content = document.createElement("div");
-  content.className = "pw-url-card-content";
-
-  // Domain row
-  const domainRow = document.createElement("div");
-  domainRow.className = "pw-url-card-domain";
-  const favicon = document.createElement("img");
-  favicon.src = `https://www.google.com/s2/favicons?domain=${encodeURIComponent(domain)}&sz=16`;
-  favicon.className = "pw-url-card-favicon";
-  favicon.alt = "";
-  favicon.addEventListener("error", () => { favicon.style.display = "none"; });
-  const domainText = document.createElement("span");
-  domainText.textContent = domain;
-  domainRow.appendChild(favicon);
-  domainRow.appendChild(domainText);
-  content.appendChild(domainRow);
-
-  // Title
-  if (og.title) {
-    const titleEl = document.createElement("div");
-    titleEl.className = "pw-url-card-title";
-    titleEl.textContent = og.title;
-    content.appendChild(titleEl);
-  }
-
-  // Description
-  if (og.description) {
-    const descEl = document.createElement("div");
-    descEl.className = "pw-url-card-desc";
-    descEl.textContent = og.description;
-    content.appendChild(descEl);
-  }
-
-  body.appendChild(content);
-
-  // Thumbnail
-  if (og.image) {
+  // Thumbnail — absolutely positioned so the content column drives card height,
+  // not the image. Flex stretches the thumb div to match; img fills it via inset:0.
+  if (og?.image) {
     const thumb = document.createElement("div");
-    thumb.className = "pw-url-card-thumb";
+    thumb.className = "cx-card-thumb";
+    thumb.style.cssText = "width: 38%; flex-shrink: 0; position: relative; overflow: hidden;";
     const img = document.createElement("img");
     img.src = og.image;
     img.alt = "";
-    img.addEventListener("error", () => { thumb.remove(); });
+    img.style.cssText = "position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center; display: block; opacity: 0.9; border-radius: 0;";
+    img.addEventListener("error", () => { thumb.remove(); el.classList.remove("cx-card-has-thumb"); });
     thumb.appendChild(img);
-    body.appendChild(thumb);
+    el.appendChild(thumb);
   }
 
-  el.appendChild(body);
+  // Content column — mirrors ContentColumn in CXCard
+  const outer = document.createElement("div");
+  outer.style.cssText = "flex: 1; min-width: 0; display: flex; flex-direction: column;";
+
+  const col = document.createElement("div");
+  col.style.cssText = "padding: 16px 20px 14px; display: flex; flex-direction: column; gap: 8px; flex: 1; min-width: 0;";
+
+  // Eyebrow row — domain + favicon, matches pw-eyebrow usage in CXCard
+  const eyebrowRow = document.createElement("div");
+  eyebrowRow.style.cssText = "display: flex; align-items: center; gap: 5px;";
+  const favicon = document.createElement("img");
+  favicon.src = `https://www.google.com/s2/favicons?domain=${encodeURIComponent(domain)}&sz=16`;
+  favicon.alt = "";
+  favicon.style.cssText = "width: 11px; height: 11px; flex-shrink: 0; opacity: 0.7; display: inline; margin: 0; border-radius: 2px;";
+  favicon.addEventListener("error", () => { favicon.style.display = "none"; });
+  const domainSpan = document.createElement("span");
+  domainSpan.className = "pw-eyebrow";
+  domainSpan.style.color = "var(--section-accent)";
+  domainSpan.textContent = domain;
+  eyebrowRow.appendChild(favicon);
+  eyebrowRow.appendChild(domainSpan);
+  col.appendChild(eyebrowRow);
+
+  // Title — matches ContentColumn title style in CXCard
+  const titleEl = document.createElement("div");
+  titleEl.style.cssText = `
+    font-size: 17px; font-weight: 500; letter-spacing: -0.3px; line-height: 1.2;
+    text-wrap: balance; overflow: hidden;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+  `;
+  titleEl.textContent = og.title!;
+  col.appendChild(titleEl);
+
+  // Hook/description — matches ContentColumn hook style in CXCard
+  if (og?.description) {
+    const descEl = document.createElement("div");
+    descEl.style.cssText = `
+      font-size: 12px; color: var(--ink-soft); line-height: 1.45;
+      overflow: hidden; display: -webkit-box;
+      -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+    `;
+    descEl.textContent = og.description;
+    col.appendChild(descEl);
+  }
+
+  outer.appendChild(col);
+  el.appendChild(outer);
+  el.appendChild(makeExternalArrow());
   return el;
 }
 
@@ -539,8 +602,8 @@ export function enhanceProse(el: HTMLElement, opts: ProseOptions = {}): () => vo
     if (a.closest(".pw-url-card")) return;
     const href = a.getAttribute("href") ?? "";
     if (a.textContent?.trim() !== href) return; // not a bare URL (has descriptive text)
-    const og = ogLinkCache[href];
-    if (!og?.title) return;
+    const cached = ogLinkCache[href] ?? null;
+    const og = cached && opts.noThumb?.includes(href) ? { ...cached, image: null } : cached;
 
     const card = createLinkCard(href, og);
     const parent = a.parentElement;

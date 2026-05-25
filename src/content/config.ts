@@ -14,7 +14,9 @@ const logs = defineCollection({
     series: z.object({
       name: z.string(),
       part: z.number(),
+      total: z.number().optional(),
     }).optional(),
+    noThumb: z.array(z.string()).optional(),
   }),
 });
 

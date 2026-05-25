@@ -23,18 +23,26 @@ import dotenv from "dotenv";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 dotenv.config({ path: path.join(__dirname, "../.env") });
 
+const hasCloudinary =
+  process.env.CLOUDINARY_URL ||
+  (process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_KEY && process.env.CLOUDINARY_SECRET);
+
+if (!hasCloudinary) {
+  console.warn("⚠️   Cloudinary not configured — skipping OG image generation (set CLOUDINARY_URL or CLOUDINARY_CLOUD_NAME + CLOUDINARY_KEY + CLOUDINARY_SECRET)");
+  process.exit(0);
+}
+
 if (process.env.CLOUDINARY_URL) {
-  cloudinary.config({ secure: true });
-} else if (process.env.CLOUDINARY_CLOUD_NAME) {
+  const m = process.env.CLOUDINARY_URL.match(/^cloudinary:\/\/([^:]+):([^@]+)@(.+)$/);
+  if (!m) { console.error("❌  Invalid CLOUDINARY_URL format"); process.exit(1); }
+  cloudinary.config({ api_key: m[1], api_secret: m[2], cloud_name: m[3], secure: true });
+} else {
   cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
     api_key:    process.env.CLOUDINARY_KEY,
     api_secret: process.env.CLOUDINARY_SECRET,
     secure:     true,
   });
-} else {
-  console.error("❌  Cloudinary not configured — set CLOUDINARY_URL or CLOUDINARY_CLOUD_NAME in env");
-  process.exit(1);
 }
 
 const LOGS_DIR = path.join(__dirname, "../src/content/logs");

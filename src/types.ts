@@ -29,6 +29,7 @@ export interface Log {
   hook?: string;
   devto?: string;
   series?: { name: string; part: number; total: number };
+  noThumb?: string[];
 }
 
 export type ViewKind = "home" | "entry" | "grid";

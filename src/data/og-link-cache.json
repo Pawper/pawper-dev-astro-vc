@@ -94,5 +94,17 @@
     "description": "ITPro Today, Network Computing and IoT World Today have combined with TechTarget.com. The page you are looking for may no longer exist.",
     "image": "https://www.techtarget.com/rms/onlineimages/arvr_g1273484747.jpg",
     "domain": "itprotoday.com"
+  },
+  "https://www.udemy.com/course/the-linux-command-line-bootcamp/": {
+    "title": "The Linux Command Line Bootcamp: Beginner To Power User",
+    "description": "<p>Welcome to The Linux Command Line Bootcamp, <strong>a brand new course</strong> that aims to turn you into a command line power user! This course will teach you dozens and dozens of powerful commands (see the long list at the bottom), but more importantly it gives you the tools the continue to learn new commands and take full control of your machine. The skills you learn in this course will make you a stronger web developer, data scientist, machine learning engineer, game dev, or plain old computer user!&nbsp; You will feel POWERFUL!!</p><p>Hi there, my name is Colt Steele. I",
+    "image": "https://img-c.udemycdn.com/course/480x270/3998050_2ed8.jpg",
+    "domain": "udemy.com"
+  },
+  "https://web.archive.org/web/20240226110454/https://www.itprotoday.com/windows-78/nt-vsunix-one-substantially-better#close-modal": {
+    "title": "NT vs.UNIX: Is One Substantially Better",
+    "description": null,
+    "image": "/web/20240226110454im_/https://www.itprotoday.com/sites/all/themes/penton_subtheme_itprotoday/images/logos/share-logo.png",
+    "domain": "web.archive.org"
   }
 }

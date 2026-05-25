@@ -46,7 +46,7 @@ export default function DCLog({ id, html, onOpenLog, onOpenProject, onOpenSeries
     const el = proseRef.current;
     if (!el) return;
     el.innerHTML = html || '<p>Content not found.</p>';
-    return enhanceProse(el, { onOpenProject, onOpenLog, onOpenSeries, onOpenService, onOpenMedia });
+    return enhanceProse(el, { onOpenProject, onOpenLog, onOpenSeries, onOpenService, onOpenMedia, noThumb: a?.noThumb });
   }, [html]);
 
   useEffect(() => {
