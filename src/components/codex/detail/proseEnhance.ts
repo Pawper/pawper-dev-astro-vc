@@ -1,9 +1,10 @@
-import { soundHover } from "../../../context/SoundContext";
+import { soundHover, soundClick } from "../../../context/SoundContext";
 import { PROJECTS, LOGS, slugify } from "../../../data/content";
 import type { Endorsement } from "../../../data/content";
 import type { Log, Project } from "../../../types";
 import endorsementsData from "../../../data/endorsements.json";
 import ogLinkCacheRaw from "../../../data/og-link-cache.json";
+import { getProgress, advanceBookmark, completeSection, checkSection, uncheckSection } from "../../../utils/logProgress";
 
 const allEndorsements = endorsementsData as Endorsement[];
 
@@ -16,6 +17,7 @@ export interface ProseOptions {
   onOpenService?: (service: string) => void;
   onOpenMedia?: (src: string, alt: string, siblings?: Array<{ kind: "media"; id: string; label?: string }>) => void;
   noThumb?: string[];
+  slug?: string;
 }
 
 // ── Series card — matches CXSeriesPanel front card ──────────────────────────
@@ -505,6 +507,311 @@ function createLinkCard(href: string, og: OgData | null): HTMLAnchorElement {
   return el;
 }
 
+// ── Heading progress tracking ────────────────────────────────────────────────
+
+const DWELL_MS = 5000;
+const CIRC = 2 * Math.PI * 5;
+const SVG_NS = "http://www.w3.org/2000/svg";
+
+function makeRingSvg(): SVGSVGElement {
+  const svg = document.createElementNS(SVG_NS, "svg") as SVGSVGElement;
+  svg.setAttribute("width", "14"); svg.setAttribute("height", "14");
+  svg.setAttribute("viewBox", "0 0 14 14");
+  svg.style.flexShrink = "0";
+  const track = document.createElementNS(SVG_NS, "circle") as SVGCircleElement;
+  track.setAttribute("cx","7"); track.setAttribute("cy","7"); track.setAttribute("r","5");
+  track.setAttribute("fill","none"); track.setAttribute("stroke","rgba(255,255,255,0.12)");
+  track.setAttribute("stroke-width","2");
+  const arc = document.createElementNS(SVG_NS, "circle") as SVGCircleElement;
+  arc.setAttribute("cx","7"); arc.setAttribute("cy","7"); arc.setAttribute("r","5");
+  arc.setAttribute("fill","none"); arc.setAttribute("stroke","var(--section-accent)");
+  arc.setAttribute("stroke-width","2"); arc.setAttribute("stroke-linecap","round");
+  arc.setAttribute("stroke-dasharray", String(CIRC));
+  arc.setAttribute("stroke-dashoffset", String(CIRC));
+  arc.setAttribute("transform","rotate(-90 7 7)");
+  svg.appendChild(track); svg.appendChild(arc);
+  return svg;
+}
+
+function makeBookmarkSvg(): SVGSVGElement {
+  const svg = document.createElementNS(SVG_NS, "svg") as SVGSVGElement;
+  svg.setAttribute("width", "10"); svg.setAttribute("height", "13");
+  svg.setAttribute("viewBox", "0 0 10 13");
+  svg.style.flexShrink = "0";
+  const path = document.createElementNS(SVG_NS, "path") as SVGPathElement;
+  path.setAttribute("d", "M1 0.5h8v12L5 9 1 12.5V0.5z");
+  path.setAttribute("fill", "var(--section-accent)");
+  svg.appendChild(path);
+  return svg;
+}
+
+function makeCheckSvg(): SVGSVGElement {
+  const svg = document.createElementNS(SVG_NS, "svg") as SVGSVGElement;
+  svg.setAttribute("width", "14"); svg.setAttribute("height", "14");
+  svg.setAttribute("viewBox", "0 0 14 14");
+  svg.style.flexShrink = "0";
+  const poly = document.createElementNS(SVG_NS, "polyline") as SVGPolylineElement;
+  poly.setAttribute("points", "2.5 7 5.5 10 11.5 4");
+  poly.setAttribute("fill", "none");
+  poly.setAttribute("stroke", "var(--section-deep)");
+  poly.setAttribute("stroke-width", "2");
+  poly.setAttribute("stroke-linecap", "round");
+  poly.setAttribute("stroke-linejoin", "round");
+  svg.appendChild(poly);
+  return svg;
+}
+
+function makeLinkIcon(h: HTMLHeadingElement): HTMLButtonElement {
+  const btn = document.createElement("button");
+  btn.style.cssText = "display: flex; align-items: center; justify-content: center; background: none; border: none; padding: 0 2px; cursor: pointer; opacity: 0.15; transition: opacity 0.15s; flex-shrink: 0; color: currentColor;";
+  btn.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>`;
+  btn.addEventListener("mouseenter", () => { btn.style.opacity = "0.6"; soundHover(); });
+  btn.addEventListener("mouseleave", () => { btn.style.opacity = "0.15"; });
+  btn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    soundClick();
+    const url = `${window.location.origin}${window.location.pathname}#${h.id}`;
+    navigator.clipboard.writeText(url).then(() => {
+      btn.style.opacity = "1";
+      const svg = btn.querySelector("svg");
+      if (svg) svg.style.stroke = "var(--section-accent)";
+      setTimeout(() => {
+        btn.style.opacity = "0.15";
+        if (svg) svg.style.stroke = "currentColor";
+      }, 1500);
+    });
+  });
+  return btn;
+}
+
+function attachHeadingProgress(el: HTMLElement, slug: string): () => void {
+  const headings = Array.from(el.querySelectorAll<HTMLHeadingElement>("h2")).filter(h => h.id);
+  if (!headings.length) return () => {};
+
+  const allIds = headings.map(h => h.id);
+  const progress = getProgress(slug);
+  const indicators = new Map<HTMLHeadingElement, SVGSVGElement>();
+
+  headings.forEach((h) => {
+    const svg = progress.checked.includes(h.id) ? makeCheckSvg()
+      : progress.current === h.id ? makeBookmarkSvg()
+      : makeRingSvg();
+    const wrapper = document.createElement("span");
+    wrapper.style.cssText = "display: flex; align-items: flex-start; gap: 8px;";
+    while (h.firstChild) wrapper.appendChild(h.firstChild);
+
+    const iconGroup = document.createElement("span");
+    iconGroup.style.cssText = "margin-left: auto; margin-top: calc(0.5lh - 7px); display: flex; align-items: center; gap: 3px; flex-shrink: 0;";
+    iconGroup.appendChild(makeLinkIcon(h));
+    svg.style.cssText = "flex-shrink: 0; cursor: pointer; opacity: 0.4;";
+    svg.addEventListener("mouseenter", () => soundHover());
+    svg.addEventListener("click", (e) => { e.stopPropagation(); soundClick(); handleClick(h); });
+    iconGroup.appendChild(svg);
+    wrapper.appendChild(iconGroup);
+    h.appendChild(wrapper);
+    indicators.set(h, svg);
+  });
+
+  const sentinels: HTMLDivElement[] = headings.map((h, i) => {
+    const s = document.createElement("div");
+    s.style.cssText = "height: 1px; pointer-events: none;";
+    const next = headings[i + 1];
+    if (next) next.parentNode?.insertBefore(s, next);
+    else el.appendChild(s);
+    return s;
+  });
+
+  const rafIds = new Map<string, number>();
+  const startTs = new Map<string, number>();
+
+  function getArc(h: HTMLHeadingElement): SVGCircleElement | null {
+    return (indicators.get(h) as SVGSVGElement | undefined)
+      ?.querySelectorAll("circle")[1] as SVGCircleElement | null ?? null;
+  }
+
+  function replaceIndicator(h: HTMLHeadingElement, newSvg: SVGSVGElement) {
+    newSvg.style.cssText = "flex-shrink: 0; cursor: pointer; opacity: 0.4;";
+    newSvg.addEventListener("mouseenter", () => soundHover());
+    newSvg.addEventListener("click", (e) => { e.stopPropagation(); soundClick(); handleClick(h); });
+    const old = indicators.get(h);
+    if (old?.parentNode) old.parentNode.replaceChild(newSvg, old);
+    indicators.set(h, newSvg);
+  }
+
+  function cancelFill(key: string) {
+    const id = rafIds.get(key);
+    if (id !== undefined) cancelAnimationFrame(id);
+    rafIds.delete(key); startTs.delete(key);
+  }
+
+  function startFill(key: string, arc: SVGCircleElement, onComplete: () => void) {
+    cancelFill(key);
+    const tick = (ts: number) => {
+      if (!startTs.has(key)) startTs.set(key, ts);
+      const pct = Math.min(1, (ts - startTs.get(key)!) / DWELL_MS);
+      arc.setAttribute("stroke-dashoffset", String(CIRC * (1 - pct)));
+      if (pct < 1) {
+        rafIds.set(key, requestAnimationFrame(tick));
+      } else {
+        cancelFill(key);
+        onComplete();
+      }
+    };
+    rafIds.set(key, requestAnimationFrame(tick));
+  }
+
+  function startTimer(key: string, onComplete: () => void) {
+    cancelFill(key);
+    const tick = (ts: number) => {
+      if (!startTs.has(key)) startTs.set(key, ts);
+      if (ts - startTs.get(key)! < DWELL_MS) {
+        rafIds.set(key, requestAnimationFrame(tick));
+      } else {
+        cancelFill(key);
+        onComplete();
+      }
+    };
+    rafIds.set(key, requestAnimationFrame(tick));
+  }
+
+  // headingObs/sentinelObs are let so createObservers can replace them once the
+  // OverlayScrollbars root is available (it initializes after useLayoutEffect).
+  let headingObs: IntersectionObserver;
+  let sentinelObs: IntersectionObserver;
+
+  function observeNextEligible() {
+    const prog = getProgress(slug);
+    if (prog.current) {
+      const idx = allIds.indexOf(prog.current);
+      if (idx < 0) return;
+      if (idx === headings.length - 1) {
+        sentinelObs.observe(sentinels[idx]);
+      } else {
+        const nextIdx = allIds.findIndex((id, i) => i > idx && !prog.checked.includes(id));
+        if (nextIdx >= 0) headingObs.observe(headings[nextIdx]);
+      }
+      return;
+    }
+    const idx = allIds.findIndex(id => !prog.checked.includes(id));
+    if (idx >= 0) headingObs.observe(headings[idx]);
+  }
+
+  function handleClick(h: HTMLHeadingElement) {
+    cancelFill(h.id + "-h");
+    cancelFill(h.id + "-s");
+    const prog = getProgress(slug);
+    if (prog.checked.includes(h.id)) uncheckSection(slug, h.id);
+    else checkSection(slug, h.id, allIds);
+  }
+
+  function syncWithProgress() {
+    const prog = getProgress(slug);
+    headingObs.disconnect();
+    sentinelObs.disconnect();
+    rafIds.forEach(id => cancelAnimationFrame(id));
+    rafIds.clear(); startTs.clear();
+    headings.forEach(h => {
+      const svg = indicators.get(h);
+      const cur = !svg ? "ring"
+        : svg.querySelector("polyline") ? "check"
+        : svg.querySelector("path") ? "bookmark"
+        : "ring";
+      const want: "ring" | "bookmark" | "check" = prog.checked.includes(h.id) ? "check"
+        : prog.current === h.id ? "bookmark"
+        : "ring";
+      if (cur !== want)
+        replaceIndicator(h, want === "check" ? makeCheckSvg() : want === "bookmark" ? makeBookmarkSvg() : makeRingSvg());
+    });
+    observeNextEligible();
+  }
+
+  function createObservers(root: Element | null) {
+    headingObs?.disconnect();
+    sentinelObs?.disconnect();
+    const obsOpts = { root, rootMargin: "0px 0px -200px 0px", threshold: 0 };
+
+    // Phase 1: heading enters scroll root → ring fills → bookmark
+    headingObs = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        const h = entry.target as HTMLHeadingElement;
+        const arc = getArc(h);
+        if (!arc) return;
+        if (entry.isIntersecting) {
+          startFill(h.id + "-h", arc, () => {
+            headingObs.unobserve(h);
+            const prevBookmark = getProgress(slug).current;
+            replaceIndicator(h, makeBookmarkSvg());
+            advanceBookmark(slug, prevBookmark, h.id, allIds);
+          });
+        } else {
+          cancelFill(h.id + "-h");
+          arc.setAttribute("stroke-dashoffset", String(CIRC));
+        }
+      });
+    }, obsOpts);
+
+    // Phase 2: sentinel enters scroll root → timer → check off (last heading only)
+    sentinelObs = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        const sentinel = entry.target as HTMLDivElement;
+        const idx = sentinels.indexOf(sentinel);
+        if (idx < 0) return;
+        const h = headings[idx];
+        if (entry.isIntersecting) {
+          startTimer(h.id + "-s", () => {
+            sentinelObs.unobserve(sentinel);
+            replaceIndicator(h, makeCheckSvg());
+            completeSection(slug, h.id, allIds);
+            observeNextEligible();
+          });
+        } else {
+          cancelFill(h.id + "-s");
+        }
+      });
+    }, obsOpts);
+
+    observeNextEligible();
+  }
+
+  const onProgressUpdate = (e: Event) => {
+    const detail = (e as CustomEvent).detail;
+    if (!detail?.slug || detail.slug === slug) syncWithProgress();
+  };
+  window.addEventListener("pw-progress-update", onProgressUpdate);
+
+  function findScrollRoot(): Element | null {
+    let node: Element | null = el.parentElement;
+    while (node && !node.hasAttribute("data-overlayscrollbars-viewport")) {
+      node = node.parentElement;
+    }
+    return node;
+  }
+
+  // OverlayScrollbars initializes in useEffect, after our useLayoutEffect — so the
+  // viewport attribute may not exist yet. Create observers immediately (root: null
+  // = browser viewport as fallback), then recreate with the correct root once OS fires.
+  createObservers(findScrollRoot());
+
+  let mo: MutationObserver | null = null;
+  if (!findScrollRoot()) {
+    mo = new MutationObserver(() => {
+      const root = findScrollRoot();
+      if (root) { mo!.disconnect(); mo = null; createObservers(root); }
+    });
+    mo.observe(document.body, { subtree: true, attributes: true, attributeFilter: ["data-overlayscrollbars-viewport"] });
+  }
+
+  return () => {
+    headingObs.disconnect();
+    sentinelObs.disconnect();
+    mo?.disconnect();
+    window.removeEventListener("pw-progress-update", onProgressUpdate);
+    rafIds.forEach(id => cancelAnimationFrame(id));
+    rafIds.clear(); startTs.clear();
+    sentinels.forEach(s => s.remove());
+  };
+}
+
 // ── Main enhancer ────────────────────────────────────────────────────────────
 
 export function enhanceProse(el: HTMLElement, opts: ProseOptions = {}): () => void {
@@ -697,5 +1004,11 @@ export function enhanceProse(el: HTMLElement, opts: ProseOptions = {}): () => vo
     soundHover();
   };
   el.addEventListener("mouseover", handler);
-  return () => el.removeEventListener("mouseover", handler);
+
+  const progressCleanup = opts.slug ? attachHeadingProgress(el, opts.slug) : null;
+
+  return () => {
+    el.removeEventListener("mouseover", handler);
+    progressCleanup?.();
+  };
 }

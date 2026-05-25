@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import { useIsMobile } from "../../hooks/useIsMobile";
 import type { View, ModalState, Theme, Log } from "../../types";
 import { BACKDROPS, CX_INDEX, PROJECTS, LOGS, EXPERIENCES, SKILLS, PROJECT_CATEGORIES, DEFAULT_PROJECT_CAT, getProjectsForCategory, LOG_CATEGORIES, DEFAULT_LOG_CAT, getLogsForCategory, initLogs } from "../../data/content";
@@ -8,6 +8,8 @@ import CXHeader from "./CXHeader";
 import CXIndex from "./CXIndex";
 import CXMain, { StatusBar } from "./CXMain";
 import CXModal from "./CXModal";
+import { extractHeadings } from "./detail/DCLog";
+import { populateHeadingCache } from "../../utils/headingCache";
 
 interface AppProps {
   logsHtml: Record<string, string>;
@@ -123,6 +125,14 @@ function parseUrl() {
 }
 
 function AppInner({ logsHtml }: Pick<AppProps, "logsHtml">) {
+  useMemo(() => {
+    populateHeadingCache(
+      Object.fromEntries(
+        Object.entries(logsHtml).map(([id, html]) => [id, extractHeadings(html).map(h => h.anchorId)])
+      )
+    );
+  }, [logsHtml]);
+
   const isMobile = useIsMobile();
   const [navOpen, setNavOpen] = useState(false);
   const { enabled: soundOn, toggle: soundToggle } = useSound();

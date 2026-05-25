@@ -4,9 +4,9 @@ import { LOGS, slugify } from "../../../data/content";
 import Tap from "../../shared/Tap";
 import CXPill from "../CXPill";
 import { enhanceProse } from "./proseEnhance";
-import { SidebarTagGroups, SidebarTOC } from "./DCDetailSidebar";
+import { SidebarTagGroups, SidebarTOC, ProgressDot, ArticleProgressRing } from "./DCDetailSidebar";
 import { soundClick } from "../../../context/SoundContext";
-
+import { getProgress, checkSection, uncheckSection } from "../../../utils/logProgress";
 
 interface DCLogProps {
   id: string;
@@ -34,6 +34,24 @@ export default function DCLog({ id, html, onOpenLog, onOpenProject, onOpenSeries
   const proseRef = useRef<HTMLDivElement>(null);
   const tocRef = useRef<HTMLDivElement>(null);
   const [tocExpanded, setTocExpanded] = useState(false);
+  const [resetKey, setResetKey] = useState(0);
+  const [progress, setProgress] = useState(() => getProgress(a.id));
+
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const detail = (e as CustomEvent).detail;
+      if (!detail?.slug || detail.slug === a.id) {
+        setProgress(getProgress(a.id));
+        if (e.type === "pw-progress-reset") setResetKey(k => k + 1);
+      }
+    };
+    window.addEventListener("pw-progress-update", handler);
+    window.addEventListener("pw-progress-reset", handler);
+    return () => {
+      window.removeEventListener("pw-progress-update", handler);
+      window.removeEventListener("pw-progress-reset", handler);
+    };
+  }, [a.id]);
   const headings = extractHeadings(html);
   const seriesLogs = a.series
     ? LOGS.filter(x => x.series?.name === a.series!.name).sort((x, y) => x.series!.part - y.series!.part)
@@ -46,8 +64,29 @@ export default function DCLog({ id, html, onOpenLog, onOpenProject, onOpenSeries
     const el = proseRef.current;
     if (!el) return;
     el.innerHTML = html || '<p>Content not found.</p>';
-    return enhanceProse(el, { onOpenProject, onOpenLog, onOpenSeries, onOpenService, onOpenMedia, noThumb: a?.noThumb });
-  }, [html]);
+    return enhanceProse(el, { onOpenProject, onOpenLog, onOpenSeries, onOpenService, onOpenMedia, noThumb: a?.noThumb, slug: a.id });
+  }, [html, resetKey]);
+
+  // Scroll to saved reading position when a log opens
+  useEffect(() => {
+    const { current } = getProgress(id);
+    if (!current || !proseRef.current) return;
+    const target = proseRef.current.querySelector<HTMLElement>(`[id="${CSS.escape(current)}"]`);
+    if (!target) return;
+    let viewport: Element | null = proseRef.current.parentElement;
+    while (viewport && !viewport.hasAttribute("data-overlayscrollbars-viewport")) {
+      viewport = viewport.parentElement;
+    }
+    const timer = setTimeout(() => {
+      if (viewport) {
+        const offset = target.getBoundingClientRect().top - viewport.getBoundingClientRect().top + viewport.scrollTop - 80;
+        viewport.scrollTo({ top: offset, behavior: "smooth" });
+      } else {
+        target.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }, 450);
+    return () => clearTimeout(timer);
+  }, [id]);
 
   useEffect(() => {
     if (!tocExpanded) return;
@@ -84,11 +123,27 @@ export default function DCLog({ id, html, onOpenLog, onOpenProject, onOpenSeries
         )}
       </div>
       <h1 style={{ fontSize: 22, fontWeight: 500, letterSpacing: -0.3, lineHeight: 1.2, margin: 0 }}>{a.title}</h1>
-      <div style={{ display: "flex", gap: 12, alignItems: "baseline" }}>
+      <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
         <span className="pw-mono" style={{ fontSize: 12, color: "var(--ink-mute)" }}>{a.date}</span>
         <span className="pw-mono" style={{ fontSize: 12, color: "var(--ink-mute)" }}>
           · {a.words} words · ~{Math.round(a.words / 240)} min
         </span>
+        {headings.length > 0 && (
+          <span style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 8 }}>
+            {progress.checked.length > 0 && !progress.completed && (() => {
+              const remaining = Math.round(a.words * (1 - progress.checked.length / headings.length));
+              return (
+                <>
+                  <span className="pw-mono" style={{ fontSize: 11, color: "var(--section-accent)" }}>
+                    ~{remaining}w · ~{Math.round(remaining / 240)} min left
+                  </span>
+                  <span className="pw-mono" style={{ fontSize: 11, color: "var(--ink-mute)" }}>·</span>
+                </>
+              );
+            })()}
+            <span><ArticleProgressRing progress={progress} total={headings.length} slug={a.id} allIds={headings.map(h => h.anchorId)} /></span>
+          </span>
+        )}
       </div>
 
       {a.series && seriesLogs.length > 0 && (
@@ -147,7 +202,7 @@ export default function DCLog({ id, html, onOpenLog, onOpenProject, onOpenSeries
             >
               <span className="pw-eyebrow" style={{ color: "var(--section-deep)" }}>In this entry</span>
               <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                <span className="pw-mono" style={{ fontSize: 10, color: "var(--ink-mute)" }}>{headings.length}</span>
+                <ArticleProgressRing progress={progress} total={headings.length} slug={a.id} allIds={headings.map(h => h.anchorId)} />
                 <span style={{ fontSize: 10, color: "var(--ink-mute)", transition: "transform 0.2s", display: "inline-block", transform: tocExpanded ? "rotate(180deg)" : "none" }}>▾</span>
               </span>
             </Tap>
@@ -182,9 +237,15 @@ export default function DCLog({ id, html, onOpenLog, onOpenProject, onOpenSeries
                       }
                       setTocExpanded(false);
                     }}
-                    style={{ padding: "8px 14px", fontSize: 13, color: "var(--ink-soft)", cursor: "pointer", borderBottom: "1px solid rgba(255,255,255,0.04)" }}
+                    style={{ padding: "8px 14px", fontSize: 13, color: "var(--ink-soft)", cursor: "pointer", borderBottom: "1px solid rgba(255,255,255,0.04)", position: "relative" }}
                   >
                     {h.text}
+                    <ProgressDot anchorId={h.anchorId} progress={progress} accentColor="var(--section-accent)"
+                      onToggle={() => {
+                        const allIds = headings.map(x => x.anchorId);
+                        if (progress.checked.includes(h.anchorId)) uncheckSection(a.id, h.anchorId);
+                        else checkSection(a.id, h.anchorId, allIds);
+                      }} />
                   </Tap>
                 ))}
               </div>
@@ -293,7 +354,7 @@ export function DCLogSidebar({ id, headings, onOpenSkill, onOpenLog, onOpenSerie
         </div>
       </div>
       <SidebarTagGroups tags={a.tags ?? []} onOpen={onOpenSkill} />
-      <SidebarTOC headings={headings} label="In this entry" />
+      <SidebarTOC headings={headings} label="In this entry" slug={id} />
     </div>
   );
 }

@@ -1,8 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { LOGS, slugify } from "../../data/content";
 import type { ModalState } from "../../types";
 import Tap from "../shared/Tap";
 import { soundClick, soundHover } from "../../context/SoundContext";
+import { getProgress, completeAll, clearProgress } from "../../utils/logProgress";
+import { getLogHeadingIds } from "../../utils/headingCache";
+import { ArticleProgressRing } from "./detail/DCDetailSidebar";
 
 interface CXSeriesPanelProps {
   openModal: (m: ModalState) => void;
@@ -14,6 +17,16 @@ const OFFSETS  = [9, 5] as const;
 
 export default function CXSeriesPanel({ openModal }: CXSeriesPanelProps) {
   const [hovered, setHovered] = useState<string | null>(null);
+  const [, setTick] = useState(0);
+  useEffect(() => {
+    const handler = () => setTick(t => t + 1);
+    window.addEventListener("pw-progress-update", handler);
+    window.addEventListener("pw-progress-reset", handler);
+    return () => {
+      window.removeEventListener("pw-progress-update", handler);
+      window.removeEventListener("pw-progress-reset", handler);
+    };
+  }, []);
 
   const seriesNames = [...new Set(LOGS.filter((a) => a.series).map((a) => a.series!.name))];
   const groups = seriesNames.map((name) => {
@@ -29,6 +42,21 @@ export default function CXSeriesPanel({ openModal }: CXSeriesPanelProps) {
         const totalOffset = OFFSETS.slice(0, n - 1).reduce((s, v) => s + v, 0);
         const containerH  = CARD_H + totalOffset;
         const isHov = hovered === slug;
+
+        const completedLogs = logs.filter(a => getProgress(a.id).completed);
+        const allPublishedDone = logs.length > 0 && completedLogs.length === logs.length;
+        const seriesCompleted = allPublishedDone && unreleased === 0;
+        const seriesProgress = { current: null as string | null, checked: completedLogs.map(a => a.id), completed: seriesCompleted };
+        const handleSeriesAction = () => {
+          if (allPublishedDone) {
+            logs.forEach(a => clearProgress(a.id));
+          } else {
+            logs.forEach(a => {
+              const ids = getLogHeadingIds(a.id);
+              if (ids.length > 0) completeAll(a.id, ids);
+            });
+          }
+        };
 
         return (
           <Tap
@@ -98,20 +126,21 @@ export default function CXSeriesPanel({ openModal }: CXSeriesPanelProps) {
                     {a.title}
                   </div>
                 ))}
-                {(logs.length > 3 || unreleased > 0) && (
-                  <div className="pw-mono" style={{
-                    fontSize: 10, letterSpacing: "0.16em",
-                    opacity: 0.55, marginTop: 2,
-                    display: "flex", gap: 10,
-                  }}>
-                    {logs.length > 3 && (
-                      <span style={{ color: "var(--ink-mute)" }}>+{logs.length - 3} MORE</span>
-                    )}
-                    {unreleased > 0 && (
-                      <span style={{ color: "var(--section-accent)" }}>· {unreleased} COMING SOON</span>
-                    )}
-                  </div>
-                )}
+                <div style={{ marginTop: 2, display: "flex", alignItems: "center" }}>
+                  {(logs.length > 3 || unreleased > 0) && (
+                    <div className="pw-mono" style={{ fontSize: 10, letterSpacing: "0.16em", opacity: 0.55, display: "flex", gap: 10 }}>
+                      {logs.length > 3 && <span style={{ color: "var(--ink-mute)" }}>+{logs.length - 3} MORE</span>}
+                      {unreleased > 0 && <span style={{ color: "var(--section-accent)" }}>· {unreleased} COMING SOON</span>}
+                    </div>
+                  )}
+                  <ArticleProgressRing
+                    progress={seriesProgress}
+                    total={total}
+                    slug={`__series__${slug}`}
+                    allIds={[]}
+                    onAction={handleSeriesAction}
+                  />
+                </div>
               </div>
 
               {/* Thick bottom stripe — clipped to card's border-radius by parent overflow:hidden */}
