@@ -88,7 +88,7 @@ function parseFrontmatter(raw) {
   const seriesMatch = yaml.match(/^series:\s*\n\s+name:\s*"([^"]*)"/m);
   const series = seriesMatch ? seriesMatch[1] : null;
 
-  return { title: getString("title"), devto: getString("devto"), tags, series, body };
+  return { title: getString("title"), devto: getString("devto"), image: getString("image"), tags, series, body };
 }
 
 function slugFromUrl(url) {
@@ -99,7 +99,7 @@ function slugFromUrl(url) {
 
 async function main() {
   const raw = fs.readFileSync(filePath, "utf-8");
-  const { title, devto, tags, series, body } = parseFrontmatter(raw);
+  const { title, devto, image, tags, series, body } = parseFrontmatter(raw);
 
   if (!devto) {
     console.error("❌  No devto: URL in frontmatter — cannot determine which article to update.");
@@ -113,6 +113,7 @@ async function main() {
   console.log(`🌐  Canonical: https://pawper.dev/l/${path.basename(filePath, ".md")}`);
   console.log(`🏷️   Tags: ${tags.join(", ") || "(none)"}`);
   if (series) console.log(`📚  Series: ${series}`);
+  if (image) console.log(`🖼️   Hero: ${image}`);
   console.log("");
 
   // Resolve numeric article ID by listing the user's published articles
@@ -150,6 +151,7 @@ async function main() {
   const canonicalUrl = `https://pawper.dev/l/${localSlug}`;
   const article = { title, body_markdown: devtoBody, tags, canonical_url: canonicalUrl };
   if (series) article.series = series;
+  if (image) article.main_image = image;
   const payload = JSON.stringify({ article });
 
   // Push update
