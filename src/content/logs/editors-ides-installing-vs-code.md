@@ -9,6 +9,19 @@ series:
   name: "Foundations of Digital Agency"
   part: 2
   total: 2
+noThumb:
+  - https://code.visualstudio.com/docs
+  - https://code.visualstudio.com/docs/editor/whyvscode
+  - https://code.visualstudio.com/docs/getstarted/userinterface
+  - https://code.visualstudio.com/docs/editor/codebasics
+  - https://code.visualstudio.com/docs/editor/extension-marketplace
+  - https://code.visualstudio.com/docs/setup/windows
+  - https://marketplace.visualstudio.com/items?itemName=vscode-icons-team.vscode-icons
+  - https://marketplace.visualstudio.com/items?itemName=christian-kohler.path-intellisense
+  - https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer
+  - https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode
+  - https://marketplace.visualstudio.com/items?itemName=GitHub.copilot
+
 ---
 
 Everything you need to know to get started with VS Code: useful context to the world's most popular code editor, a simple install guide, and some useful keyboard shortcuts.
@@ -31,48 +44,24 @@ VS Code is the most popular editor and has many features, including syntax highl
 > https://code.visualstudio.com/docs/editor/whyvscode
 > https://code.visualstudio.com/docs/getstarted/userinterface 
 > https://code.visualstudio.com/docs/editor/codebasics 
-> https://code.visualstudio.com/docs/editor/extension-marketplace 
 
 ---
 
 ## 💻 Set Up VS Code
-These instructions are for Windows.
-1. Download the Visual Studio Code installer for Windows. https://code.visualstudio.com/download
+1. Download the Visual Studio Code installer. https://code.visualstudio.com/download
    * The Insiders edition is a nightly build with the latest features, but it is not a stable release and you may encounter issues. That said, you can have both versions installed. https://code.visualstudio.com/insiders/ 
-1. Once it is downloaded, run the installer (VSCodeUserSetup-{version}.exe). This will only take a minute.
-1. By default, VS Code is installed under `C:\users\{username}\AppData\Local\Programs\Microsoft VS Code`.
-1. If you want to use Windows Subsystem for Linux (WSL) - which I highly recommend - install the [WSL extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-wsl).
-   * Restart VS Code.
+1. Once it is downloaded, run the installer. This will only take a minute.
 
 > Sources / additional material:
-> https://code.visualstudio.com/docs/setup/windows 
+> https://code.visualstudio.com/docs/setup/setup-overview 
 
 ---
 
-## Let's talk extensions
-Extensions are key to the VS Code developer experience. You absolutely should explore extensions; often times you will do so to find the best & laziest way to do things. Extensions help make development more accessible.
+## Extensions
+Extensions are key to the VS Code developer experience. You absolutely should explore extensions; often times you will do so to find the best & laziest way to do things. Extensions help make development more accessible. We'll be installing some extensions in this series.
 
-Here are some of my personal recommendations for beginners:
-
-### vscode-icons
-https://marketplace.visualstudio.com/items?itemName=vscode-icons-team.vscode-icons
-I find this extension just makes it easier to identify my files at a glance.
-
-### Path IntelliSense
-https://marketplace.visualstudio.com/items?itemName=christian-kohler.path-intellisense
-When you're typing in a relative file path, this extension helps by displaying IntelliSense suggestions for directories and files. It will save you from typos.
-
-### Live Server
-https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer
-Launch a live preview of your current HTML project in your web browser. It updates as you save changes to your work.
-
-### Prettier - Code Formatter
-https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode
-Prettier cleans up your code's formatting on save. Formatting your code doesn't make it _fully_ clean code, but it gets you one step closer. Formatted code is important for readability. You will have to read your code, and others you share it won't want to if it's a mess.
-
-### GitHub Copilot
-https://marketplace.visualstudio.com/items?itemName=GitHub.copilot
-GitHub Copilot is an AI coding assistant that suggests code completions as you type, and can generate entire functions or files from a prompt. It requires a paid subscription (there is a free tier with limited usage). As of 2024 it is built into VS Code and can be accessed from the Copilot icon in the title bar. AI-assisted coding has become a standard part of the modern developer workflow — even as a beginner it is worth knowing it exists.
+> Sources / additional material:
+> https://code.visualstudio.com/docs/editor/extension-marketplace 
 
 ---
 
@@ -83,48 +72,53 @@ VS Code's settings are stored in `settings.json`. You can access this by opening
 1. Values can be strings (in quotation marks), numbers (without quotation marks), boolean (`true`/`false`), arrays (comma-separated elements in square brackets `[]`), or objects (comma-separated key: value pairs in curly brackets `{}`). It's out of our scope here to cover data types, but you can be mindful of the indicated syntax.
 
 Here are some settings that I recommend:
-1. Set the editor to update closing tags when opening tags are updated. Useful for HTML.
 1. Set the default tab size to 2 spaces. I find that a minimal tab size makes it easier to share blocks of code.
 1. Set the word wrap as on by default. I don't like scrolling left & right to read a long line of code.
-1. Set the editor to format the document on save, and to use Prettier as the formatter.
-1. Set Prettier to not create line breaks after a certain number of characters by giving it a large print width.
 
 ```json
 {
-  "editor.linkedEditing": true,
   "editor.tabSize": 2,
   "editor.wordWrap": "on",
-  "editor.formatOnSave": true,
-  "editor.defaultFormatter": "esbenp.prettier-vscode",
-  "prettier.printWidth": 9999
 }
 ```
 You can create settings specific to a certain project as well. Just create a `.vscode` directory at the top level, and inside it create a `settings.json` file. Any specific settings here will override those settings within VS Code's main settings.json.
-![JavaScript React Language Mode](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/rjor2xf2ui82ffch7m98.png)
+
+![JavaScript React Language Mode](https://res.cloudinary.com/dr1sonbsi/image/upload/v1779696818/pawper.dev/logs/rjor2xf2ui82ffch7m98_qmyqo2.png)
+
 Here you can see that since this is a React project, I am setting all JavaScript files (`.js`) to be associated with the JavaScript React language mode (`"javascriptreact"`). The icons update as well to the React icon.
  
+> Sources / additional material:
+> https://code.visualstudio.com/docs/configure/settings
+
 ---
 
 ## 📜Key Bindings: VS Code
-* <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd> Show Command Palette
-* <kbd>Ctrl</kbd>+<kbd>P</kbd> Quick Open, Go to File...
-* <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>X</kbd> Open Extensions panel
-* <kbd>Ctrl</kbd>+<kbd>`</kbd> Show Integrated Terminal
-* <kbd>Alt</kbd>+<kbd>Click</kbd> Insert additional cursors.
 
-> Sources / additional material:  https://code.visualstudio.com/shortcuts/keyboard-shortcuts-windows.pdf 
+| Shortcut | Action |
+|---|---|
+| <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd> | Show Command Palette |
+| <kbd>Ctrl</kbd>+<kbd>P</kbd> | Quick Open, Go to File |
+| <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>X</kbd> | Open Extensions panel |
+| <kbd>Ctrl</kbd>+<kbd>`</kbd> | Show Integrated Terminal |
+| <kbd>Alt</kbd>+<kbd>Click</kbd> | Insert additional cursors |
 
 ## 📜Key Bindings: Navigating & Selecting Text
-* <kbd>Ctrl</kbd>+<kbd>→</kbd> Move the cursor one word to the right
-* <kbd>Ctrl</kbd>+<kbd>←</kbd> Move the cursor one word to the left
-* <kbd>Shift</kbd>+<kbd>→</kbd> Select text to the right
-* <kbd>Shift</kbd>+<kbd>←</kbd> Select text to the left
-* <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>←</kbd> Select the word to the left.
-* <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>→</kbd> Select the word to the right.
-* <kbd>Shift</kbd>+<kbd>Home</kbd> Select from the current position to the beginning of the current line.
-* <kbd>Shift</kbd>+<kbd>End</kbd> Select from the current position to the end of the current line.
-* <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Home</kbd> Select from the current position to the beginning of the document.
-* <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>End</kbd> Select from the current position to the end of the document.
-* <kbd>Ctrl</kbd>+<kbd>A</kbd> Select all document content.
 
-> More here specific to VS Code: https://code.visualstudio.com/shortcuts/keyboard-shortcuts-windows.pdf
+| Shortcut | Action |
+|---|---|
+| <kbd>Ctrl</kbd>+<kbd>→</kbd> | Move the cursor one word to the right |
+| <kbd>Ctrl</kbd>+<kbd>←</kbd> | Move the cursor one word to the left |
+| <kbd>Shift</kbd>+<kbd>→</kbd> | Select text to the right |
+| <kbd>Shift</kbd>+<kbd>←</kbd> | Select text to the left |
+| <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>→</kbd> | Select the word to the right |
+| <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>←</kbd> | Select the word to the left |
+| <kbd>Shift</kbd>+<kbd>Home</kbd> | Select to the beginning of the current line |
+| <kbd>Shift</kbd>+<kbd>End</kbd> | Select to the end of the current line |
+| <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Home</kbd> | Select to the beginning of the document |
+| <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>End</kbd> | Select to the end of the document |
+| <kbd>Ctrl</kbd>+<kbd>A</kbd> | Select all document content |
+
+> Sources / additional material:
+> https://code.visualstudio.com/shortcuts/keyboard-shortcuts-macos.pdf
+> https://code.visualstudio.com/shortcuts/keyboard-shortcuts-windows.pdf
+> https://code.visualstudio.com/docs/configure/keybindings

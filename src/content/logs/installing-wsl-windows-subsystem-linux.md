@@ -10,6 +10,10 @@ series:
   name: "Foundations of Digital Agency"
   part: 3
   total: 4
+noThumb:
+  - https://docs.microsoft.com/en-us/windows/wsl/install
+  - https://docs.microsoft.com/en-us/windows/wsl/about
+  - https://docs.microsoft.com/en-us/windows/wsl/setup/environment
 ---
 
 If you're a web developer on Windows, Windows Subsystem for Linux (WSL) is essential. This tutorial walks you through understanding what WSL is, why you should use it, and how to install and configure it for development.

@@ -212,25 +212,25 @@ These are more secure than .env files for production.
 ## Practical Security Checklist
 
 ### For Your Personal Accounts
-- [ ] Use a password manager (Bitwarden, 1Password, or LastPass)
-- [ ] Create one strong master password and memorize it
-- [ ] Enable 2FA on critical accounts (email, GitHub, banking, social media)
-- [ ] Use authenticator apps instead of SMS when possible
-- [ ] Never click links in suspicious emails — visit websites directly
-- [ ] Never give passwords or 2FA codes to anyone, even "IT support"
-- [ ] Keep your OS and software updated
-- [ ] Use a VPN on public WiFi if handling sensitive work
+- Use a password manager (Bitwarden, 1Password, or LastPass)
+- Create one strong master password and memorize it
+- Enable 2FA on critical accounts (email, GitHub, banking, social media)
+- Use authenticator apps instead of SMS when possible
+- Never click links in suspicious emails — visit websites directly
+- Never give passwords or 2FA codes to anyone, even "IT support"
+- Keep your OS and software updated
+- Use a VPN on public WiFi if handling sensitive work
 
 ### For Your Development Projects
-- [ ] Create a `.env` file for local secrets
-- [ ] Add `.env` to `.gitignore` before your first commit
-- [ ] Create a `.env.example` with placeholder values
-- [ ] Never commit real API keys, passwords, or tokens
-- [ ] Review your `.git` history — if you accidentally committed secrets, revoke them immediately
-- [ ] Use environment variables in production (deployment platforms handle this)
-- [ ] Keep dependencies updated (`npm update`, `pip install --upgrade`)
-- [ ] Be cautious installing packages from npm, pip, etc. — check the source and download counts
-- [ ] Ask friends and trusted sources for recommendations before risking stranger danger.
+- Create a `.env` file for local secrets
+- Add `.env` to `.gitignore` before your first commit
+- Create a `.env.example` with placeholder values
+- Never commit real API keys, passwords, or tokens
+- Review your `.git` history — if you accidentally committed secrets, revoke them immediately
+- Use environment variables in production (deployment platforms handle this)
+- Keep dependencies updated (`npm update`, `pip install --upgrade`)
+- Be cautious installing packages from npm, pip, etc. — check the source and download counts
+- Ask friends and trusted sources for recommendations before risking stranger danger.
 
 ---
 
@@ -265,17 +265,12 @@ You don't need to be paranoid, just consistent:
 These habits will protect you from 99% of common attacks.
 
 > **Sources / additional material:**
->
-> https://haveibeenpwned.com — Check if your email was in a data breach
->
-> https://bitwarden.com — Open-source password manager
->
-> https://owasp.org/www-community/attacks/Social_Engineering — OWASP social engineering guide
->
-> https://www.cisa.gov/tips — U.S. Cybersecurity & Infrastructure Security Agency tips
->
-> https://cheatsheetseries.owasp.org/ — OWASP cheat sheets on security topics
->
-> https://12factor.net/config — 12-Factor App configuration best practices
+> 
+> Check if your email was in a data breach: 
+> https://haveibeenpwned.com
+>Open-source password manager: 
+> https://bitwarden.com
+> OWASP cheat sheets on security topics (open the menu in the top left): 
+> https://cheatsheetseries.owasp.org/
 
 _This article was generated with AI for the purpose of providing practical information. I have reviewed it for accuracy and edited it appropriately._

@@ -3,6 +3,7 @@ title: "Operating Systems, Terminals & Shells"
 date: "2022.02.02"
 kicker: "Tutorial"
 tags: ["Git", "PowerShell", "Bash", "Mentoring"]
+image: "https://res.cloudinary.com/dr1sonbsi/image/upload/v1779690568/pawper.dev/logs/3178c9eb-9890-4b2f-9ab6-a5801b64761f_wrlk2d.png"
 hook: "Before you build anything, understand what's underneath: operating systems, the command line, and why Windows/Mac/Linux are different (and the same). This foundation matters."
 devto: "https://dev.to/pawper/intro-to-operating-systems-terminals-shells-faq-4agm"
 series:
@@ -40,6 +41,8 @@ Both Windows NT and UNIX have roots in the mid-1970s and both were influenced by
 ## What is Windows Subsystem for Linux (WSL)?
 Windows Subsystem for Linux lets developers run a GNU/Linux environment—including most command-line tools, utilities, and applications—directly on Windows, unmodified, without the overhead of a traditional virtual machine or dualboot setup. WSL 2 introduced an entirely new architecture that benefits from running a real Linux kernel. It runs in a lightweight virtual machine environment through a subset of Microsoft's Hyper-V features.
 
+![OS Lineage (Generated with Claude Design)](https://res.cloudinary.com/dr1sonbsi/image/upload/v1779689030/pawper.dev/logs/ChatGPT_Image_May_24_2026_02_24_26_PM_woinhd.png)
+
 ## On Windows, why not use a virtual machine (VM) for Linux?
 You can, but WSL requires fewer resources (CPU, memory, and storage) than a full VM. You can't easily work between the VM and Windows software.
 
@@ -52,6 +55,8 @@ A shell is an interpreter for command line language. Common shells include Bash 
 ## What is a CLI?
 A CLI is a **Command Line Interface**—any interface where you interact with a computer using text commands instead of clicking buttons. The terminal is the application; the shell is the interpreter; but CLI is the broader concept: communicating with software by typing commands. When you use Bash, PowerShell, or Zsh, you're using a CLI. When you run `npm install` or `git commit`, you're using a CLI. CLIs are powerful because they let you express complex instructions precisely and automate tasks through scripts. Many development tools—especially agentic AI tools like Claude Code—live entirely in the CLI.
 
+![Anatomy of the Command Line (Generated with Claude Design)](https://res.cloudinary.com/dr1sonbsi/image/upload/v1779688440/pawper.dev/logs/Screenshot_2026-05-24_225335_ro0q4w.png)
+
 ## Are Bash and PowerShell just shells?
 The same names are used to refer to the shells' scripting languages as well.
 
@@ -63,6 +68,8 @@ Zsh (Z shell) is a Unix shell that is largely compatible with Bash but adds many
 
 ## What is PowerShell 7?
 PowerShell 7 is the current cross-platform (Windows, Linux, and macOS), open-source version of PowerShell. It is the successor to both Windows PowerShell (which remains at version 5.1 and is built into Windows) and PowerShell Core (versions 6.x, a transitional release). PowerShell 7 is what you should install if you want to use PowerShell on macOS or Linux, or want the latest features on Windows.
+
+![Bash • Zsh • PowerShell (Generated with Claude Design)](https://res.cloudinary.com/dr1sonbsi/image/upload/v1779688665/pawper.dev/logs/Screenshot_2026-05-24_225731_mmhhb4.png)
 
 ---
 
@@ -87,9 +94,11 @@ This knowledge is power. In the next tutorials in this series, you'll further gr
 
 With each step you'll grow the understanding to navigate confidently, make informed decisions, and see the world opportunistically -- through the eyes of someone who possesses the technology.
 
-> Sources / additional material: \
-> https://www.itprotoday.com/windows-78/nt-vsunix-one-substantially-better \
-> https://docs.microsoft.com/en-us/windows/wsl/about \
+![Mind = blown](https://res.cloudinary.com/dr1sonbsi/image/upload/v1779659070/pawper.dev/logs/blow-mind-mind-blown_pawb4a.gif)
+
+> Sources / additional material:
+> https://web.archive.org/web/20240226110454/https://www.itprotoday.com/windows-78/nt-vsunix-one-substantially-better#close-modal
+> https://docs.microsoft.com/en-us/windows/wsl/about
 > https://www.udemy.com/course/the-linux-command-line-bootcamp/
 
 _This article was revised & expanded with AI for the purpose of providing practical information. I have reviewed it for accuracy and edited it appropriately._
