@@ -3,6 +3,7 @@ import { PROJECTS, LOGS, slugify } from "../../../data/content";
 import type { Endorsement } from "../../../data/content";
 import type { Log, Project } from "../../../types";
 import endorsementsData from "../../../data/endorsements.json";
+import ogLinkCacheRaw from "../../../data/og-link-cache.json";
 
 const allEndorsements = endorsementsData as Endorsement[];
 
@@ -366,6 +367,81 @@ function createEndorsementCard(e: Endorsement, onClick?: () => void): HTMLElemen
   return el;
 }
 
+// ── OG link cards ────────────────────────────────────────────────────────────
+
+interface OgData {
+  title?: string | null;
+  description?: string | null;
+  image?: string | null;
+  domain?: string | null;
+}
+
+const ogLinkCache = ogLinkCacheRaw as Record<string, OgData>;
+
+function createLinkCard(href: string, og: OgData): HTMLAnchorElement {
+  let domain = og.domain ?? "";
+  if (!domain) { try { domain = new URL(href).hostname.replace(/^www\./, ""); } catch {} }
+
+  const el = document.createElement("a");
+  el.href = href;
+  el.target = "_blank";
+  el.rel = "noopener noreferrer";
+  el.className = "pw-url-card pw-prose-ref";
+
+  const body = document.createElement("div");
+  body.className = "pw-url-card-body";
+
+  const content = document.createElement("div");
+  content.className = "pw-url-card-content";
+
+  // Domain row
+  const domainRow = document.createElement("div");
+  domainRow.className = "pw-url-card-domain";
+  const favicon = document.createElement("img");
+  favicon.src = `https://www.google.com/s2/favicons?domain=${encodeURIComponent(domain)}&sz=16`;
+  favicon.className = "pw-url-card-favicon";
+  favicon.alt = "";
+  favicon.addEventListener("error", () => { favicon.style.display = "none"; });
+  const domainText = document.createElement("span");
+  domainText.textContent = domain;
+  domainRow.appendChild(favicon);
+  domainRow.appendChild(domainText);
+  content.appendChild(domainRow);
+
+  // Title
+  if (og.title) {
+    const titleEl = document.createElement("div");
+    titleEl.className = "pw-url-card-title";
+    titleEl.textContent = og.title;
+    content.appendChild(titleEl);
+  }
+
+  // Description
+  if (og.description) {
+    const descEl = document.createElement("div");
+    descEl.className = "pw-url-card-desc";
+    descEl.textContent = og.description;
+    content.appendChild(descEl);
+  }
+
+  body.appendChild(content);
+
+  // Thumbnail
+  if (og.image) {
+    const thumb = document.createElement("div");
+    thumb.className = "pw-url-card-thumb";
+    const img = document.createElement("img");
+    img.src = og.image;
+    img.alt = "";
+    img.addEventListener("error", () => { thumb.remove(); });
+    thumb.appendChild(img);
+    body.appendChild(thumb);
+  }
+
+  el.appendChild(body);
+  return el;
+}
+
 // ── Main enhancer ────────────────────────────────────────────────────────────
 
 export function enhanceProse(el: HTMLElement, opts: ProseOptions = {}): () => void {
@@ -428,27 +504,34 @@ export function enhanceProse(el: HTMLElement, opts: ProseOptions = {}): () => vo
       return;
     }
 
-    // Raw pawper.dev URLs with modal params
+    // Raw pawper.dev URLs with modal params  /  external OG link cards
     if (href.startsWith("http")) {
       try {
         const url = new URL(href);
         const modal = url.searchParams.get("modal");
         const id = url.searchParams.get("id");
-        if (!modal || !id) return;
-        if (modal === "project") {
-          const project = PROJECTS.find((pr) => pr.id === id);
-          if (!project) return;
-          p.replaceWith(createProjectCard(project, () => opts.onOpenProject?.(id)));
-        } else if (modal === "log" || modal === "article") {
-          const log = LOGS.find((ar) => ar.id === id);
-          if (!log) return;
-          p.replaceWith(createLogCard(log, () => opts.onOpenLog?.(id)));
-        } else if (modal === "series") {
-          const name = [...new Set(LOGS.filter(a => a.series).map(a => a.series!.name))].find(n => slugify(n) === id);
-          if (!name) return;
-          const logList = LOGS.filter(a => a.series?.name === name).sort((a, b) => a.series!.part - b.series!.part);
-          const total = logList[0]?.series?.total ?? logList.length;
-          p.replaceWith(createSeriesCard(name, logList, total, () => opts.onOpenSeries?.(id)));
+        if (modal && id) {
+          if (modal === "project") {
+            const project = PROJECTS.find((pr) => pr.id === id);
+            if (!project) return;
+            p.replaceWith(createProjectCard(project, () => opts.onOpenProject?.(id)));
+          } else if (modal === "log" || modal === "article") {
+            const log = LOGS.find((ar) => ar.id === id);
+            if (!log) return;
+            p.replaceWith(createLogCard(log, () => opts.onOpenLog?.(id)));
+          } else if (modal === "series") {
+            const name = [...new Set(LOGS.filter(a => a.series).map(a => a.series!.name))].find(n => slugify(n) === id);
+            if (!name) return;
+            const logList = LOGS.filter(a => a.series?.name === name).sort((a, b) => a.series!.part - b.series!.part);
+            const total = logList[0]?.series?.total ?? logList.length;
+            p.replaceWith(createSeriesCard(name, logList, total, () => opts.onOpenSeries?.(id)));
+          }
+          return;
+        }
+        // Bare external URL — render as OG link card if cached data is available
+        const og = ogLinkCache[href];
+        if (og?.title && a.textContent?.trim() === href) {
+          p.replaceWith(createLinkCard(href, og));
         }
       } catch {}
     }

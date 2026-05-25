@@ -1,0 +1,38 @@
+{
+  "https://marketplace.visualstudio.com/items?itemName=vscode-icons-team.vscode-icons": {
+    "title": "vscode-icons - Visual Studio Marketplace",
+    "description": "Extension for Visual Studio Code - Icons for Visual Studio Code",
+    "image": "https://vscode-icons-team.gallerycdn.vsassets.io/extensions/vscode-icons-team/vscode-icons/12.18.0/1776616405324/Microsoft.VisualStudio.Services.Icons.Default",
+    "domain": "marketplace.visualstudio.com"
+  },
+  "https://marketplace.visualstudio.com/items?itemName=christian-kohler.path-intellisense": {
+    "title": "Path Intellisense - Visual Studio Marketplace",
+    "description": "Extension for Visual Studio Code - Visual Studio Code plugin that autocompletes filenames",
+    "image": "https://christian-kohler.gallerycdn.vsassets.io/extensions/christian-kohler/path-intellisense/2.10.0/1732919213601/Microsoft.VisualStudio.Services.Icons.Default",
+    "domain": "marketplace.visualstudio.com"
+  },
+  "https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer": {
+    "title": "Live Server - Visual Studio Marketplace",
+    "description": "Extension for Visual Studio Code - Launch a development local Server with live reload feature for static & dynamic pages",
+    "image": "https://ritwickdey.gallerycdn.vsassets.io/extensions/ritwickdey/liveserver/5.7.10/1772184436918/Microsoft.VisualStudio.Services.Icons.Default",
+    "domain": "marketplace.visualstudio.com"
+  },
+  "https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode": {
+    "title": "Prettier - Code formatter - Visual Studio Marketplace",
+    "description": "Extension for Visual Studio Code - Code formatter using prettier",
+    "image": "https://esbenp.gallerycdn.vsassets.io/extensions/esbenp/prettier-vscode/12.4.0/1773688466128/Microsoft.VisualStudio.Services.Icons.Default",
+    "domain": "marketplace.visualstudio.com"
+  },
+  "https://marketplace.visualstudio.com/items?itemName=GitHub.copilot": {
+    "title": "GitHub Copilot - Visual Studio Marketplace",
+    "description": "Extension for Visual Studio Code - Your AI pair programmer",
+    "image": "https://GitHub.gallerycdn.vsassets.io/extensions/github/copilot/1.388.0/1761326434179/Microsoft.VisualStudio.Services.Icons.Default",
+    "domain": "marketplace.visualstudio.com"
+  },
+  "https://pawper.dev/?v=entry&cat=logs&entry=latest&modal=log&id=guide-password-management-cybersecurity-beginners": {
+    "title": "Phillip Wessels · CODEX",
+    "description": "Phillip Wessels — Full-Stack Developer. React, TypeScript, Node.",
+    "image": null,
+    "domain": "pawper.dev"
+  }
+}
