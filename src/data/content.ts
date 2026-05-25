@@ -394,6 +394,7 @@ export const SKILL_ALIASES: Record<string, string[]> = {
   "Writing":       ["copy editing", "copyediting", "copy-editing"],
   "Design":        ["web design", "ux", "user experience", "user experience (ux)"],
   "Testing":       ["quality assurance", "qa"],
+  "VS Code":       ["vscode"],
 };
 
 export function canonicalizeSkill(name: string): string {

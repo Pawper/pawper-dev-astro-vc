@@ -2,7 +2,7 @@
 title: "Editors, IDEs & Installing VS Code"
 date: "2022.02.04"
 kicker: "Tutorial"
-tags: ["VS Code", "Mentoring"]
+tags: ["vscode", "Mentoring"]
 hook: "Everything you need to know to get started with VS Code: useful context to the world's most popular..."
 devto: "https://dev.to/pawper/faq-editors-ides-vs-code-3fp0"
 series:
