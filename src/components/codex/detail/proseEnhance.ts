@@ -528,13 +528,35 @@ export function enhanceProse(el: HTMLElement, opts: ProseOptions = {}): () => vo
           }
           return;
         }
-        // Bare external URL — render as OG link card if cached data is available
-        const og = ogLinkCache[href];
-        if (og?.title && a.textContent?.trim() === href) {
-          p.replaceWith(createLinkCard(href, og));
-        }
       } catch {}
     }
+  });
+
+  // OG link cards — runs after cross-ref pass so it only touches raw bare URLs.
+  // Handles URLs in any parent context: standalone <p>, <blockquote>, <li>, etc.
+  el.querySelectorAll<HTMLAnchorElement>('a[href^="http"]').forEach((a) => {
+    if (!a.isConnected) return; // already replaced by cross-ref pass above
+    if (a.closest(".pw-url-card")) return;
+    const href = a.getAttribute("href") ?? "";
+    if (a.textContent?.trim() !== href) return; // not a bare URL (has descriptive text)
+    const og = ogLinkCache[href];
+    if (!og?.title) return;
+
+    const card = createLinkCard(href, og);
+    const parent = a.parentElement;
+
+    // If the <a> is the sole meaningful child of its <p>, swap the whole <p>
+    if (parent?.tagName === "P") {
+      const meaningful = Array.from(parent.childNodes).filter(
+        (n) => !(n.nodeType === Node.TEXT_NODE && (n.textContent ?? "").trim() === "")
+      );
+      if (meaningful.length === 1) { parent.replaceWith(card); return; }
+    }
+
+    // Otherwise replace just the <a> and remove any preceding <br>
+    const prev = a.previousSibling;
+    if (prev?.nodeName === "BR") prev.remove();
+    a.replaceWith(card);
   });
 
   // Images — clickable to open media viewer

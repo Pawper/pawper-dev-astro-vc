@@ -34,5 +34,65 @@
     "description": "Phillip Wessels — Full-Stack Developer. React, TypeScript, Node.",
     "image": null,
     "domain": "pawper.dev"
+  },
+  "https://code.visualstudio.com/docs": {
+    "title": "Documentation for Visual Studio Code",
+    "description": "Your home for multi-agent development. Explore AI agents, coding tools, extensions, and everything you need to build faster with Visual Studio Code.",
+    "image": "https://code.visualstudio.com/opengraphimg/opengraph-gettingstarted.png",
+    "domain": "code.visualstudio.com"
+  },
+  "https://code.visualstudio.com/docs/editor/whyvscode": {
+    "title": "Why did we build Visual Studio Code?",
+    "description": "Visual Studio Code provides developers with a new choice of tool that combines the simplicity of a code editor with the best tooling for their core edit-build-debug cycle. Visual Studio Code is available for macOS, Linux, and Windows.",
+    "image": "https://code.visualstudio.com/opengraphimg/generated/docs/editor/whyvscode.webp",
+    "domain": "code.visualstudio.com"
+  },
+  "https://code.visualstudio.com/docs/getstarted/userinterface": {
+    "title": "User interface",
+    "description": "A quick overview of the Visual Studio Code user interface. Learn about the editor, window management, and special UI to handle source control, extension management, full text search and more.",
+    "image": "https://code.visualstudio.com/opengraphimg/generated/docs/getstarted/userinterface.webp",
+    "domain": "code.visualstudio.com"
+  },
+  "https://code.visualstudio.com/docs/editor/codebasics": {
+    "title": "Basic editing",
+    "description": "Learn about the basic editing features of Visual Studio Code. Search, multiple selection, code formatting.",
+    "image": "https://code.visualstudio.com/opengraphimg/generated/docs/editing/codebasics.webp",
+    "domain": "code.visualstudio.com"
+  },
+  "https://code.visualstudio.com/docs/editor/extension-marketplace": {
+    "title": "Extension Marketplace",
+    "description": "Discover, add, update, disable and uninstall Visual Studio Code extensions (plug-ins) through the Extension Marketplace.",
+    "image": "https://code.visualstudio.com/opengraphimg/generated/docs/configure/extensions/extension-marketplace.webp",
+    "domain": "code.visualstudio.com"
+  },
+  "https://code.visualstudio.com/docs/setup/windows": {
+    "title": "Installing Visual Studio Code on Windows",
+    "description": "Install Visual Studio Code on Windows, choose User or System setup, and configure Windows developer tools.",
+    "image": "https://code.visualstudio.com/opengraphimg/generated/docs/setup/windows.webp",
+    "domain": "code.visualstudio.com"
+  },
+  "https://docs.microsoft.com/en-us/windows/wsl/install": {
+    "title": "Install WSL",
+    "description": "Install Windows Subsystem for Linux with the command, wsl --install. Use a Bash terminal on your Windows machine run by your preferred Linux distribution - Ubuntu, Debian, SUSE, Kali, Fedora, Pengwin, Alpine, and more are available.",
+    "image": "https://learn.microsoft.com/en-us/media/open-graph-image.png",
+    "domain": "docs.microsoft.com"
+  },
+  "https://docs.microsoft.com/en-us/windows/wsl/about": {
+    "title": "What is Windows Subsystem for Linux",
+    "description": "Learn about the Windows Subsystem for Linux, including the different versions and ways you can use them. Microsoft Loves Linux.",
+    "image": "https://learn.microsoft.com/en-us/media/open-graph-image.png",
+    "domain": "docs.microsoft.com"
+  },
+  "https://docs.microsoft.com/en-us/windows/wsl/setup/environment": {
+    "title": "Set up a WSL development environment",
+    "description": "Set up a WSL development environment using best practices from this set-by-step guide. Learn how to run Ubuntu, Visual Studio Code or Visual Studio, Git, Windows Credential Manager, MongoDB, MySQL, Docker remote containers and more.",
+    "image": "https://learn.microsoft.com/en-us/media/open-graph-image.png",
+    "domain": "docs.microsoft.com"
+  },
+  "https://www.itprotoday.com/windows-78/nt-vsunix-one-substantially-better": {
+    "title": "ITPro Today, Network Computing, IoT World Today combine with TechTarget | TechTarget",
+    "description": "ITPro Today, Network Computing and IoT World Today have combined with TechTarget.com. The page you are looking for may no longer exist.",
+    "image": "https://www.techtarget.com/rms/onlineimages/arvr_g1273484747.jpg",
+    "domain": "itprotoday.com"
   }
 }

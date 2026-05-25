@@ -33,7 +33,11 @@ function extractMarkdownUrls(markdown) {
     const trimmed = line.trimStart();
     if (trimmed.startsWith('```') || trimmed.startsWith('~~~')) { inCode = !inCode; continue; }
     if (inCode) continue;
-    const t = line.trim();
+    let t = line.trim();
+    // Strip leading blockquote markers (> or >> etc.)
+    while (t.startsWith('>')) t = t.slice(1).trimStart();
+    // Strip trailing hard-line-break marker (\)
+    if (t.endsWith('\\')) t = t.slice(0, -1).trimEnd();
     if (/^https?:\/\/\S+$/.test(t)) urls.add(t);
   }
   return urls;
