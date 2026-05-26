@@ -3,6 +3,7 @@ title: "Editors, IDEs & Installing VS Code"
 date: "2022.02.04"
 kicker: "Tutorial"
 tags: ["vscode", "Mentoring"]
+image: "https://res.cloudinary.com/dr1sonbsi/image/upload/v1779743212/pawper.dev/logs/ChatGPT_Image_May_25_2026_02_06_27_PM_unpehp.png"
 hook: "Everything you need to know to get started with VS Code: useful context to the world's most popular..."
 devto: "https://dev.to/pawper/faq-editors-ides-vs-code-3fp0"
 series:
