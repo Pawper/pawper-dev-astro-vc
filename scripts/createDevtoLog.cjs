@@ -98,7 +98,8 @@ function parseFrontmatter(raw) {
 }
 
 function injectDevtoUrl(raw, url) {
-  // Insert devto: on the line immediately after title:
+  // Replace existing devto: line if present, otherwise insert after title:
+  if (/^devto:/m.test(raw)) return raw.replace(/^devto:.*$/m, `devto: "${url}"`);
   return raw.replace(/(^title:\s*"[^"]*")/m, `$1\ndevto: "${url}"`);
 }
 
