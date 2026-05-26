@@ -45,6 +45,7 @@ export function CXContactFooter({ sent }: { sent: boolean }) {
 export default function CXContactCombo({ onSent, onService }: CXContactComboProps) {
   const formRef = useRef<HTMLFormElement>(null);
   const [error, setError] = useState(false);
+  const [sent, setSent] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -59,7 +60,7 @@ export default function CXContactCombo({ onSent, onService }: CXContactComboProp
     });
     try {
       const res = await fetch("/", { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: body.toString() });
-      if (res.ok) { onSent(); } else { setError(true); }
+      if (res.ok) { formRef.current?.reset(); setSent(true); onSent(); } else { setError(true); }
     } catch { setError(true); }
   }
 
@@ -82,6 +83,7 @@ export default function CXContactCombo({ onSent, onService }: CXContactComboProp
         <FormField name="email"   label="Return address" placeholder="you@somewhere.dev" />
         <FormField name="subject" label="Subject"        placeholder="What's on your mind?" />
         <FormField name="message" label="Transmission"   placeholder="A few sentences is plenty…" multiline />
+        {sent && <span className="pw-mono" style={{ fontSize: 11, color: "#4caf82", letterSpacing: "0.1em" }}>MESSAGE TRANSMITTED · THANK YOU</span>}
         {error && <span className="pw-mono" style={{ fontSize: 11, color: "var(--color-error, #e05c5c)", letterSpacing: "0.1em" }}>TRANSMISSION FAILED · TRY AGAIN</span>}
         <span className="pw-mono" style={{ fontSize: 11, color: "var(--ink-mute)", letterSpacing: "0.16em", marginTop: 4 }}>
           SENT SECURELY · HTTPS
