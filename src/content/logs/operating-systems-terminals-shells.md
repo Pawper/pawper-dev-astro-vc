@@ -2,7 +2,7 @@
 title: "Operating Systems, Terminals & Shells"
 date: "2022.02.02"
 kicker: "Tutorial"
-tags: ["PowerShell", "Bash", "WSL", "Mentoring"]
+tags: ["Terminal", "PowerShell", "Bash", "WSL", "Mentoring"]
 image: "https://res.cloudinary.com/dr1sonbsi/image/upload/v1779690568/pawper.dev/logs/3178c9eb-9890-4b2f-9ab6-a5801b64761f_wrlk2d.png"
 hook: "Before you build anything, understand what's underneath: operating systems, the command line, and why Windows/Mac/Linux are different (and the same). This foundation matters."
 devto: "https://dev.to/pawper/intro-to-operating-systems-terminals-shells-faq-4agm"

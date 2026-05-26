@@ -598,7 +598,10 @@ function attachHeadingProgress(el: HTMLElement, slug: string): () => void {
       : makeRingSvg();
     const wrapper = document.createElement("span");
     wrapper.style.cssText = "display: flex; align-items: flex-start; gap: 8px;";
-    while (h.firstChild) wrapper.appendChild(h.firstChild);
+    const textGroup = document.createElement("span");
+    textGroup.style.cssText = "flex: 1; min-width: 0;";
+    while (h.firstChild) textGroup.appendChild(h.firstChild);
+    wrapper.appendChild(textGroup);
 
     const iconGroup = document.createElement("span");
     iconGroup.style.cssText = "margin-left: auto; margin-top: calc(0.5lh - 7px); display: flex; align-items: center; gap: 3px; flex-shrink: 0;";
@@ -952,6 +955,112 @@ export function enhanceProse(el: HTMLElement, opts: ProseOptions = {}): () => vo
       img.addEventListener("click", () => { opts.onOpenMedia!(img.src, img.alt, mediaSiblings); });
     });
   }
+
+  // bash-prompt colors — matches classic terminal scheme
+  const BP_COLORS = {
+    user:   "#6699ff", // blue
+    at:     "rgba(255,255,255,0.4)",
+    host:   "#ffaa44", // orange
+    colon:  "rgba(255,255,255,0.4)",
+    dir:    "#55ff55", // green
+    dollar: "#ff5555", // red
+    hash:   "#ff5555", // red
+  };
+
+  function buildPromptWrap(): HTMLDivElement {
+    const wrap = document.createElement("div");
+    wrap.style.cssText = "background: #0d0d0d; border-radius: 10px; padding: 14px 18px; display: flex; flex-direction: column; gap: 8px; font-family: var(--pw-mono, monospace); font-size: 13px; line-height: 1.5; margin: 4px 0; border: 1px solid rgba(255,255,255,0.07);";
+    return wrap;
+  }
+
+  function buildPromptRow(line: string, addCursor: boolean): HTMLDivElement {
+    const row = document.createElement("div");
+    row.style.cssText = "display: flex; align-items: baseline; flex-wrap: wrap;";
+    // Bash: user@host:dir[$#]
+    const bash = line.match(/^([^@\s]+)(@)([^:\s]+)(:)(.+?)([#$])\s*$/);
+    // Zsh:  user@host dir [%$#]  (space-separated, % suffix)
+    const zsh  = !bash && line.match(/^([^@\s]+)(@)([^\s]+)(\s+)(\S+)\s+([%#$])\s*$/);
+    const m = bash ?? zsh;
+    if (m) {
+      const [, user, , host, sep, dir, suffix] = m;
+      const parts: [string, string][] = [
+        [user,   BP_COLORS.user],
+        ["@",    BP_COLORS.at],
+        [host,   BP_COLORS.host],
+        [sep,    BP_COLORS.colon],
+        [dir,    BP_COLORS.dir],
+        ...(zsh ? [[" ", "rgba(255,255,255,0.4)"] as [string, string]] : []),
+        [suffix, suffix === "#" ? BP_COLORS.hash : BP_COLORS.dollar],
+      ];
+      parts.forEach(([text, color]) => {
+        const s = document.createElement("span");
+        s.textContent = text;
+        s.style.color = color;
+        row.appendChild(s);
+      });
+    } else {
+      row.style.color = "rgba(255,255,255,0.7)";
+      row.textContent = line;
+    }
+    if (addCursor) {
+      const cursor = document.createElement("span");
+      cursor.className = "pw-terminal-cursor";
+      row.appendChild(cursor);
+    }
+    return row;
+  }
+
+  // bash-prompt — plain white text, no color parsing
+  el.querySelectorAll<HTMLElement>("pre[data-language='bash-prompt']").forEach((pre) => {
+    const code = pre.querySelector("code");
+    const lines = (code?.textContent ?? "").split("\n").map(l => l.trimEnd()).filter(l => l.length > 0);
+    const wrap = buildPromptWrap();
+    lines.forEach((line, idx) => {
+      const row = document.createElement("div");
+      row.style.cssText = "display: flex; align-items: baseline; color: rgba(255,255,255,0.85);";
+      row.textContent = line;
+      if (idx === lines.length - 1) {
+        const cursor = document.createElement("span");
+        cursor.className = "pw-terminal-cursor";
+        row.appendChild(cursor);
+      }
+      wrap.appendChild(row);
+    });
+    pre.replaceWith(wrap);
+  });
+
+  // bash-prompt-key — color-coded using BP_COLORS; falls back to anatomy legend if empty
+  el.querySelectorAll<HTMLElement>("pre[data-language='bash-prompt-key']").forEach((pre) => {
+    const code = pre.querySelector("code");
+    const lines = (code?.textContent ?? "").split("\n").map(l => l.trimEnd()).filter(l => l.length > 0);
+    const wrap = buildPromptWrap();
+    if (lines.length > 0) {
+      lines.forEach((line, idx) => wrap.appendChild(buildPromptRow(line, idx === lines.length - 1)));
+    } else {
+      // No content → render anatomy legend
+      const keyParts: [string, string][] = [
+        ["currentuser",      BP_COLORS.user],
+        ["@",                BP_COLORS.at],
+        ["hostname",         BP_COLORS.host],
+        [":",                BP_COLORS.colon],
+        ["workingdirectory", BP_COLORS.dir],
+        ["UID",              BP_COLORS.dollar],
+      ];
+      const row = document.createElement("div");
+      row.style.cssText = "display: flex; align-items: baseline; flex-wrap: wrap;";
+      keyParts.forEach(([text, color]) => {
+        const s = document.createElement("span");
+        s.textContent = text;
+        s.style.color = color;
+        row.appendChild(s);
+      });
+      const cursor = document.createElement("span");
+      cursor.className = "pw-terminal-cursor";
+      row.appendChild(cursor);
+      wrap.appendChild(row);
+    }
+    pre.replaceWith(wrap);
+  });
 
   // Code blocks — copy button
   el.querySelectorAll<HTMLPreElement>("pre").forEach((pre) => {

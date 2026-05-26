@@ -402,6 +402,10 @@ html, body {
 .pw-prose code { font-family: var(--font-mono); font-size: 12px; background: rgba(255,255,255,0.1); padding: 1px 5px; border-radius: 4px; }
 .pw-prose pre  { background: rgba(0,0,0,0.3); border-radius: 8px; padding: 14px; overflow-x: auto; margin: 0 0 .75em; }
 .pw-prose pre code { background: none; padding: 0; }
+.pw-prose h1 code, .pw-prose h2 code, .pw-prose h3 code,
+.pw-article-body h2 code, .pw-article-body h3 code { background: none; padding: 0; border-radius: 0; font-size: inherit; color: inherit; }
+.pw-terminal-cursor { display: inline-block; width: 8px; height: 1.1em; background: rgba(255,255,255,0.75); margin-left: 2px; vertical-align: text-bottom; position: relative; top: 3px; animation: pw-blink 1.1s step-start infinite; }
+@keyframes pw-blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
 .pw-prose a    { color: var(--acc-blue-deep); }
 .pw-prose .markdown-heading { display: flex; align-items: center; }
 .pw-prose .markdown-heading h1,

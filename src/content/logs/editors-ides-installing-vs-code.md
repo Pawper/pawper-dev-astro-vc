@@ -123,3 +123,5 @@ Here you can see that since this is a React project, I am setting all JavaScript
 > https://code.visualstudio.com/shortcuts/keyboard-shortcuts-macos.pdf
 > https://code.visualstudio.com/shortcuts/keyboard-shortcuts-windows.pdf
 > https://code.visualstudio.com/docs/configure/keybindings
+
+_This article was revised & expanded with AI for the purpose of providing practical information. I have reviewed it for accuracy and edited it appropriately._

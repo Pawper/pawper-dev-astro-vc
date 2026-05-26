@@ -3,7 +3,7 @@ title: "Using VS Code with WSL"
 devto: ""
 date: "2026.05.23"
 kicker: "Tutorial"
-tags: ["VS Code", "WSL", "Development"]
+tags: ["vscode", "WSL", "Mentoring"]
 image: "https://res.cloudinary.com/dr1sonbsi/image/upload/v1779743630/pawper.dev/logs/ChatGPT_Image_May_25_2026_02_13_10_PM_vwdt6q.png"
 hook: "VS Code is a Windows editor, but your development happens in Linux. Learn how to configure VS Code to work seamlessly with WSL, access your Linux files, and run your entire workflow in a Unix environment..."
 series:
@@ -196,6 +196,8 @@ cd /mnt/c/Users/YourUsername/Downloads
 ```
 
 But for development, keep projects in your WSL home directory. Performance and permissions are better there.
+
+![The Shared Filesystem (Generated with Claude Design)](https://res.cloudinary.com/dr1sonbsi/image/upload/v1779767818/pawper.dev/logs/Screenshot_2026-05-25_205638_rqywgk.png)
 
 ---
 

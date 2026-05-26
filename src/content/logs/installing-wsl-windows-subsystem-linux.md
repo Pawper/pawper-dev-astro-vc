@@ -3,7 +3,7 @@ title: "Installing Terminal & WSL (Windows Subsystem for Linux)"
 devto: "https://dev.to/pawper/installing-terminal-wsl-windows-subsystem-for-linux-1e0k"
 date: "2026.05.23"
 kicker: "Tutorial"
-tags: ["WSL", "Bash"]
+tags: ["WSL", "Bash", "Mentoring"]
 image: "https://res.cloudinary.com/dr1sonbsi/image/upload/v1779561479/pawper.dev/logs/ChatGPT_Image_May_23_2026_11_37_00_AM_drmpxt.png"
 hook: "Everything you need to know to install and configure Windows Subsystem for Linux: what WSL is, why you need it, and step-by-step setup for development..."
 series:
