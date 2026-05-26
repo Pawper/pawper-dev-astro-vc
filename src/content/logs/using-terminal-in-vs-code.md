@@ -1,6 +1,7 @@
 ---
 title: "Using the Terminal in VS Code"
-devto: "https://dev.to/pawper/using-the-terminal-in-vs-code-3il8"
+devto: "https://dev.to/pawper/using-the-terminal-in-vs-code-1f3g"
+devto: ""
 devto: ""
 date: "2026.05.25"
 kicker: "Tutorial"
