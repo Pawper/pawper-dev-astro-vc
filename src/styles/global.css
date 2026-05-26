@@ -527,6 +527,11 @@ html, body {
 .cx-proj-btn { transition: filter .15s; cursor: pointer; }
 .cx-proj-btn:hover { filter: brightness(1.18); }
 .cx-btn-icon { display: flex; align-items: center; justify-content: center; transform: scale(1.5); transform-origin: center; }
+@media (min-width: 769px) {
+  .cx-btn-row-fluid > * { flex: 1; min-width: 0; }
+  .cx-btn-row-fluid > div .cx-proj-btn { width: 100%; }
+  .cx-btn-row-fluid .cx-btn-inner { width: auto !important; flex: 1 !important; max-width: 200px !important; min-width: 0 !important; }
+}
 .cx-toc-item { cursor: pointer; border-radius: 6px; transition: background .15s, color .15s; }
 .cx-toc-item:hover { background: rgba(var(--section-rgb), 0.28) !important; }
 .cx-toc-item:hover > span:first-child { color: var(--section-accent) !important; }
@@ -1019,6 +1024,11 @@ html, body {
     flex-direction: column !important;
     gap: 3px !important;
     align-items: flex-end !important;
+  }
+
+  .cx-btn-row-fluid {
+    left: auto !important;
+    right: 24px !important;
   }
 
   .cx-proj-btn {

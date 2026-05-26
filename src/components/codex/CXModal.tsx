@@ -14,6 +14,7 @@ import { soundClick } from "../../context/SoundContext";
 import CXBtn, { RssIcon } from "./CXBtn";
 import { PROJECTS, LOGS, EXPERIENCES, slugify, getPrimaryColor } from "../../data/content";
 import { contrastText } from "./CXPill";
+import { getProgress } from "../../utils/logProgress";
 import devtoSeriesRaw from "../../data/devto-series.json";
 
 const DEVTO_SERIES = devtoSeriesRaw as Record<string, number>;
@@ -235,11 +236,24 @@ function SharePopover({ shareUrl, title, num, primaryHex, secondaryHex, isDark, 
   );
 }
 
-function ModalFooterButtons({ modal, proj, primaryHex, secondaryHex, isDark, onNavigateToService }: {
+function ModalFooterButtons({ modal, proj, primaryHex, secondaryHex, isDark, onNavigateToService, onNavigate }: {
   modal: ModalState; proj?: ReturnType<typeof PROJECTS.find>;
   primaryHex: string; secondaryHex: string; isDark: boolean;
   onNavigateToService?: (serviceId: string) => void;
+  onNavigate?: (m: ModalState) => void;
 }) {
+  const [, setTick] = useState(0);
+  useEffect(() => {
+    if (modal.kind !== "series") return;
+    const handler = () => setTick(t => t + 1);
+    window.addEventListener("pw-progress-update", handler);
+    window.addEventListener("pw-progress-reset", handler);
+    return () => {
+      window.removeEventListener("pw-progress-update", handler);
+      window.removeEventListener("pw-progress-reset", handler);
+    };
+  }, [modal.kind]);
+
   if (modal.kind === "search" || modal.kind === "media") return null;
 
   if (modal.kind === "log") {
@@ -294,8 +308,20 @@ function ModalFooterButtons({ modal, proj, primaryHex, secondaryHex, isDark, onN
         .find(n => slugify(n) === modal.id) ?? modal.id)
     : "";
 
+  const seriesLogs = modal.kind === "series"
+    ? LOGS.filter(a => a.series && slugify(a.series.name) === modal.id).sort((a, b) => a.series!.part - b.series!.part)
+    : [];
+  const allPublishedDone = seriesLogs.length > 0 && seriesLogs.every(a => getProgress(a.id).completed);
+  const seriesStarted = seriesLogs.some(a => { const p = getProgress(a.id); return p.checked.length > 0 || p.current !== null; });
+  const continueLog = !allPublishedDone && seriesLogs.length > 0
+    ? (seriesLogs.find(a => { const p = getProgress(a.id); return !p.completed && p.current !== null; })
+       ?? seriesLogs.find(a => !getProgress(a.id).completed)
+       ?? null)
+    : null;
+  const seriesSiblings = seriesLogs.map(a => ({ kind: "log" as const, id: a.id }));
+
   return (
-    <div className="cx-btn-row" style={{ position: "absolute", bottom: 7, right: 24, display: "flex", gap: 8, zIndex: 20, alignItems: "flex-end" }}>
+    <div className={`cx-btn-row${modal.kind === "series" && continueLog ? " cx-btn-row-fluid" : ""}`} style={{ position: "absolute", bottom: 7, left: modal.kind === "series" && continueLog ? 24 : undefined, right: 24, display: "flex", gap: 8, zIndex: 20, alignItems: "flex-end" }}>
       {modal.kind === "project" && proj && (
         <>
           {proj.webURL
@@ -304,20 +330,25 @@ function ModalFooterButtons({ modal, proj, primaryHex, secondaryHex, isDark, onN
           {proj.webURL && <CXBtn num="02" label="View source" href={proj.githubURL} bgHex={secondaryHex} isDark={isDark} />}
         </>
       )}
+      {modal.kind === "series" && continueLog && (
+        <CXBtn num="01" label={seriesStarted ? "Continue" : "Start"} primary bgHex={primaryHex} isDark={isDark} icon={<span className="cx-btn-icon">›</span>}
+          onClick={() => onNavigate?.({ kind: "log", id: continueLog.id, siblings: seriesSiblings })} />
+      )}
       {(modal.kind === "series" || skillHasContent) && (
-        <CXBtn num="01" label="RSS feed" href={rssHref} primary bgHex={primaryHex} isDark={isDark} icon={<RssIcon />} />
+        <CXBtn num={modal.kind === "series" ? (continueLog ? "02" : "01") : "01"} label="RSS feed" href={rssHref}
+          primary={modal.kind !== "series" || !continueLog} bgHex={continueLog ? secondaryHex : primaryHex} isDark={isDark} icon={<RssIcon />} />
       )}
       {skillHasContent && (
         <CXBtn num="02" label="Full GH activity" href={ghHref} bgHex={secondaryHex} isDark={isDark} />
       )}
       {modal.kind === "series" && seriesHasDevto && (
-        <CXBtn num="02" label="Series on dev.to" href={seriesDevtoId ? `https://dev.to/pawper/series/${seriesDevtoId}` : `https://dev.to/pawper`} bgHex={secondaryHex} isDark={isDark} />
+        <CXBtn num={continueLog ? "03" : "02"} label="Series on dev.to" href={seriesDevtoId ? `https://dev.to/pawper/series/${seriesDevtoId}` : `https://dev.to/pawper`} bgHex={secondaryHex} isDark={isDark} />
       )}
       {modal.kind === "series" && (
         <SharePopover
           shareUrl={`https://pawper.dev/ls/${modal.id}`}
           title={seriesName}
-          num={seriesHasDevto ? "03" : "02"}
+          num={continueLog ? (seriesHasDevto ? "04" : "03") : (seriesHasDevto ? "03" : "02")}
           primaryHex={primaryHex}
           secondaryHex={secondaryHex}
           isDark={isDark}
@@ -612,7 +643,7 @@ export default function CXModal({ modal, previousModal, onClose, onBack, onNavig
         </div>
         {/* Spacer pushes content below both LCARS arcs (soft arc bottom = top:29 + border:10 = 39px) */}
         <div style={{ height: 40, flexShrink: 0 }} />
-        <ModalFooterButtons modal={modal} proj={_proj} primaryHex={primaryColor} secondaryHex={secondaryColor} isDark={theme === "dark"} onNavigateToService={onNavigateToService} />
+        <ModalFooterButtons modal={modal} proj={_proj} primaryHex={primaryColor} secondaryHex={secondaryColor} isDark={theme === "dark"} onNavigateToService={onNavigateToService} onNavigate={onNavigate} />
         <div style={{ flex: 1, minHeight: 0, position: "relative", display: "flex", flexDirection: "column" }}>
           {modal.kind === "media" && <DCMedia src={modal.id} alt={modal.label} />}
           {modal.kind === "search" && (

@@ -4,6 +4,7 @@ import CXPill from "../CXPill";
 import { SKILLS } from "../../../data/content";
 import { getProgress, checkSection, uncheckSection, completeAll, clearProgress } from "../../../utils/logProgress";
 import type { LogProgressEntry } from "../../../utils/logProgress";
+import { soundHover, soundClick } from "../../../context/SoundContext";
 
 const _CIRC = 2 * Math.PI * 4;
 
@@ -48,8 +49,8 @@ export function ArticleProgressRing({ progress, total, slug, allIds, onAction }:
   const checked = progress.checked.length;
   const R = 8;
   const CIRC = 2 * Math.PI * R;
-  const handleClick = (e: { stopPropagation: () => void }) => { e.stopPropagation(); onAction ? onAction() : (progress.completed ? clearProgress(slug) : completeAll(slug, allIds)); };
-  const svgProps = { onClick: handleClick, onMouseEnter: () => setHovered(true), onMouseLeave: () => setHovered(false), style: { cursor: "pointer", flexShrink: 0 } };
+  const handleClick = (e: { stopPropagation: () => void }) => { e.stopPropagation(); soundClick(); onAction ? onAction() : (progress.completed ? clearProgress(slug) : completeAll(slug, allIds)); };
+  const svgProps = { onClick: handleClick, onMouseEnter: () => { setHovered(true); soundHover(); }, onMouseLeave: () => setHovered(false), style: { cursor: "pointer", flexShrink: 0 } };
 
   if (progress.completed) {
     return (
