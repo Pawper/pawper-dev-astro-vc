@@ -179,6 +179,11 @@ function SharePopover({ shareUrl, title, num, primaryHex, secondaryHex, isDark, 
       )}
       {open && (
         <div style={popoverStyle}>
+          <img
+            src={`https://api.qrserver.com/v1/create-qr-code/?size=256x256&data=${encodeURIComponent(shareUrl)}&bgcolor=${isDark ? "12141c" : "eef1f8"}&color=${primaryHex.replace("#", "")}&qzone=1&format=svg`}
+            alt="QR code"
+            style={{ width: "100%", height: "auto", borderRadius: 8, display: "block" }}
+          />
           <div style={{
             display: "flex", alignItems: "center", gap: 8,
             background: `rgba(${rgb}, 0.06)`,
