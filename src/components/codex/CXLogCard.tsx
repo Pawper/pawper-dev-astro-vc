@@ -65,7 +65,7 @@ export default function CXLogCard({ log, onClick, seriesTotal }: CXLogCardProps)
         badgeSub={badgeSub}
         badgeColor={LOG_CAT.accent}
         eyebrow={log.kicker}
-        date={log.date}
+        date={log.updated ?? log.date}
         title={log.title}
         titleSize={16}
         hook={log.hook}

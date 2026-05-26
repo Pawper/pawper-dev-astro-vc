@@ -125,7 +125,20 @@ export default function DCLog({ id, html, anchor, onOpenLog, onOpenProject, onOp
       </div>
       <h1 style={{ fontSize: 22, fontWeight: 500, letterSpacing: -0.3, lineHeight: 1.2, margin: 0 }}>{a.title}</h1>
       <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
-        <span className="pw-mono" style={{ fontSize: 12, color: "var(--ink-mute)" }}>{a.date}</span>
+        {a.updated && (
+          <>
+            <span className="pw-mono" style={{ fontSize: 12, color: "var(--section-accent)" }}>
+              <span style={{ fontSize: 9, letterSpacing: "0.12em", opacity: 0.7, marginRight: 4 }}>UPDATED</span>{a.updated}
+            </span>
+            <span className="pw-mono" style={{ fontSize: 12, color: "var(--ink-mute)" }}>·</span>
+            <span className="pw-mono" style={{ fontSize: 12, color: "var(--ink-mute)" }}>
+              <span style={{ fontSize: 9, letterSpacing: "0.12em", opacity: 0.7, marginRight: 4 }}>POSTED</span>{a.date}
+            </span>
+          </>
+        )}
+        {!a.updated && (
+          <span className="pw-mono" style={{ fontSize: 12, color: "var(--ink-mute)" }}>{a.date}</span>
+        )}
         <span className="pw-mono" style={{ fontSize: 12, color: "var(--ink-mute)" }}>
           · {a.words} words · ~{Math.round(a.words / 240)} min
         </span>

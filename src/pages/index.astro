@@ -3,6 +3,7 @@ import App from '../components/codex/App';
 import '../styles/global.css';
 import { getCollection } from 'astro:content';
 import type { Log } from '../types';
+import logUpdatedDates from '../data/log-updated-dates.json';
 
 const rawLogs = await getCollection('logs');
 const logsHtml: Record<string, string> = {};
@@ -47,10 +48,13 @@ for (const [name, members] of seriesGroups) {
   seriesTotals.set(name, Math.max(members.length, specifiedTotal));
 }
 
+const logUpdated = logUpdatedDates as Record<string, string>;
+
 const logs: Log[] = rawEntries.map((e) => ({
   id: e.id,
   title: e.title,
   date: e.date,
+  updated: logUpdated[e.id],
   kicker: e.kicker,
   words: e.words,
   tags: e.tags,

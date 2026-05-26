@@ -22,6 +22,7 @@ export interface Log {
   id: string;
   title: string;
   date: string;
+  updated?: string;
   words: number;
   kicker: string;
   tags?: string[];
