@@ -1,6 +1,7 @@
 ---
 title: "Commanding the Command Line"
-devto: "https://dev.to/pawper/commanding-the-command-line-17h8"
+devto: "https://dev.to/pawper/commanding-the-command-line-2ei6"
+devto: ""
 devto: ""
 date: "2026.05.25"
 kicker: "Tutorial"
