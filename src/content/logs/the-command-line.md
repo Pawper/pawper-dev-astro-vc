@@ -42,6 +42,7 @@ The command line allows you to interact with the operating system through the sh
 ## What am I looking at?
 The first thing you see is the **prompt**. The default composition of the prompt is as follows:
 ```bash-prompt-key
+currentuser@hostname:workingdirectoryUID
 ```
 
 Your prompt should look something like this if on WSL:
