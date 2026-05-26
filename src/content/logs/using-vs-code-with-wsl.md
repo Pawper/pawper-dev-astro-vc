@@ -1,5 +1,6 @@
 ---
 title: "Using VS Code with WSL"
+devto: "https://dev.to/pawper/using-vs-code-with-wsl-1f7g"
 devto: ""
 date: "2026.05.23"
 kicker: "Tutorial"
