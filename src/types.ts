@@ -50,6 +50,7 @@ export interface ModalState {
   siblings?: ModalSibling[];
   query?: string;
   label?: string;
+  anchor?: string;
 }
 
 export interface CXEntry {

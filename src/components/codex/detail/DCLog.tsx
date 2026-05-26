@@ -11,7 +11,8 @@ import { getProgress, checkSection, uncheckSection } from "../../../utils/logPro
 interface DCLogProps {
   id: string;
   html: string;
-  onOpenLog?: (id: string) => void;
+  anchor?: string;
+  onOpenLog?: (id: string, anchor?: string) => void;
   onOpenProject?: (id: string) => void;
   onOpenSeries?: (slug: string) => void;
   onOpenService?: (service: string) => void;
@@ -29,7 +30,7 @@ export function extractHeadings(html: string): Array<{ text: string; anchorId: s
   return headings;
 }
 
-export default function DCLog({ id, html, onOpenLog, onOpenProject, onOpenSeries, onOpenService, onOpenMedia }: DCLogProps) {
+export default function DCLog({ id, html, anchor, onOpenLog, onOpenProject, onOpenSeries, onOpenService, onOpenMedia }: DCLogProps) {
   const a = LOGS.find((x) => x.id === id) ?? LOGS[0];
   const proseRef = useRef<HTMLDivElement>(null);
   const tocRef = useRef<HTMLDivElement>(null);
@@ -67,11 +68,11 @@ export default function DCLog({ id, html, onOpenLog, onOpenProject, onOpenSeries
     return enhanceProse(el, { onOpenProject, onOpenLog, onOpenSeries, onOpenService, onOpenMedia, noThumb: a?.noThumb, slug: a.id });
   }, [html, resetKey]);
 
-  // Scroll to saved reading position when a log opens
+  // Scroll to anchor (from link) or saved reading position when a log opens
   useEffect(() => {
-    const { current } = getProgress(id);
-    if (!current || !proseRef.current) return;
-    const target = proseRef.current.querySelector<HTMLElement>(`[id="${CSS.escape(current)}"]`);
+    const targetId = anchor ?? getProgress(id).current;
+    if (!targetId || !proseRef.current) return;
+    const target = proseRef.current.querySelector<HTMLElement>(`[id="${CSS.escape(targetId)}"]`);
     if (!target) return;
     let viewport: Element | null = proseRef.current.parentElement;
     while (viewport && !viewport.hasAttribute("data-overlayscrollbars-viewport")) {
@@ -86,7 +87,7 @@ export default function DCLog({ id, html, onOpenLog, onOpenProject, onOpenSeries
       }
     }, 450);
     return () => clearTimeout(timer);
-  }, [id]);
+  }, [id, anchor]);
 
   useEffect(() => {
     if (!tocExpanded) return;

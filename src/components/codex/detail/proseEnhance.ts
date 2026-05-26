@@ -12,7 +12,7 @@ type Match = { kind: "language"; color: string } | { kind: "topic" } | null;
 
 export interface ProseOptions {
   onOpenProject?: (id: string) => void;
-  onOpenLog?: (id: string) => void;
+  onOpenLog?: (id: string, anchor?: string) => void;
   onOpenSeries?: (slug: string) => void;
   onOpenService?: (service: string) => void;
   onOpenMedia?: (src: string, alt: string, siblings?: Array<{ kind: "media"; id: string; label?: string }>) => void;
@@ -815,8 +815,20 @@ function attachHeadingProgress(el: HTMLElement, slug: string): () => void {
 // ── Main enhancer ────────────────────────────────────────────────────────────
 
 export function enhanceProse(el: HTMLElement, opts: ProseOptions = {}): () => void {
-  // External links → new tab
+  // External links → new tab (pawper.dev /l/ links open the modal instead)
   el.querySelectorAll<HTMLAnchorElement>('a[href^="http"]').forEach((a) => {
+    const href = a.getAttribute("href") ?? "";
+    try {
+      const url = new URL(href);
+      if (/pawper\.dev$/.test(url.hostname)) {
+        const parts = url.pathname.split("/").filter(Boolean);
+        if (parts[0] === "l" && parts[1] && opts.onOpenLog) {
+          const anchor = url.hash ? url.hash.slice(1) : undefined;
+          a.addEventListener("click", (e) => { e.preventDefault(); soundClick(); opts.onOpenLog!(parts[1], anchor); });
+          return;
+        }
+      }
+    } catch {}
     a.target = "_blank";
     a.rel = "noopener noreferrer";
   });

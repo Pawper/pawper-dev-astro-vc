@@ -68,7 +68,8 @@ function parseUrl() {
     } else if (seg0 === "p" && seg1) {
       modalStack.push({ kind: "project", id: seg1, siblings: PROJECTS.map(proj => ({ kind: "project" as const, id: proj.id })) });
     } else if (seg0 === "l" && seg1) {
-      modalStack.push({ kind: "log", id: seg1, siblings: LOGS.map(a => ({ kind: "log" as const, id: a.id })) });
+      const anchor = location.hash ? location.hash.slice(1) : undefined;
+      modalStack.push({ kind: "log", id: seg1, siblings: LOGS.map(a => ({ kind: "log" as const, id: a.id })), anchor });
     } else if (seg0 === "ls" && seg1) {
       modalStack.push({ kind: "series", id: seg1 });
     } else if (seg0 === "skill" && seg1) {

@@ -721,14 +721,14 @@ export default function CXModal({ modal, previousModal, onClose, onBack, onNavig
           {modal.kind === "log" && (
             <ContentModalLayout
               body={
-                <DCLog id={modal.id} html={logsHtml[modal.id] ?? ''} onOpenMedia={(src, alt, siblings) => onNavigate({ kind: "media", id: src, label: alt, siblings })} onOpenLog={(targetId) => {
+                <DCLog id={modal.id} html={logsHtml[modal.id] ?? ''} anchor={modal.anchor} onOpenMedia={(src, alt, siblings) => onNavigate({ kind: "media", id: src, label: alt, siblings })} onOpenLog={(targetId, targetAnchor) => {
                     const target = LOGS.find(a => a.id === targetId);
                     const sibs = target?.series
                       ? LOGS.filter(a => a.series?.name === target.series?.name)
                           .sort((a, b) => a.series!.part - b.series!.part)
                           .map(a => ({ kind: "log" as const, id: a.id }))
                       : [];
-                    onNavigate({ kind: "log", id: targetId, siblings: sibs });
+                    onNavigate({ kind: "log", id: targetId, anchor: targetAnchor, siblings: sibs });
                   }} onOpenProject={(projectId) => {
                     onNavigate({ kind: "project", id: projectId });
                   }} onOpenSeries={(slug) => {
