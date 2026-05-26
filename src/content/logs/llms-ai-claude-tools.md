@@ -1,6 +1,6 @@
 ---
 title: "All About AI & Using Claude"
-devto: ""
+devto: "https://dev.to/pawper/all-about-ai-using-claude-385e"
 date: "2026.05.26"
 kicker: "Tutorial"
 tags: ["Claude", "Bash", "Terminal"]

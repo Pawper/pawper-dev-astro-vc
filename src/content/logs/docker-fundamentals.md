@@ -1,6 +1,6 @@
 ---
 title: "Containers & Agents with Docker & OpenClaw"
-devto: ""
+devto: "https://dev.to/pawper/containers-agents-with-docker-openclaw-4pbd"
 date: "2026.05.26"
 kicker: "Tutorial"
 tags: ["Docker", "Containers", "Agents", "OpenClaw", "Deployment"]

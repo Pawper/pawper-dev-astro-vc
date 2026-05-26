@@ -1,6 +1,6 @@
 ---
 title: "On the Shoulders of Giants: Package Registries, Node & NPM"
-devto: ""
+devto: "https://dev.to/pawper/on-the-shoulders-of-giants-package-registries-node-npm-46m2"
 date: "2026.05.26"
 kicker: "Tutorial"
 tags: ["Bash", "node"]
