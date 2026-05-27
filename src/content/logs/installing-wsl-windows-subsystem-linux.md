@@ -10,6 +10,7 @@ series:
   name: "Foundations of Digital Agency"
   part: 3
   total: 4
+mentor: true
 noThumb:
   - https://docs.microsoft.com/en-us/windows/wsl/install
   - https://docs.microsoft.com/en-us/windows/wsl/about

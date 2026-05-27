@@ -10,6 +10,7 @@ series:
   name: "Foundations of Digital Agency"
   part: 1
   total: 2
+mentor: true
 ---
 
 Welcome to **Foundations of Digital Agency**—a series built for anyone who wants to seize the tools and technology reshaping opportunity. You don't need permission. You don't need a computer science degree. You just need a cogntivie foundation and some scaffolding assembled from simple ideas. Once you have that sense of structure in mind, you can frame technology within it, move through it and build on top of it. Sound complicated? Language is magic. Once you start reading and applying it, the pieces -- mental models -- fall into place.

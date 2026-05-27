@@ -10,6 +10,7 @@ series:
   name: "Foundations of Digital Agency"
   part: 7
   total: 8
+mentor: true
 ---
 
 You've mastered the command line. You understand your operating system and your development environment. Now it's time to learn how modern developers leverage the work of others: through packages, registries, and package managers.

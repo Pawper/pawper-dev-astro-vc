@@ -10,6 +10,7 @@ series:
   name: "Foundations of Digital Agency"
   part: 2
   total: 2
+mentor: true
 noThumb:
   - https://code.visualstudio.com/docs
   - https://code.visualstudio.com/docs/editor/whyvscode

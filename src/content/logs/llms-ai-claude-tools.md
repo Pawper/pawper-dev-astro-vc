@@ -10,6 +10,7 @@ series:
   name: "Foundations of Digital Agency"
   part: 8
   total: 9
+mentor: true
 ---
 
 AI tools are fundamentally changing what developers can build -- and who can be a developer.

@@ -15,7 +15,7 @@ const rawEntries = rawLogs.map((entry) => {
   logsHtml[id] = html;
   const words = html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().split(' ').filter(Boolean).length;
   const hook = entry.data.hook ?? (html.match(/<p[^>]*>([\s\S]*?)<\/p>/)?.[1].replace(/<[^>]+>/g, "").trim() || undefined);
-  return { id, title: entry.data.title, date: entry.data.date, kicker: entry.data.kicker, words, tags: entry.data.tags, image: entry.data.image, hook, devto: entry.data.devto, seriesRaw: entry.data.series, noThumb: entry.data.noThumb };
+  return { id, title: entry.data.title, date: entry.data.date, kicker: entry.data.kicker, words, tags: entry.data.tags, image: entry.data.image, hook, devto: entry.data.devto, seriesRaw: entry.data.series, noThumb: entry.data.noThumb, mentor: entry.data.mentor };
 });
 
 // Group articles that belong to a series
@@ -65,6 +65,7 @@ const logs: Log[] = rawEntries.map((e) => ({
     ? { name: e.seriesRaw.name, part: assignedParts.get(e.id)!, total: seriesTotals.get(e.seriesRaw.name)! }
     : undefined,
   noThumb: e.noThumb,
+  mentor: e.mentor,
 })).sort((a, b) => b.date.localeCompare(a.date));
 ---
 

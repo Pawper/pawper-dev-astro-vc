@@ -31,6 +31,7 @@ export interface Log {
   devto?: string;
   series?: { name: string; part: number; total: number };
   noThumb?: string[];
+  mentor?: boolean;
 }
 
 export type ViewKind = "home" | "entry" | "grid";

@@ -17,6 +17,7 @@ const logs = defineCollection({
       total: z.number().optional(),
     }).optional(),
     noThumb: z.array(z.string()).optional(),
+    mentor: z.boolean().optional(),
   }),
 });
 

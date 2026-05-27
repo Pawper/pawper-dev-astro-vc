@@ -10,6 +10,7 @@ series:
   name: "Foundations of Digital Agency"
   part: 6
   total: 7
+mentor: true
 ---
 
 You may experience some emotions of trepidation when staring at the empty prompt in the terminal.

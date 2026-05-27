@@ -13,4 +13,9 @@ export default defineConfig({
       ],
     },
   },
+  vite: {
+    server: {
+      allowedHosts: ["potatoes-holidays-wrap-improving.trycloudflare.com"],
+    },
+  },
 });

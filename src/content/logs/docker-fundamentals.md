@@ -10,6 +10,7 @@ series:
   name: "Foundations of Digital Agency"
   part: 9
   total: 10
+mentor: true
 ---
 
 You have a fundamental problem in software: your code works on your machine, but breaks on someone else's. Different operating systems. Different versions of dependencies. Different configurations. "It works on my machine" is the oldest excuse in development.

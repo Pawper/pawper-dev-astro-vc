@@ -1,12 +1,70 @@
 
-import { useRef, useEffect, useLayoutEffect, useState } from "react";
-import { LOGS, slugify } from "../../../data/content";
+import React, { useRef, useEffect, useLayoutEffect, useState } from "react";
+import { LOGS, SERVICES, PROFILE, slugify } from "../../../data/content";
 import Tap from "../../shared/Tap";
 import CXPill from "../CXPill";
+import CXCard from "../CXCard";
 import { enhanceProse } from "./proseEnhance";
 import { SidebarTagGroups, SidebarTOC, ProgressDot, ArticleProgressRing } from "./DCDetailSidebar";
 import { soundClick } from "../../../context/SoundContext";
 import { getProgress, checkSection, uncheckSection } from "../../../utils/logProgress";
+
+const MENTOR_PURPLE_VARS = {
+  "--section-accent": "#9055e8",
+  "--section-deep": "#c49ef8",
+  "--section-rgb": "144, 85, 232",
+} as React.CSSProperties;
+
+const KOFI_URL = "https://ko-fi.com/pawper";
+
+function MentorLink({
+  children,
+  onClick,
+  href,
+}: {
+  children: React.ReactNode;
+  onClick?: () => void;
+  href?: string;
+}) {
+  const [hover, setHover] = useState(false);
+  const style: React.CSSProperties = {
+    color: hover ? "#c49ef8" : "#9055e8",
+    textDecoration: hover ? "underline" : "none",
+    background: "none",
+    border: "none",
+    padding: 0,
+    font: "inherit",
+    fontSize: 13,
+    fontWeight: 500,
+    cursor: "pointer",
+    display: "inline",
+  };
+  if (href) {
+    const external = /^https?:\/\//.test(href);
+    return (
+      <a
+        href={href}
+        {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+        style={style}
+        onMouseEnter={() => setHover(true)}
+        onMouseLeave={() => setHover(false)}
+      >
+        {children}
+      </a>
+    );
+  }
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      style={style}
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
+    >
+      {children}
+    </button>
+  );
+}
 
 interface DCLogProps {
   id: string;
@@ -268,7 +326,90 @@ export default function DCLog({ id, html, anchor, onOpenLog, onOpenProject, onOp
         </div>
       )}
 
+      {a.mentor && (() => {
+        const svc = SERVICES.find((s) => s.id === "mentoring");
+        if (!svc) return null;
+        return (
+          <div style={MENTOR_PURPLE_VARS}>
+            <CXCard style={{
+              padding: "16px 20px", borderRadius: 12,
+              borderLeft: "3px solid #9055e8",
+              display: "flex", flexDirection: "column", gap: 10,
+            }}>
+              <div className="pw-eyebrow" style={{ color: "var(--section-deep)" }}>
+                About your mentor
+              </div>
+              <p style={{ fontSize: 13, lineHeight: 1.65, color: "var(--ink-soft)", margin: 0 }}>
+                {PROFILE.intro}
+              </p>
+              <div className="cx-mentor-card-footer" style={{
+                display: "flex", alignItems: "center", justifyContent: "space-between",
+                gap: 12, flexWrap: "wrap", marginTop: 2,
+              }}>
+                <div style={{
+                  display: "inline-flex", alignItems: "center", gap: 4,
+                  fontSize: 10, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase",
+                  color: "var(--section-deep)",
+                }}>
+                  <span style={{ fontSize: 12, fontWeight: 300 }}>◈</span>
+                  <span>Mentoring · Open</span>
+                </div>
+                <div style={{ display: "flex", gap: 14, alignItems: "center", flexWrap: "wrap" }}>
+                  <MentorLink href="/contact/">Ask about mentoring →</MentorLink>
+                  <span style={{ color: "var(--ink-mute)", fontSize: 12 }}>·</span>
+                  <MentorLink href={KOFI_URL}>Tip on Ko-fi ↗</MentorLink>
+                </div>
+              </div>
+            </CXCard>
+          </div>
+        );
+      })()}
+
       <div ref={proseRef} className="pw-article-body" />
+
+      {(() => {
+        const svc = SERVICES.find((s) => s.id === "mentoring");
+        if (!svc) return null;
+        return (
+          <div style={MENTOR_PURPLE_VARS}>
+            <CXCard style={{
+              padding: "24px 26px", borderRadius: 14,
+              borderLeft: "4px solid #9055e8",
+              display: "flex", flexDirection: "column", gap: 12,
+            }}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                <div className="pw-eyebrow cx-glass-label">{svc.kicker}</div>
+                <div style={{
+                  display: "flex", alignItems: "center", gap: 1,
+                  fontSize: 10, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase",
+                  color: "var(--section-deep)",
+                }}>
+                  <span style={{ fontSize: 13.5, fontWeight: 300, display: "inline-flex", alignItems: "center" }}>◈</span>
+                  Open
+                </div>
+              </div>
+              <div style={{ fontSize: 22, fontWeight: 500, letterSpacing: -0.3, lineHeight: 1.2 }}>
+                Receive Mentoring
+              </div>
+              {svc.body.map((para, i) => (
+                <p key={i} style={{
+                  fontSize: i === 0 ? 15 : 14,
+                  lineHeight: 1.65,
+                  color: i === 0 ? "var(--ink)" : "var(--ink-soft)",
+                  margin: 0, textWrap: "pretty",
+                } as React.CSSProperties}>
+                  {para}
+                </p>
+              ))}
+              <div style={{ display: "flex", gap: 14, marginTop: 8, justifyContent: "flex-end", flexWrap: "wrap", alignItems: "center" }}>
+                <MentorLink href="/contact/">Receive Mentoring →</MentorLink>
+                <span style={{ color: "var(--ink-mute)", fontSize: 12 }}>·</span>
+                <MentorLink href={KOFI_URL}>Tip on Ko-fi ↗</MentorLink>
+              </div>
+            </CXCard>
+          </div>
+        );
+      })()}
     </article>
   );
 }

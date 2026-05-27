@@ -10,6 +10,7 @@ series:
   name: "Foundations of Digital Agency"
   part: 5
   total: 6
+mentor: true
 ---
 
 VS Code is technically an editor, not a full IDE (Integrated Development Environment). Unlike IDEs like Visual Studio or JetBrains products that bundle everything together, VS Code starts minimal and lets you add what you need. But here's where it gets interesting: features like the integrated [terminal](https://pawper.dev/l/operating-systems-terminals-shells#what-is-a-terminal), source control integration, debugging, and extensions blur that line significantly. By integrating tools into VS Code—especially the terminal—you're not adding bloat; you're building a customized developer experience tailored to your workflow.

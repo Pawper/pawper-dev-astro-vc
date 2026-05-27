@@ -10,6 +10,7 @@ series:
   name: "Foundations of Digital Agency"
   part: 4
   total: 5
+mentor: true
 ---
 
 > **Note: This guide is for Windows only.** If you're on macOS, you are already living in Unix in VS Code, so you can skip this tutorial and move on to the next one in the series.
