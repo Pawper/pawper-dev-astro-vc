@@ -5,6 +5,8 @@ import Readout from "../shared/Readout";
 import Tap from "../shared/Tap";
 import CXCard from "./CXCard";
 import CXPill from "./CXPill";
+import { useTheme } from "../../hooks/useTheme";
+import { clampEyebrowColor } from "../../utils/color";
 
 const directory = [
   { l: "Email",    v: "hello@pawper.dev" },
@@ -46,6 +48,8 @@ export default function CXContactCombo({ onSent, onService }: CXContactComboProp
   const formRef = useRef<HTMLFormElement>(null);
   const [error, setError] = useState(false);
   const [sent, setSent] = useState(false);
+  const theme = useTheme();
+  const eyebrowColor = clampEyebrowColor("#a07e15", theme === "dark");
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -92,8 +96,8 @@ export default function CXContactCombo({ onSent, onService }: CXContactComboProp
 
       <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
         <div className="pw-glass-dim" style={{ padding: 18, borderRadius: 14, display: "flex", flexDirection: "column", gap: 10 }}>
-          <Readout label="Timezone" value="UTC−07 · PDT"  accent="#a07e15" />
-          <Readout label="Response" value="< 48 hours"    accent="#a07e15" />
+          <Readout label="Timezone" value="UTC−07 · PDT"  accent={eyebrowColor} />
+          <Readout label="Response" value="< 48 hours"    accent={eyebrowColor} />
           <Readout
             label="Open to"
             value={
@@ -105,17 +109,17 @@ export default function CXContactCombo({ onSent, onService }: CXContactComboProp
                 ))}
               </div>
             }
-            accent="#a07e15"
+            accent={eyebrowColor}
           />
         </div>
-        <div className="pw-eyebrow" style={{ marginTop: 6, color: "#a07e15" }}>Directory</div>
+        <div className="pw-eyebrow" style={{ marginTop: 6, color: eyebrowColor }}>Directory</div>
         <div className="cx-contact-dir-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
           {directory.map((item) => (
             <CXCard
               key={item.l}
               style={{ padding: "12px 14px", borderRadius: 10, display: "flex", flexDirection: "column", gap: 2 }}
             >
-              <span className="pw-eyebrow" style={{ color: "#a07e15" }}>{item.l}</span>
+              <span className="pw-eyebrow" style={{ color: eyebrowColor }}>{item.l}</span>
               <span className="pw-mono" style={{ fontSize: 13, color: "var(--ink)" }}>{item.v}</span>
             </CXCard>
           ))}
