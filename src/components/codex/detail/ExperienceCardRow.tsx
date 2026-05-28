@@ -244,7 +244,7 @@ export default function ExperienceCardRow({ exp, openModal, onCardClick, onOpenS
           ...cardVars,
           padding: "16px 20px", borderRadius: 16,
           borderLeft: "4px solid var(--section-accent)",
-          display: "grid", gridTemplateColumns: "90px 1fr auto",
+          display: "grid", gridTemplateColumns: "90px 1fr",
           gap: 16, alignItems: "start", cursor: "pointer",
         }}
         onClick={() => { soundClick(); handleCardClick(); }}
@@ -262,24 +262,27 @@ export default function ExperienceCardRow({ exp, openModal, onCardClick, onOpenS
         </div>
 
         {/* Content */}
-        <div>
-          <div style={{ fontSize: 15, fontWeight: 600, lineHeight: 1.2, letterSpacing: -0.2 }}>{exp.title}</div>
+        <div style={{ minWidth: 0 }}>
+          {/* Title row with org + action floated right */}
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12 }}>
+            <div style={{ fontSize: 15, fontWeight: 600, lineHeight: 1.2, letterSpacing: -0.2, minWidth: 0, flex: 1 }}>{exp.title}</div>
+            {(exp.organization || action) && (
+              <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
+                {exp.organization && (
+                  <span style={{ fontSize: 12, color: "var(--ink-mute)", whiteSpace: "nowrap" }}>{exp.organization}</span>
+                )}
+                {exp.organization && action && (
+                  <span style={{ fontSize: 11, color: "var(--ink-mute)" }}>•</span>
+                )}
+                {action}
+              </div>
+            )}
+          </div>
           {descSummary && (
             <div style={{ fontSize: 12, color: "var(--ink-soft)", lineHeight: 1.45, marginTop: 6 }}>{descSummary}</div>
           )}
           {location && <div style={{ marginTop: 6 }}>{location}</div>}
           {skillsNode}
-        </div>
-
-        {/* Org + Action */}
-        <div style={{ paddingTop: 2, display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
-          {exp.organization && (
-            <span style={{ fontSize: 12, color: "var(--ink-mute)", whiteSpace: "nowrap" }}>{exp.organization}</span>
-          )}
-          {exp.organization && action && (
-            <span style={{ fontSize: 11, color: "var(--ink-mute)" }}>•</span>
-          )}
-          {action}
         </div>
       </Tap>
     );
