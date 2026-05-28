@@ -301,7 +301,11 @@ export function DCExperienceSidebar({ id, onOpen, onNavigateToAgenda, onOpenExpe
         <div className="pw-glass-dim" style={{ borderRadius: 14, padding: "14px 16px", display: "flex", flexDirection: "column", gap: 8 }}>
           <div className="pw-eyebrow" style={{ color: "var(--section-deep)", marginBottom: 2 }}>Experienced at</div>
           {parentEvents.map((e) => {
-            const parentPeriod = derivePeriod(e.title, e.period ?? "");
+            const parentPeriod = e.datetimeStart
+              ? (e.datetimeEnd && e.datetimeEnd !== e.datetimeStart
+                  ? `${formatAgendaDate(e.datetimeStart)} – ${formatAgendaDate(e.datetimeEnd)}`
+                  : formatAgendaDate(e.datetimeStart))
+              : derivePeriod(e.title, e.period ?? "");
             return (
               <div
                 key={e.id}
