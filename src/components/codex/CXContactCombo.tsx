@@ -49,7 +49,7 @@ export default function CXContactCombo({ onSent, onService }: CXContactComboProp
   const [error, setError] = useState(false);
   const [sent, setSent] = useState(false);
   const theme = useTheme();
-  const eyebrowColor = clampEyebrowColor("#a07e15", theme === "dark");
+  const eyebrowColor = clampEyebrowColor(theme === "dark" ? "#a07e15" : "#6b5410", theme === "dark");
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
