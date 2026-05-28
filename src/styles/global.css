@@ -496,8 +496,8 @@ html, body {
 .cx-search-footer:hover .pw-mono { color: var(--ink) !important; }
 .pw-artboard[data-theme="dark"] .cx-nav-dash { background: rgba(255,255,255,0.3); }
 .pw-artboard[data-theme="light"] .cx-glass-label { color: rgba(0,0,0,0.65) !important; }
-.cx-section-eyebrow-link { cursor: pointer; border-radius: 6px; padding: 5px 10px; margin: -5px -10px; transition: background .15s; display: inline-block; }
-.cx-section-eyebrow-link:hover { background: color-mix(in srgb, var(--section-deep) 22%, transparent); }
+.cx-section-eyebrow-link { cursor: pointer; border-radius: 6px; padding: 5px 10px; margin: -5px -10px; transition: background .15s; display: inline-block; background: transparent; text-decoration: none; }
+.cx-section-eyebrow-link:hover { background: color-mix(in srgb, var(--section-deep) 30%, transparent); }
 .cx-modal-close { transition: filter .15s; }
 .cx-modal-close:hover { filter: brightness(1.25); }
 .cx-resume-preview { transition: transform .2s cubic-bezier(.2,.7,.3,1), filter .2s; }

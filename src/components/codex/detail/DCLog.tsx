@@ -35,8 +35,6 @@ function MentorLink({
   const color = isDark ? "#b48bff" : "#5b2eb8";
   const style: React.CSSProperties = {
     color,
-    textDecoration: "none",
-    background: "none",
     border: "none",
     font: "inherit",
     fontSize: 13,
