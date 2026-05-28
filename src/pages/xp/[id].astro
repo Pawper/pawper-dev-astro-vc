@@ -1,22 +1,46 @@
 ---
-import { EXPERIENCES } from '../../data/content';
+import { EXPERIENCES, AGENDA_EVENTS } from '../../data/content';
+import ogImagesRaw from '../../data/og-images.json';
+
+const ogImages = ogImagesRaw as Record<string, string>;
+
+const LONE_URL_RE = /^<?(https?:\/\/[^\s>]+)>?$/;
 
 export function getStaticPaths() {
-  return EXPERIENCES.map((e) => ({
+  const all = [
+    ...EXPERIENCES,
+    ...AGENDA_EVENTS.filter((e) => !EXPERIENCES.some((x) => x.id === e.id)),
+  ];
+  return all.map((e) => ({
     params: { id: e.id },
     props: {
       title: e.title,
-      organization: e.organization,
-      description: e.description,
+      organization: e.organization ?? '',
+      description: e.description ?? '',
+      category: e.category,
+      datetimeStart: e.datetimeStart,
     },
   }));
 }
 
 const { id } = Astro.params;
-const { title, organization, description } = Astro.props;
+const { title, organization, description, category, datetimeStart } = Astro.props;
+
+/** Clean description — skip bare URLs that are only useful inside the SPA */
+function ogDesc(raw: string, org: string, cat: string): string {
+  if (!raw) return `${cat} · ${org}`;
+  const first = raw.split('\n')[0].trim();
+  if (LONE_URL_RE.test(first)) return `${cat} · ${org}`;
+  return raw.length > 200 ? raw.slice(0, 197) + '…' : raw;
+}
+
 const siteUrl = Astro.site?.toString().replace(/\/$/, '') ?? 'https://pawper.dev';
 const pageUrl = `${siteUrl}/xp/${id}`;
-const ogTitle = `${title} · ${organization}`;
+const ogTitle = organization ? `${title} · ${organization}` : title;
+const ogDescription = ogDesc(description, organization, category);
+const ogImage = ogImages[`xp/${id}`] ?? '';
+
+const isAgenda = !!datetimeStart;
 ---
 
 <!DOCTYPE html>
@@ -25,18 +49,24 @@ const ogTitle = `${title} · ${organization}`;
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>{ogTitle} · Phillip Wessels / CODEX</title>
-  <meta name="description" content={description} />
+  <meta name="description" content={ogDescription} />
   <link rel="canonical" href={pageUrl} />
 
-  <meta property="og:type" content="profile" />
+  <meta property="og:type" content={isAgenda ? 'event' : 'profile'} />
   <meta property="og:url" content={pageUrl} />
   <meta property="og:title" content={ogTitle} />
-  <meta property="og:description" content={description} />
+  <meta property="og:description" content={ogDescription} />
   <meta property="og:site_name" content="pawper.dev · CODEX" />
+  {ogImage && <meta property="og:image" content={ogImage} />}
+  {ogImage && <meta property="og:image:width" content="1200" />}
+  {ogImage && <meta property="og:image:height" content="630" />}
+  {ogImage && <meta property="og:image:alt" content={ogTitle} />}
 
-  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:card" content={ogImage ? 'summary_large_image' : 'summary'} />
   <meta name="twitter:title" content={ogTitle} />
-  <meta name="twitter:description" content={description} />
+  <meta name="twitter:description" content={ogDescription} />
+  {ogImage && <meta name="twitter:image" content={ogImage} />}
+  {ogImage && <meta name="twitter:image:alt" content={ogTitle} />}
 
   <script is:inline define:vars={{ id }}>
     window.location.replace('/?modal=experience&id=' + encodeURIComponent(id));

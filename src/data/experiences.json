@@ -1,0 +1,73 @@
+[
+  {
+    "id": "upenn-coursera-2026",
+    "title": "Positive Psychology: Martin E. P. Seligman's Visionary Science",
+    "organization": "UPenn · Coursera",
+    "period": "Feb 2026",
+    "category": "education",
+    "description": "PERMA framework, VIA Strengths Inventory, Positive Interventions. Credential ID: PTEV8VSOB4IV.",
+    "featured": true,
+    "skills": ["Positive Psychology", "PERMA", "VIA Strengths", "Wellness Coaching"],
+    "certificationImage": "https://res.cloudinary.com/dr1sonbsi/image/upload/c_crop,h_924,w_1194/v1779398667/pawper.dev/Certifications/CERTIFICATE_LANDING_PAGE_PTEV8VSOB4IV_ti3klv.jpg",
+    "certificationUrl": "https://www.coursera.org/account/accomplishments/verify/PTEV8VSOB4IV"
+  },
+  {
+    "id": "classic-vacations-architect-2022",
+    "title": "Web Producer",
+    "organization": "Classic Vacations",
+    "period": "2022–2026",
+    "category": "employment",
+    "description": "Sole architect of the WordPress CMS; custom post types, REST API, external API integration, design system.",
+    "longDescription": [
+      "Architected and implemented a custom WordPress CMS from the ground up — custom post types, taxonomies, relational content models (Toolset), JetMenu megamenu, and Elementor page templates — serving thousands of destination, hotel, and itinerary pages used daily by 6+ editors across Marketing and Solutions.",
+      "Built a REST API endpoint delivering destination images to client travel statements: hierarchical lookup with parent fallback, custom image sizing, Toolset custom fields for external location IDs, and a coverage-reporting view coordinated with Marketing for gap resolution.",
+      "Engineered a TBO API integration layer on hotel property pages — custom import UI with live JSON store, per-field content-source toggles between internal and third-party data, and a photo gallery — enabling real-time content switching without developer intervention.",
+      "Owned all templated product and taxonomy pages; designed full content architecture for destination, hotel, and itinerary content types site-wide.",
+      "Reduced Marketing dependency on developers for content publishing through structured CMS design, enabling self-service page creation for 6+ non-technical editors.",
+      "Leveraged AI coding assistance (ChatGPT, Copilot, Claude) as a core development practice; explicitly recognized by management for incorporating AI into workflow."
+    ],
+    "featured": true,
+    "skills": ["WordPress", "PHP", "JavaScript", "TypeScript", "REST APIs"],
+    "endorsementIds": ["lauren-brown"]
+  },
+  {
+    "id": "classic-vacations-qa-2019",
+    "title": "Product Operations Admin — QA & Training",
+    "organization": "Classic Vacations",
+    "period": "2019–2022",
+    "category": "employment",
+    "description": "Rebuilt automated reporting infrastructure: PowerShell, SQL pipelines, Excel VBA, modular query architecture.",
+    "longDescription": [
+      "Designed and deployed a centralized reporting automation platform — consolidating hundreds of individual scheduled tasks into a maintainable PowerShell + SQL + Windows Task Scheduler system generating recurring QA, booking, and operational reports for two teams and cross-departmental stakeholders.",
+      "Took over and corrected production-critical SQL queries (originally broken by another team) powering QA and booking-travel reports; documented and maintained the query library.",
+      "Built a custom Excel VBA add-in that turned a neglected CSV report (source of recurring financial loss) into a one-click pivot table dashboard, driving consistent adoption.",
+      "Engineered PowerShell scripts replacing a multi-step error-prone manual process with a single automated workflow; successfully advocated for the software update required to enable it.",
+      "Led team adoption of GitHub for version control, replacing email-based code sharing and manual backups; trained new hires and authored process and workflow documentation."
+    ],
+    "featured": true,
+    "skills": ["PowerShell", "SQL", "Excel/VBA"]
+  },
+  {
+    "id": "classic-vacations-admin-2013",
+    "title": "Product Operations Admin",
+    "organization": "Classic Vacations",
+    "period": "2013–2019",
+    "category": "employment",
+    "description": "QA review, data entry, copy editing, and Excel-based reporting. Contracted via Volt Workforce Solutions, Oct 2013 – Jul 2014.",
+    "longDescription": [
+      "Supported product contracting operations through QA review, data entry, copy editing, and Excel-based reporting."
+    ],
+    "featured": true,
+    "skills": ["Excel/VBA", "SQL"]
+  },
+  {
+    "id": "csu-fresno-ba-2008",
+    "title": "B.A., Special Major — Interactive Intermedia",
+    "organization": "CSU Fresno",
+    "period": "2008–2013",
+    "category": "education",
+    "description": "Self-designed program unifying art, media, and interactive experience.",
+    "featured": true,
+    "skills": ["Design"]
+  }
+]

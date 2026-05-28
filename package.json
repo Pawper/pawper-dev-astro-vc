@@ -9,7 +9,7 @@
     "dev": "astro dev",
     "import:devto": "node scripts/importDevtoLogs.cjs",
     "push:devto": "node scripts/pushDevtoLog.cjs",
-    "build": "node scripts/generateProjects.cjs && node scripts/generateEndorsements.cjs && node scripts/generateDevtoData.mjs && node scripts/generateOgImages.mjs && node scripts/fetchLinkCards.mjs && node scripts/generateLogDates.mjs && astro build && node scripts/generateResumePdf.mjs",
+    "build": "node scripts/generateProjects.cjs && node scripts/generateEndorsements.cjs && node scripts/generateAgendaData.cjs && node scripts/generateDevtoData.mjs && node scripts/generateOgImages.mjs && node scripts/fetchLinkCards.mjs && node scripts/generateLogDates.mjs && astro build && node scripts/generateResumePdf.mjs",
     "preview": "astro preview",
     "astro": "astro",
     "typecheck": "astro check"

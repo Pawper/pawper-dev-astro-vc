@@ -1,14 +1,15 @@
 #!/usr/bin/env node
 /**
- * Generates OG share images for log entries and series, uploads to Cloudinary.
+ * Generates OG share images for log entries, series, and experiences — uploads to Cloudinary.
  *
  * Logs WITH a hero image  → Cloudinary transformation URL (no upload)
  * Logs WITHOUT a hero     → Puppeteer branded card, uploaded as pawper.dev/og/[slug]
  * Series                  → Puppeteer series card, uploaded as pawper.dev/og/series/[slug]
+ * Experiences             → Puppeteer experience card, uploaded as pawper.dev/og/xp/[id]
  *
  * Skips entries that already have a cached URL in og-images.json.
  *
- * Writes: src/data/og-images.json  — { [slug]: url, "series/[slug]": url }
+ * Writes: src/data/og-images.json  — { [slug]: url, "series/[slug]": url, "xp/[id]": url }
  *
  * Env vars: CLOUDINARY_URL  or  CLOUDINARY_CLOUD_NAME + CLOUDINARY_KEY + CLOUDINARY_SECRET
  */
@@ -45,10 +46,22 @@ if (process.env.CLOUDINARY_URL) {
   });
 }
 
-const LOGS_DIR = path.join(__dirname, "../src/content/logs");
-const OUT_FILE = path.join(__dirname, "../src/data/og-images.json");
+const LOGS_DIR          = path.join(__dirname, "../src/content/logs");
+const OUT_FILE          = path.join(__dirname, "../src/data/og-images.json");
+const EXPERIENCES_FILE  = path.join(__dirname, "../src/data/experiences.json");
+const AGENDA_FILE       = path.join(__dirname, "../src/data/agenda.json");
 
 const slugify = (s) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+
+const SERVICE_CATS = new Set(["employment", "contracting", "consulting", "coaching", "speaking", "mentoring"]);
+
+function isPast(iso) {
+  if (!iso) return false;
+  const [y, m, d] = iso.split("-").map(Number);
+  const date = new Date(y, m - 1, d);
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  return date < today;
+}
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -127,6 +140,53 @@ function seriesCardHtml(name, kicker, parts) {
 </div></body></html>`;
 }
 
+/**
+ * Experience OG card.
+ * accent: purple for service categories, orange for upcoming agenda, red for past/default.
+ */
+function experienceCardHtml(title, organization, category, datetimeStart, datetimeEnd) {
+  const isService = SERVICE_CATS.has(category);
+  const isAgenda  = !!datetimeStart;
+  const past      = isAgenda && isPast(datetimeEnd ?? datetimeStart);
+  const accent = isService ? "#9055e8"
+    : (isAgenda && !past) ? "#f55a28"
+    : "#e84455";
+  const accentRgb = isService ? "144, 85, 232"
+    : (isAgenda && !past) ? "245, 90, 40"
+    : "232, 68, 85";
+
+  const catLabel = category.charAt(0).toUpperCase() + category.slice(1);
+  let eyebrow = catLabel;
+  if (isAgenda && datetimeStart) {
+    const [y, m, d] = datetimeStart.split("-").map(Number);
+    const dateStr = new Date(y, m - 1, d).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+    eyebrow = `${catLabel} · ${dateStr}`;
+  }
+
+  const titleSize = title.length > 60 ? "40px" : title.length > 40 ? "50px" : "58px";
+
+  return `<!DOCTYPE html><html><head><meta charset="utf-8"><style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { width: 1200px; height: 630px; overflow: hidden; background: #0e0e12;
+    font-family: 'Courier New', Courier, monospace; display: flex; align-items: center; justify-content: center; }
+  .card { width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center;
+    padding: 72px 100px; background: linear-gradient(135deg, #0e0e12 0%, #141420 60%, #0e0e12 100%); position: relative; }
+  .card::before { content: ''; position: absolute; top: 0; left: 0; width: 8px; height: 100%; background: ${accent}; }
+  .card::after { content: ''; position: absolute; top: 0; right: 0; width: 100%; height: 100%;
+    background: radial-gradient(ellipse at 90% 10%, rgba(${accentRgb}, 0.09) 0%, transparent 60%); pointer-events: none; }
+  .eyebrow { font-size: 18px; letter-spacing: 0.18em; text-transform: uppercase; color: ${accent}; margin-bottom: 24px; font-weight: 700; }
+  .title { font-size: ${titleSize}; line-height: 1.12; font-weight: 700; color: #f0f0f0; margin-bottom: 22px; max-width: 920px; }
+  .org { font-size: 22px; color: #5a5a6a; margin-bottom: 40px; letter-spacing: 0.02em; }
+  .brand { font-size: 19px; letter-spacing: 0.12em; text-transform: uppercase; color: #4a4a5a; }
+  .brand .accent { color: #4ecca3; }
+</style></head><body><div class="card">
+  <div class="eyebrow">${esc(eyebrow)}</div>
+  <div class="title">${esc(title)}</div>
+  ${organization ? `<div class="org">${esc(organization)}</div>` : ""}
+  <div class="brand"><span class="accent">pawper</span>.dev &middot; codex</div>
+</div></body></html>`;
+}
+
 async function screenshot(browser, html) {
   const page = await browser.newPage();
   await page.setViewport({ width: 1200, height: 630, deviceScaleFactor: 1 });
@@ -168,21 +228,16 @@ async function main() {
     });
   }
 
-  // Determine if Puppeteer is needed (uncached logs without hero, or uncached series)
-  const needsPuppeteer =
-    files.some((f) => {
-      const { image, title } = parseFrontmatter(readFileSync(path.join(LOGS_DIR, f), "utf-8"));
-      return title && !image && !existing[f.replace(/\.md$/, "")];
-    }) ||
-    [...seriesMap.keys()].some((slug) => !existing[`series/${slug}`]);
-
   let browser = null;
-  if (needsPuppeteer) {
-    console.log("🚀  Launching Puppeteer...");
-    browser = await puppeteer.launch({
-      headless: true,
-      args: ["--no-sandbox", "--disable-setuid-sandbox", "--disable-dev-shm-usage", "--disable-gpu"],
-    });
+  async function ensureBrowser() {
+    if (!browser) {
+      console.log("🚀  Launching Puppeteer...");
+      browser = await puppeteer.launch({
+        headless: true,
+        args: ["--no-sandbox", "--disable-setuid-sandbox", "--disable-dev-shm-usage", "--disable-gpu"],
+      });
+    }
+    return browser;
   }
 
   const ogImages = { ...existing };
@@ -208,7 +263,7 @@ async function main() {
     }
 
     console.log(`🎨  ${slug}: generating card...`);
-    const buf = await screenshot(browser, logCardHtml(title, kicker));
+    const buf = await screenshot(await ensureBrowser(), logCardHtml(title, kicker));
     ogImages[slug] = await uploadCard(buf, `pawper.dev/og/${slug}`);
     console.log(`✅  ${slug}: uploaded → ${ogImages[slug]}`);
   }
@@ -224,9 +279,37 @@ async function main() {
     }
 
     console.log(`🎨  series/${slug}: generating card...`);
-    const buf = await screenshot(browser, seriesCardHtml(name, kicker, parts));
+    const buf = await screenshot(await ensureBrowser(), seriesCardHtml(name, kicker, parts));
     ogImages[key] = await uploadCard(buf, `pawper.dev/og/series/${slug}`);
     console.log(`✅  series/${slug}: uploaded → ${ogImages[key]}`);
+  }
+
+  // ── Experiences (inline + agenda) ──
+  const experiencesRaw = JSON.parse(readFileSync(EXPERIENCES_FILE, "utf-8"));
+  const agendaRaw      = JSON.parse(readFileSync(AGENDA_FILE, "utf-8"));
+  const allExperiences = [
+    ...experiencesRaw,
+    ...agendaRaw.filter((e) => !experiencesRaw.some((x) => x.id === e.id)),
+  ];
+
+  for (const exp of allExperiences) {
+    const key = `xp/${exp.id}`;
+    if (existing[key]) {
+      ogImages[key] = existing[key];
+      console.log(`⏭️   ${key}: cached`);
+      continue;
+    }
+    console.log(`🎨  ${key}: generating card...`);
+    const html = experienceCardHtml(
+      exp.title ?? exp.id,
+      exp.organization ?? "",
+      exp.category ?? "",
+      exp.datetimeStart,
+      exp.datetimeEnd,
+    );
+    const buf = await screenshot(await ensureBrowser(), html);
+    ogImages[key] = await uploadCard(buf, `pawper.dev/og/xp/${exp.id}`);
+    console.log(`✅  ${key}: uploaded → ${ogImages[key]}`);
   }
 
   if (browser) await browser.close();

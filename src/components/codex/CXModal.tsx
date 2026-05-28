@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import CXScrollable from "../shared/CXScrollable";
 import type { ModalState, Theme } from "../../types";
 import { LOG_CAT } from "../../data/content";
@@ -10,9 +11,11 @@ import DCSeriesList from "./detail/DCSeriesList";
 import DCSearch from "./detail/DCSearch";
 import DCExperience, { DCExperienceSidebar } from "./detail/DCExperience";
 import DCMedia from "./detail/DCMedia";
-import { soundClick } from "../../context/SoundContext";
+import { soundClick, soundHover } from "../../context/SoundContext";
 import CXBtn, { RssIcon } from "./CXBtn";
-import { PROJECTS, LOGS, EXPERIENCES, slugify, getPrimaryColor } from "../../data/content";
+import { PROJECTS, LOGS, EXPERIENCES, AGENDA_EVENTS, SERVICES, slugify, getPrimaryColor } from "../../data/content";
+import type { Experience } from "../../data/content";
+import { isPastDate, isServiceCategory } from "./detail/ExperienceCardRow";
 import { contrastText } from "./CXPill";
 import { getProgress } from "../../utils/logProgress";
 import devtoSeriesRaw from "../../data/devto-series.json";
@@ -112,14 +115,19 @@ function ShareIcon() {
   );
 }
 
-function SharePopover({ shareUrl, title, num, primaryHex, secondaryHex, isDark, hasPrimary }: {
+export function SharePopover({ shareUrl, title, num, primaryHex, secondaryHex, isDark, hasPrimary }: {
   shareUrl: string; title: string; num: string;
   primaryHex: string; secondaryHex: string; isDark: boolean; hasPrimary: boolean;
 }) {
   const [open, setOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const [mobile, setMobile] = useState(false);
+  const [fixedPos, setFixedPos] = useState<{ bottom: number; right: number } | null>(null);
+  const [mounted, setMounted] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  const portalRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => { setMounted(true); }, []);
 
   useEffect(() => {
     const check = () => setMobile(window.innerWidth < 640);
@@ -130,12 +138,25 @@ function SharePopover({ shareUrl, title, num, primaryHex, secondaryHex, isDark, 
 
   useEffect(() => {
     if (!open) return;
+    // Close on click outside both the trigger and the portal
     const handler = (e: MouseEvent) => {
-      if (!ref.current?.contains(e.target as Node)) setOpen(false);
+      const t = e.target as Node;
+      if (!ref.current?.contains(t) && !portalRef.current?.contains(t)) setOpen(false);
     };
     document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, [open]);
+    // Recompute position on resize
+    const updatePos = () => {
+      if (!mobile && ref.current) {
+        const r = ref.current.getBoundingClientRect();
+        setFixedPos({ bottom: window.innerHeight - r.top + 10, right: window.innerWidth - r.right });
+      }
+    };
+    window.addEventListener("resize", updatePos);
+    return () => {
+      document.removeEventListener("mousedown", handler);
+      window.removeEventListener("resize", updatePos);
+    };
+  }, [open, mobile]);
 
   const copy = () => {
     navigator.clipboard.writeText(shareUrl).catch(() => {});
@@ -143,102 +164,204 @@ function SharePopover({ shareUrl, title, num, primaryHex, secondaryHex, isDark, 
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const handleToggle = () => {
+    soundClick();
+    if (!open && !mobile && ref.current) {
+      const r = ref.current.getBoundingClientRect();
+      setFixedPos({ bottom: window.innerHeight - r.top + 10, right: window.innerWidth - r.right });
+    }
+    setOpen(o => !o);
+  };
+
   const liUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`;
   const xUrl  = `https://twitter.com/intent/tweet?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(title)}`;
   const rgb   = hexToRgb(primaryHex);
 
-  const popoverStyle: React.CSSProperties = mobile ? {
-    position: "fixed", bottom: 64, left: 12, right: 12,
-    padding: "16px",
-    background: isDark ? "rgba(18, 20, 28, 0.98)" : "rgba(238, 241, 248, 0.98)",
-    border: `1px solid rgba(${rgb}, 0.22)`,
-    borderRadius: 16,
-    boxShadow: "0 -4px 40px rgba(0,0,0,0.5)",
-    display: "flex", flexDirection: "column", gap: 12,
-    zIndex: 200,
-    backdropFilter: "blur(16px)",
-  } : {
-    position: "absolute", bottom: "calc(100% + 10px)", right: 0,
-    padding: "14px 16px",
-    background: isDark ? "rgba(18, 20, 28, 0.97)" : "rgba(238, 241, 248, 0.97)",
-    border: `1px solid rgba(${rgb}, 0.22)`,
-    borderRadius: 14,
-    boxShadow: "0 8px 40px rgba(0,0,0,0.45)",
-    display: "flex", flexDirection: "column", gap: 10,
-    minWidth: 284, zIndex: 30,
-    backdropFilter: "blur(12px)",
-  };
+  const popoverContent = (isMobile: boolean) => (
+    <>
+      <img
+        src={`https://api.qrserver.com/v1/create-qr-code/?size=256x256&data=${encodeURIComponent(shareUrl)}&bgcolor=${isDark ? "12141c" : "eef1f8"}&color=${primaryHex.replace("#", "")}&qzone=1&format=svg`}
+        alt="QR code"
+        style={{ width: "100%", height: "auto", borderRadius: 8, display: "block" }}
+      />
+      <div style={{
+        display: "flex", alignItems: "center", gap: 8,
+        background: isDark ? "rgba(255,255,255,0.07)" : `rgba(${rgb}, 0.06)`,
+        border: `1px solid ${isDark ? "rgba(255,255,255,0.13)" : `rgba(${rgb}, 0.14)`}`,
+        borderRadius: 8, padding: "8px 10px",
+      }}>
+        <span className="pw-mono" style={{
+          flex: 1, fontSize: 11,
+          color: isDark ? "rgba(255,255,255,0.55)" : "var(--ink-mute)",
+          overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
+          direction: "rtl", textAlign: "left",
+        }}>
+          {shareUrl}
+        </span>
+        <Tap onClick={copy}
+          onMouseEnter={e => {
+            soundHover();
+            if (!copied) {
+              const el = e.currentTarget as HTMLElement;
+              el.style.background = `rgba(${rgb}, 0.18)`;
+              el.style.color = isDark ? "rgba(255,255,255,0.9)" : "var(--ink)";
+            }
+          }}
+          onMouseLeave={e => {
+            if (!copied) {
+              const el = e.currentTarget as HTMLElement;
+              el.style.background = `rgba(${rgb}, 0.08)`;
+              el.style.color = isDark ? "rgba(255,255,255,0.6)" : "var(--ink-soft)";
+            }
+          }}
+          style={{
+            fontSize: 10, letterSpacing: "0.08em", flexShrink: 0,
+            padding: "3px 8px", borderRadius: 5, fontFamily: "var(--font-mono)",
+            color: copied ? primaryHex : isDark ? "rgba(255,255,255,0.6)" : "var(--ink-soft)",
+            background: copied ? `rgba(${rgb}, 0.15)` : `rgba(${rgb}, 0.08)`,
+            transition: "color 0.2s, background 0.2s",
+          }}>
+          {copied ? "✓ COPIED" : "COPY"}
+        </Tap>
+      </div>
+      <div style={{ display: "flex", gap: 8 }}>
+        {[{ label: "LinkedIn", href: liUrl }, { label: "X / Twitter", href: xUrl }].map(({ label, href }) => (
+          <a key={label} href={href} target="_blank" rel="noopener noreferrer"
+            onClick={(e) => { e.stopPropagation(); soundClick(); setOpen(false); }}
+            onMouseEnter={e => {
+              soundHover();
+              const el = e.currentTarget;
+              el.style.background = `rgba(${rgb}, 0.18)`;
+              el.style.color = isDark ? "rgba(255,255,255,0.95)" : "rgba(0,0,0,0.85)";
+            }}
+            onMouseLeave={e => {
+              const el = e.currentTarget;
+              el.style.background = `rgba(${rgb}, 0.08)`;
+              el.style.color = isDark ? "rgba(255,255,255,0.72)" : "rgba(0,0,0,0.65)";
+            }}
+            style={{
+              flex: 1, textAlign: "center", textDecoration: "none",
+              fontSize: 11, letterSpacing: "0.1em", fontFamily: "var(--font-mono)",
+              padding: isMobile ? "10px" : "6px 10px", borderRadius: 8,
+              cursor: "pointer", userSelect: "none",
+              color: isDark ? "rgba(255,255,255,0.72)" : "rgba(0,0,0,0.65)",
+              background: `rgba(${rgb}, 0.08)`,
+              border: `1px solid rgba(${rgb}, 0.14)`,
+              transition: "background 0.15s, color 0.15s",
+            }}
+          >{label}</a>
+        ))}
+      </div>
+    </>
+  );
+
+  // Desktop: portal to document.body so position:fixed escapes backdrop-filter containing block
+  const desktopPortal = mounted && open && !mobile && fixedPos
+    ? createPortal(
+        <div ref={portalRef} style={{
+          position: "fixed",
+          bottom: fixedPos.bottom, right: fixedPos.right,
+          padding: "14px 16px",
+          background: isDark ? "rgba(18, 20, 28, 0.97)" : "rgba(238, 241, 248, 0.97)",
+          border: `1px solid rgba(${rgb}, 0.22)`,
+          borderRadius: 14, boxShadow: "0 8px 40px rgba(0,0,0,0.45)",
+          display: "flex", flexDirection: "column", gap: 10,
+          minWidth: 284, zIndex: 9999,
+          backdropFilter: "blur(12px)",
+        }}>
+          {popoverContent(false)}
+        </div>,
+        document.body
+      )
+    : null;
 
   return (
     <div ref={ref} style={{ position: "relative" }}>
+      {/* Mobile sheet */}
       {open && mobile && (
-        <div
-          onClick={() => setOpen(false)}
-          style={{ position: "fixed", inset: 0, zIndex: 199 }}
-        />
+        <div onClick={() => setOpen(false)} style={{ position: "fixed", inset: 0, zIndex: 199 }} />
       )}
-      {open && (
-        <div style={popoverStyle}>
-          <img
-            src={`https://api.qrserver.com/v1/create-qr-code/?size=256x256&data=${encodeURIComponent(shareUrl)}&bgcolor=${isDark ? "12141c" : "eef1f8"}&color=${primaryHex.replace("#", "")}&qzone=1&format=svg`}
-            alt="QR code"
-            style={{ width: "100%", height: "auto", borderRadius: 8, display: "block" }}
-          />
-          <div style={{
-            display: "flex", alignItems: "center", gap: 8,
-            background: `rgba(${rgb}, 0.06)`,
-            border: `1px solid rgba(${rgb}, 0.14)`,
-            borderRadius: 8, padding: "8px 10px",
-          }}>
-            <span className="pw-mono" style={{
-              flex: 1, fontSize: 11, color: "var(--ink-mute)",
-              overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
-              direction: "rtl", textAlign: "left",
-            }}>
-              {shareUrl}
-            </span>
-            <Tap onClick={copy} style={{
-              fontSize: 10, letterSpacing: "0.08em", flexShrink: 0,
-              padding: "3px 8px", borderRadius: 5,
-              fontFamily: "var(--font-mono)",
-              color: copied ? primaryHex : "var(--ink-soft)",
-              background: copied ? `rgba(${rgb}, 0.15)` : `rgba(${rgb}, 0.08)`,
-              transition: "color 0.2s, background 0.2s",
-            }}>
-              {copied ? "✓ COPIED" : "COPY"}
-            </Tap>
-          </div>
-          <div style={{ display: "flex", gap: 8 }}>
-            {[{ label: "LinkedIn", href: liUrl }, { label: "X / Twitter", href: xUrl }].map(({ label, href }) => (
-              <a
-                key={label} href={href} target="_blank" rel="noopener noreferrer"
-                onClick={() => setOpen(false)}
-                style={{
-                  flex: 1, textAlign: "center", textDecoration: "none",
-                  fontSize: 11, letterSpacing: "0.1em", fontFamily: "var(--font-mono)",
-                  padding: mobile ? "10px" : "6px 10px", borderRadius: 8,
-                  color: "var(--ink-soft)",
-                  background: `rgba(${rgb}, 0.08)`,
-                  border: `1px solid rgba(${rgb}, 0.14)`,
-                }}
-              >
-                {label}
-              </a>
-            ))}
-          </div>
+      {open && mobile && (
+        <div style={{
+          position: "fixed", bottom: 64, left: 12, right: 12,
+          padding: "16px",
+          background: isDark ? "rgba(18, 20, 28, 0.98)" : "rgba(238, 241, 248, 0.98)",
+          border: `1px solid rgba(${rgb}, 0.22)`,
+          borderRadius: 16, boxShadow: "0 -4px 40px rgba(0,0,0,0.5)",
+          display: "flex", flexDirection: "column", gap: 12,
+          zIndex: 200, backdropFilter: "blur(16px)",
+        }}>
+          {popoverContent(true)}
         </div>
       )}
+      {desktopPortal}
       <CXBtn
-        num={num}
-        label="Share"
+        num={num} label="Share"
         primary={!hasPrimary}
         bgHex={hasPrimary ? secondaryHex : primaryHex}
-        isDark={isDark}
-        icon={<ShareIcon />}
-        onClick={() => { soundClick(); setOpen(o => !o); }}
+        isDark={isDark} icon={<ShareIcon />}
+        onClick={handleToggle}
       />
     </div>
   );
+}
+
+/** Short uppercase date label for the JOIN button: "MAY 27" or "MAY 27 – JUN 3" */
+function expJoinDateLabel(exp: Experience): string {
+  const fmt = (iso: string) => {
+    const [y, m, d] = iso.split("-").map(Number);
+    return new Date(y, m - 1, d)
+      .toLocaleDateString("en-US", { month: "short", day: "numeric" })
+      .toUpperCase();
+  };
+  if (exp.datetimeEnd && exp.datetimeEnd !== exp.datetimeStart) {
+    return `${fmt(exp.datetimeStart!)} – ${fmt(exp.datetimeEnd)}`;
+  }
+  return fmt(exp.datetimeStart!);
+}
+
+/**
+ * Airtable endorsement form URL with prefilled fields.
+ * Field names must match the exact field names in the Airtable form.
+ * TODO: verify field names once the form is finalized.
+ *   prefill_Service   → the category id (e.g. "speaking", "coaching")
+ *   prefill_Skills    → comma-joined skills array
+ *   prefill_Experience → experience id (hidden)
+ */
+function endorseUrl(exp: Experience): string {
+  const base = "https://airtable.com/app5WObcR6LNZ9bQv/pagfzcuqMVAgL0FKk/form";
+  const parts: string[] = [];
+  if (exp.category) parts.push(`prefill_Service=${encodeURIComponent(exp.category)}`);
+  if (exp.skills?.length) parts.push(`prefill_Skills%20List=${encodeURIComponent(exp.skills.join(", "))}`);
+  parts.push(`prefill_Experience=${encodeURIComponent(exp.id)}`);
+  parts.push("hide_Experience=true");
+  return `${base}?${parts.join("&")}`;
+}
+
+/** Build a data-URI .ics download for a calendar event. */
+function makeExpIcs(exp: Experience): string {
+  const toD = (iso: string) => iso.replace(/-/g, "");
+  // DTEND for all-day = day after last day (RFC 5545 §3.6.1)
+  const endBase = exp.datetimeEnd ?? exp.datetimeStart!;
+  const [ey, em, ed] = endBase.split("-").map(Number);
+  const next = new Date(ey, em - 1, ed + 1);
+  const endD = `${next.getFullYear()}${String(next.getMonth() + 1).padStart(2, "0")}${String(next.getDate()).padStart(2, "0")}`;
+  const esc = (s: string) => s.replace(/\\/g, "\\\\").replace(/;/g, "\\;").replace(/,/g, "\\,").replace(/\n/g, "\\n");
+  const lines: string[] = [
+    "BEGIN:VCALENDAR",
+    "VERSION:2.0",
+    "PRODID:-//pawper.dev//calendar//EN",
+    "BEGIN:VEVENT",
+    `DTSTART;VALUE=DATE:${toD(exp.datetimeStart!)}`,
+    `DTEND;VALUE=DATE:${endD}`,
+    `SUMMARY:${esc(exp.title)}`,
+  ];
+  if (exp.description) lines.push(`DESCRIPTION:${esc(exp.description)}`);
+  const loc = exp.locationName ?? exp.location;
+  if (loc) lines.push(`LOCATION:${esc(loc)}`);
+  if (exp.registerUrl) lines.push(`URL:${exp.registerUrl}`);
+  lines.push("END:VEVENT", "END:VCALENDAR");
+  return `data:text/calendar;charset=utf-8,${encodeURIComponent(lines.join("\r\n"))}`;
 }
 
 function ModalFooterButtons({ modal, proj, primaryHex, secondaryHex, isDark, onNavigateToService, onNavigate }: {
@@ -281,11 +404,63 @@ function ModalFooterButtons({ modal, proj, primaryHex, secondaryHex, isDark, onN
   }
 
   if (modal.kind === "experience") {
+    const _expData = [...EXPERIENCES, ...AGENDA_EVENTS].find(e => e.id === modal.id);
+    const expIsAgenda = !!_expData?.datetimeStart;
+    const expPast = expIsAgenda && isPastDate(_expData?.datetimeEnd ?? _expData?.datetimeStart ?? "");
+    const expUpcoming = expIsAgenda && !expPast;
+
+    // Show endorse for: non-agenda experiences (always historical) OR agenda events that have started
+    const showEndorse = !!_expData && (!expIsAgenda || !expUpcoming);
+
+    // When endorse is shown it takes the primary slot; action button becomes secondary
+    const actionNum  = showEndorse ? "02" : "01";
+    const actionPrimary = !showEndorse;
+    const actionColor   = showEndorse ? secondaryHex : primaryHex;
+
+    let btnAction: React.ReactNode;
+    if (expUpcoming && _expData) {
+      const dateLabel = expJoinDateLabel(_expData);
+      if (_expData.registerUrl) {
+        btnAction = (
+          <CXBtn num={actionNum} label={`Join ${dateLabel}`} primary={actionPrimary} bgHex={actionColor} isDark={isDark}
+            href={_expData.registerUrl} />
+        );
+      } else {
+        btnAction = (
+          <CXBtn num={actionNum} label={`Join ${dateLabel}`} primary={actionPrimary} bgHex={actionColor} isDark={isDark}
+            icon={<span className="cx-btn-icon" style={{ fontWeight: 300, fontSize: 15 }}>+</span>}
+            href={makeExpIcs(_expData)} download />
+        );
+      }
+    } else if (_expData && isServiceCategory(_expData.category)) {
+      const svc = SERVICES.find(s => s.id === _expData.category);
+      btnAction = (
+        <CXBtn num={actionNum} label={`Explore ${svc?.label ?? _expData.category}`} primary={actionPrimary} bgHex={actionColor} isDark={isDark}
+          icon={null} onClick={() => onNavigateToService?.(_expData.category)} />
+      );
+    } else {
+      btnAction = (
+        <CXBtn num={actionNum} label="Open to work" primary={actionPrimary} bgHex={actionColor} isDark={isDark}
+          icon={null} onClick={() => onNavigateToService?.("overview")} />
+      );
+    }
+
     return (
       <div className="cx-btn-row" style={{ position: "absolute", bottom: 7, right: 24, display: "flex", gap: 8, zIndex: 20 }}>
-        <CXBtn num="01" label="Open to work" primary bgHex={primaryHex} isDark={isDark} icon={null}
-          onClick={() => onNavigateToService?.("overview")} />
-        <CXBtn num="02" label="Resume" href="/resume" bgHex={secondaryHex} isDark={isDark} />
+        {showEndorse && _expData && (
+          <CXBtn num="01" label="Endorse Phillip" primary bgHex={primaryHex} isDark={isDark}
+            href={endorseUrl(_expData)} />
+        )}
+        {btnAction}
+        <SharePopover
+          shareUrl={`https://pawper.dev/xp/${modal.id}`}
+          title={_expData?.title ?? modal.id}
+          num={showEndorse ? "03" : "02"}
+          primaryHex={primaryHex}
+          secondaryHex={secondaryHex}
+          isDark={isDark}
+          hasPrimary={true}
+        />
       </div>
     );
   }
@@ -435,7 +610,7 @@ function ContentModalLayout({ body, sidebar }: { body: React.ReactNode; sidebar:
       <div
         ref={sidebarRef}
         className="cx-modal-sidebar"
-        style={{ width: 230, flexShrink: 0, padding: "14px 0 58px", display: "flex", alignSelf: "flex-start", position: "sticky", top: 0 }}
+        style={{ width: 230, flexShrink: 0, padding: "14px 0 98px", display: "flex", alignSelf: "flex-start", position: "sticky", top: 0 }}
       >
         {sidebar}
       </div>
@@ -456,9 +631,10 @@ interface CXModalProps {
   onNavigateToCategory?: (catId: string) => void;
   onNavigateToLogCategory?: (catId: string) => void;
   onNavigateToService?: (serviceId: string) => void;
+  onNavigateToAgenda?: (eventId: string) => void;
 }
 
-export default function CXModal({ modal, previousModal, onClose, onBack, onNavigate, onSiblingNav, onPatchModal, logsHtml, theme, onNavigateToCategory, onNavigateToLogCategory, onNavigateToService }: CXModalProps) {
+export default function CXModal({ modal, previousModal, onClose, onBack, onNavigate, onSiblingNav, onPatchModal, logsHtml, theme, onNavigateToCategory, onNavigateToLogCategory, onNavigateToService, onNavigateToAgenda }: CXModalProps) {
   function handleBackdropClick() { soundClick(); onBack ? onBack() : onClose(); }
 
   const skillHasContent = modal.kind === "skill" && (
@@ -537,7 +713,12 @@ export default function CXModal({ modal, previousModal, onClose, onBack, onNavig
   const primaryColor   = modal.kind === "project"    ? (_proj ? getPrimaryColor(_proj) : "#2b8bff")
                        : modal.kind === "skill"      ? (modal.filterType === "language" && modal.color ? modal.color : "#c8d4e4")
                        : modal.kind === "search"     ? "#c8d4e4"
-                       : modal.kind === "experience" ? "#e84455"
+                       : modal.kind === "experience" ? (() => {
+                           const _exp = [...EXPERIENCES, ...AGENDA_EVENTS].find(e => e.id === modal.id);
+                           if (isServiceCategory(_exp?.category)) return "#9055e8";
+                           if (_exp?.datetimeStart) return isPastDate(_exp.datetimeEnd ?? _exp.datetimeStart) ? "#e84455" : "#f55a28";
+                           return "#e84455";
+                         })()
                        : modal.kind === "media"      ? LOG_CAT.accent
                        : LOG_CAT.accent;
   const secondaryColor = modal.kind === "project"
@@ -780,6 +961,8 @@ export default function CXModal({ modal, previousModal, onClose, onBack, onNavig
                 <DCExperienceSidebar
                   id={modal.id}
                   onOpen={(id, color, filterType) => onNavigate({ kind: "skill", id, color, filterType })}
+                  onNavigateToAgenda={onNavigateToAgenda}
+                  onOpenExperience={(expId) => onNavigate({ kind: "experience", id: expId })}
                 />
               }
             />

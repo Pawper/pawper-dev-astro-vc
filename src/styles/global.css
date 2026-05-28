@@ -349,6 +349,10 @@ html, body {
   }
 }
 
+/* Past-event dimming — fades in on hover */
+.cx-past { opacity: 0.5; transition: opacity .2s; }
+.cx-past:hover { opacity: 1; }
+
 /* Card hover */
 .cx-card {
   transition: transform .2s cubic-bezier(.2,.7,.3,1), box-shadow .2s, background .2s, border-color .2s;

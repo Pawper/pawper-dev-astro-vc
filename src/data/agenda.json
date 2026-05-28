@@ -1,0 +1,168 @@
+[
+  {
+    "id": "rec7BIdUVTAU1HmSg",
+    "title": "ClawCamp.us Campfire + Vibe Coding w/ A2A communications @ Frontier Tower; w/ Special Musical Guest, Ivan Linn, CEO of Wavv.",
+    "organization": "ClawCamp.us • Aiify.io",
+    "period": "",
+    "category": "volunteering",
+    "description": "",
+    "featured": false,
+    "skills": [
+      "OpenClaw",
+      "Nebius",
+      "ClawMax"
+    ],
+    "datetimeStart": "2026-05-19",
+    "time": "6 PM",
+    "location": "995 Market Street, San Francisco",
+    "locationName": "Frontier Tower @ Lounge",
+    "registerUrl": "https://luma.com/clawcamp-weekly-5-18?tk=ZdPPC0"
+  },
+  {
+    "id": "recY8bO9Odv4QoLyF",
+    "title": "ClawCamp: Get Up and Running+",
+    "organization": "ClawCamp.us",
+    "period": "",
+    "category": "mentoring",
+    "description": "<https://pawper.dev/l/docker-fundamentals>",
+    "featured": false,
+    "skills": [
+      "OpenClaw",
+      "Docker",
+      "WSL",
+      "Bash",
+      "Claude",
+      "Discord Bots"
+    ],
+    "datetimeStart": "2026-05-19",
+    "time": "6 PM",
+    "parentId": "rec7BIdUVTAU1HmSg",
+    "endorsementIds": ["oliver-mellan"]
+  },
+  {
+    "id": "recumlhmlxNw7Vn6X",
+    "title": "VCN #33: Total Recall - Memory for Agentic Systems - Open Registration",
+    "organization": "Frontier Tower SF",
+    "period": "",
+    "category": "attending",
+    "description": "",
+    "featured": false,
+    "skills": [
+      "Memory",
+      "Claude"
+    ],
+    "datetimeStart": "2026-05-21",
+    "time": "7 PM",
+    "location": "995 Market Street, San Francisco",
+    "locationName": "Frontier Tower @ 10th Floor",
+    "registerUrl": "https://luma.com/vcn-33-total-recall-memory-for-agentic-s?tk=yhl00v"
+  },
+  {
+    "id": "recaeIq6gtEWg7Zvf",
+    "title": "Build an expert agentic Slack bot with OpenClaw, Nebius Token Factory, and Tavily",
+    "organization": "Nebius Builders",
+    "period": "",
+    "category": "attending",
+    "description": "",
+    "featured": false,
+    "skills": [
+      "OpenClaw",
+      "Slack",
+      "Nebius",
+      "Token Factory",
+      "Tavily"
+    ],
+    "datetimeStart": "2026-05-26",
+    "time": "9 AM",
+    "registerUrl": "https://luma.com/82ompy1u?tk=RDalC4"
+  },
+  {
+    "id": "recDssgMumINnz1p7",
+    "title": "From Agentic AI to Physical AI: Talks + AI Agent Workshops, Ft AWS, Bedrock Robotics, Zoox & Knightscope",
+    "organization": "TechEquity Ai - Silicon Valley",
+    "period": "",
+    "category": "attending",
+    "description": "",
+    "featured": false,
+    "skills": [
+      "OpenClaw"
+    ],
+    "datetimeStart": "2026-05-26",
+    "time": "4:30 PM",
+    "location": "135 Constitution Dr, Menlo Park, CA 94025",
+    "locationName": "Snowflake SVAI Hub",
+    "registerUrl": "https://luma.com/.may-ai-forum?tk=0S68JQ"
+  },
+  {
+    "id": "recnn4u5kwOVW92v5",
+    "title": "Getting Started with OpenClaw - for Beginners",
+    "organization": "",
+    "period": "",
+    "category": "mentoring",
+    "description": "<https://pawper.dev/l/docker-fundamentals>",
+    "featured": false,
+    "skills": [
+      "OpenClaw",
+      "Docker",
+      "WSL",
+      "Bash",
+      "Claude",
+      "Discord Bots"
+    ],
+    "datetimeStart": "2026-05-26",
+    "time": "4:30 PM",
+    "parentId": "recDssgMumINnz1p7"
+  },
+  {
+    "id": "recP77WnppYOp0Opn",
+    "title": "VCN #34: Toolsmith - Build Your Own MCP Server",
+    "organization": "Frontier Tower SF",
+    "period": "",
+    "category": "attending",
+    "description": "",
+    "featured": false,
+    "skills": [
+      "MCP"
+    ],
+    "datetimeStart": "2026-05-28",
+    "time": "7 PM",
+    "location": "995 Market Street, San Francisco",
+    "locationName": "Frontier Tower @ 9th Floor",
+    "registerUrl": "https://luma.com/vcn-34-toolsmith-build-your-own-mcp-serv?tk=g0Zs7k"
+  },
+  {
+    "id": "recTR60pK82YhO1a5",
+    "title": "OpenClaw: After Hours @ GitHub",
+    "organization": "GitHub",
+    "period": "",
+    "category": "attending",
+    "description": "",
+    "featured": false,
+    "skills": [
+      "OpenClaw"
+    ],
+    "datetimeStart": "2026-06-04",
+    "time": "5:15 PM",
+    "location": "275 Brannan St, San Francisco, CA 94107",
+    "locationName": "GitHub QA",
+    "registerUrl": "https://luma.com/OpenClaw-GitHub?tk=azEXku"
+  },
+  {
+    "id": "recALb4Ek0vBNus99",
+    "title": "Building More Secure Autonomous AI Agents with NVIDIA NemoClaw",
+    "organization": "Nebius Builders",
+    "period": "",
+    "category": "attending",
+    "description": "",
+    "featured": false,
+    "skills": [
+      "OpenClaw",
+      "NemoClaw",
+      "Nebius",
+      "Token Factory"
+    ],
+    "datetimeStart": "2026-06-10",
+    "time": "9 AM",
+    "registerUrl": "https://luma.com/r16tprwv?tk=ymGmcd"
+  }
+]

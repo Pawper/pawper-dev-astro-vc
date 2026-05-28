@@ -1,14 +1,12 @@
 import React from "react";
-import { SERVICES, PROJECTS, LOGS, EXPERIENCES, canonicalizeSkill } from "../../../data/content";
+import { SERVICES, PROJECTS, LOGS, EXPERIENCES, AGENDA_EVENTS, canonicalizeSkill } from "../../../data/content";
 import CollapsiblePills from "../CollapsiblePills";
-import type { PillItem } from "../CollapsiblePills";
 import type { Endorsement } from "../../../data/content";
 import type { ModalState } from "../../../types";
 import endorsementsData from "../../../data/endorsements.json";
 import CXCard from "../CXCard";
-import Tap from "../../shared/Tap";
-import { soundClick } from "../../../context/SoundContext";
 import EndorsementQuote from "../EndorsementQuote";
+import ExperienceCardRow from "./ExperienceCardRow";
 
 interface Props {
   id: string;
@@ -157,44 +155,25 @@ export default function DCServiceEntry({ id, openModal }: Props) {
 
       {/* Right column: experience */}
       <div className="cx-service-right">
-      {/* Related experiences */}
+      {/* Related experiences — featured first, then the rest; latest first within each group */}
       {(() => {
-        const related = EXPERIENCES.filter((e) => e.featured && e.category === id);
+        const sortKey = (e: { datetimeStart?: string; period?: string }): string => {
+          if (e.datetimeStart) return e.datetimeStart; // ISO date — lexicographic desc works
+          const m = (e.period ?? "").match(/\d{4}/g);
+          return m ? m[m.length - 1] : "0";
+        };
+        const related = [...EXPERIENCES, ...AGENDA_EVENTS]
+          .filter((e) => e.category === id)
+          .sort((a, b) => {
+            const fDiff = (b.featured ? 1 : 0) - (a.featured ? 1 : 0);
+            return fDiff !== 0 ? fDiff : sortKey(b).localeCompare(sortKey(a));
+          });
         if (!related.length) return null;
         return (
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             <div className="pw-eyebrow" style={{ color: "var(--section-deep)" }}>Experience</div>
             {related.map((exp) => (
-              <Tap
-                key={exp.id}
-                className="pw-glass-dim cx-card cx-training-row"
-                style={{
-                  padding: "18px 22px", borderRadius: 16,
-                  borderLeft: "4px solid var(--section-accent)",
-                  display: "grid", gridTemplateColumns: "100px 1fr auto",
-                  gap: 18, alignItems: "start",
-                  cursor: "pointer",
-                }}
-                onClick={() => { soundClick(); openModal({ kind: "experience", id: exp.id }); }}
-              >
-                <span className="pw-mono" style={{ fontSize: 12, color: "var(--section-deep)", fontWeight: 600, letterSpacing: "0.08em", paddingTop: 2 }}>
-                  {exp.period}
-                </span>
-                <div>
-                  <div style={{ fontSize: 16, fontWeight: 600 }}>{exp.title}</div>
-                  <div style={{ fontSize: 13, color: "var(--ink-soft)", marginTop: 2 }}>{exp.description}</div>
-                  {(exp.skills?.length ?? 0) > 0 && (() => {
-                    const pill: PillItem[] = exp.skills!.filter((s) => matchSkill(s) !== null).map((s) => { const canonical = canonicalizeSkill(s); const match = matchSkill(s)!; return { key: s, label: canonical, onClick: () => openModal(match.kind === "language" ? { kind: "skill", id: canonical, filterType: "language", color: match.color } : { kind: "skill", id: canonical, filterType: "topic" }) }; });
-                    const plain = exp.skills!.filter((s) => matchSkill(s) === null);
-                    return (
-                      <div style={{ marginTop: 8 }}>
-                        <CollapsiblePills pills={pill} plain={plain} size="sm" />
-                      </div>
-                    );
-                  })()}
-                </div>
-                <span style={{ fontSize: 13, color: "var(--ink-mute)", alignSelf: "start", paddingTop: 2 }}>{exp.organization}</span>
-              </Tap>
+              <ExperienceCardRow key={exp.id} exp={exp} openModal={openModal} noDim />
             ))}
           </div>
         );

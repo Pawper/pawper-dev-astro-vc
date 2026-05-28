@@ -21,9 +21,11 @@ interface CXCardProps {
   eyebrow?: string;
   eyebrowColor?: string;  // defaults to accentColor
   date?: string;
+  headerRight?: ReactNode; // arbitrary node in top-right of header row (overrides date)
   title?: string;
   titleSize?: number;     // defaults to 17
-  hook?: string;
+  hook?: ReactNode;
+  hookLines?: number;     // defaults to 2; pass a large number to expand
   footer?: ReactNode;     // pinned to bottom via marginTop: auto
   footerEnd?: boolean;    // align footer to bottom-right instead of bottom-left
 }
@@ -67,11 +69,11 @@ function BadgeBlock({
 }
 
 function ContentColumn({
-  eyebrow, eyebrowColor, date, title, titleSize, hook, footer, badgeMode, footerEnd,
+  eyebrow, eyebrowColor, date, headerRight, title, titleSize, hook, hookLines, footer, badgeMode, footerEnd,
 }: {
   eyebrow?: string; eyebrowColor?: string;
-  date?: string; title?: string; titleSize?: number;
-  hook?: string; footer?: ReactNode;
+  date?: string; headerRight?: ReactNode; title?: string; titleSize?: number;
+  hook?: ReactNode; hookLines?: number; footer?: ReactNode;
   badgeMode?: boolean; footerEnd?: boolean;
 }) {
   return (
@@ -81,12 +83,13 @@ function ContentColumn({
       gap: 8, flex: 1, minWidth: 0,
       ...(badgeMode ? { alignSelf: "stretch" } : {}),
     }}>
-      {(eyebrow || date) && (
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+      {(eyebrow || date || headerRight) && (
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
           {eyebrow && (
             <span className="pw-eyebrow" style={{ color: eyebrowColor }}>{eyebrow}</span>
           )}
-          {date && (
+          {headerRight && <div style={{ marginLeft: "auto", flexShrink: 0 }}>{headerRight}</div>}
+          {!headerRight && date && (
             <span className="pw-mono" style={{ fontSize: 10, color: "var(--ink-mute)", marginLeft: "auto" }}>
               {date}
             </span>
@@ -105,7 +108,7 @@ function ContentColumn({
       {hook && (
         <div style={{
           fontSize: 12, color: "var(--ink-soft)", lineHeight: 1.45,
-          display: "-webkit-box", WebkitLineClamp: 2,
+          display: "-webkit-box", WebkitLineClamp: hookLines ?? 2,
           WebkitBoxOrient: "vertical", overflow: "hidden",
         } as React.CSSProperties}>
           {hook}
@@ -138,16 +141,18 @@ export default function CXCard({
   eyebrow,
   eyebrowColor,
   date,
+  headerRight,
   title,
   titleSize,
   hook,
+  hookLines,
   footer,
   footerEnd,
 }: CXCardProps) {
   const resolvedBadgeColor = badgeColor ?? accentColor;
   const resolvedBadgeSubColor = badgeSubColor ?? resolvedBadgeColor;
   const resolvedEyebrowColor = eyebrowColor ?? accentColor;
-  const hasContent = !!(eyebrow || date || title || hook || footer);
+  const hasContent = !!(eyebrow || date || headerRight || title || hook || footer);
 
   let cardStyle: React.CSSProperties;
   let inner: ReactNode;
@@ -177,8 +182,8 @@ export default function CXCard({
           {hasContent ? (
             <ContentColumn
               eyebrow={eyebrow} eyebrowColor={resolvedEyebrowColor}
-              date={date} title={title} titleSize={titleSize}
-              hook={hook} footer={footer} footerEnd={footerEnd}
+              date={date} headerRight={headerRight} title={title} titleSize={titleSize}
+              hook={hook} hookLines={hookLines} footer={footer} footerEnd={footerEnd}
             />
           ) : children}
         </div>
@@ -216,8 +221,8 @@ export default function CXCard({
         {hasContent ? (
           <ContentColumn
             eyebrow={eyebrow} eyebrowColor={resolvedEyebrowColor}
-            date={date} title={title} titleSize={titleSize}
-            hook={hook} footer={footer} badgeMode footerEnd={footerEnd}
+            date={date} headerRight={headerRight} title={title} titleSize={titleSize}
+            hook={hook} hookLines={hookLines} footer={footer} badgeMode footerEnd={footerEnd}
           />
         ) : children}
       </>
@@ -232,8 +237,8 @@ export default function CXCard({
     inner = hasContent ? (
       <ContentColumn
         eyebrow={eyebrow} eyebrowColor={resolvedEyebrowColor}
-        date={date} title={title} titleSize={titleSize}
-        hook={hook} footer={footer} footerEnd={footerEnd}
+        date={date} headerRight={headerRight} title={title} titleSize={titleSize}
+        hook={hook} hookLines={hookLines} footer={footer} footerEnd={footerEnd}
       />
     ) : children;
   }

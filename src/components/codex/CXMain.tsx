@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import type { View, ModalState } from "../../types";
+import type { View, ModalState, Theme } from "../../types";
 import { CX_INDEX, PROJECT_CATEGORIES, LOG_CATEGORIES, DEFAULT_PROJECT_CAT } from "../../data/content";
+import { SharePopover } from "./CXModal";
 import resumeAssets from "../../data/resume-assets.json";
 import CXBtn, { RssIcon } from "./CXBtn";
 import CXSectionFrame from "./CXSectionFrame";
@@ -8,6 +9,7 @@ import CXLanding from "./CXLanding";
 import CXProjectsGrid from "./CXProjectsGrid";
 import CXLogsGrid from "./CXLogsGrid";
 import CXContactCombo, { CXContactFooter } from "./CXContactCombo";
+import DCAgenda from "./detail/DCAgenda";
 import CXSeriesPanel from "./CXSeriesPanel";
 import DCBio, { DCBioFooter } from "./detail/DCBio";
 import DCSkills from "./detail/DCSkills";
@@ -27,6 +29,10 @@ interface CXMainProps {
   setView: (view: View) => void;
   setHeaderExpanded: (v: boolean) => void;
   openModal: (m: ModalState) => void;
+  agendaScrollTarget?: string;
+  onAgendaScrolled?: () => void;
+  navigateToAgenda?: (eventId: string) => void;
+  theme: Theme;
 }
 
 export function StatusBar() {
@@ -47,11 +53,16 @@ export function StatusBar() {
   );
 }
 
-export default function CXMain({ view, selectEntry, selectCategory, setView, setHeaderExpanded, openModal }: CXMainProps) {
+export default function CXMain({ view, selectEntry, selectCategory, setView, setHeaderExpanded, openModal, agendaScrollTarget, onAgendaScrolled, navigateToAgenda, theme }: CXMainProps) {
   const cat = CX_INDEX.find((c) => c.id === view.cat);
   const [contactSent, setContactSent] = useState(false);
   const overviewCat = view.cat !== "contact" ? view.cat : undefined;
   const goToOverview = overviewCat ? () => selectEntry(overviewCat, "overview") : undefined;
+
+  // Section accent colors for SharePopover
+  const isDark = theme === "dark";
+  const primaryHex   = isDark ? (cat?.accent ?? "#ffffff")     : (cat?.accentLight     ?? cat?.accent     ?? "#000000");
+  const secondaryHex = isDark ? (cat?.accentDeep ?? "#cccccc") : (cat?.accentDeepLight ?? cat?.accentDeep ?? "#444444");
 
   if (view.kind === "home") {
     return <CXLanding onCategory={selectCategory} onEntry={selectEntry} />;
@@ -145,14 +156,46 @@ export default function CXMain({ view, selectEntry, selectCategory, setView, set
               <div className="cx-btn-row" style={{ display: "flex", gap: 8 }}>
                 <CXBtn num="01" label="Download PDF" href={resumeAssets.pdfUrl.replace("/raw/upload/", "/raw/upload/fl_attachment/")} primary icon={<span className="cx-btn-icon">↓</span>} />
                 <CXBtn num="02" label="Open in Browser" href="/resume" />
+                <SharePopover
+                  shareUrl="https://pawper.dev/about/resume"
+                  title="Resume · Phillip Wessels"
+                  num="03" primaryHex={primaryHex} secondaryHex={secondaryHex} isDark={isDark} hasPrimary={true}
+                />
               </div>
             )
             : view.cat === "personnel" && view.entry === "activity"
             ? <CXBtn num="01" label="RSS feed" href="/feed/activity.xml" primary icon={<RssIcon />} />
             : view.cat === "services"
-            ? <CXBtn num="01" label="Contact" onClick={() => selectEntry("contact", "all")} primary icon={null} />
+            ? (
+              <div className="cx-btn-row" style={{ display: "flex", gap: 8 }}>
+                <CXBtn num="01" label="Contact" onClick={() => selectEntry("contact", "all")} primary icon={null} />
+                <CXBtn num="02" label="Resume" onClick={() => selectEntry("personnel", "resume")} icon={null} />
+                <SharePopover
+                  shareUrl={`https://pawper.dev/services${view.entry && view.entry !== "overview" ? `/${view.entry}` : ""}`}
+                  title={cat?.entries.find((e) => e.id === view.entry)?.label ?? "Services"}
+                  num="03" primaryHex={primaryHex} secondaryHex={secondaryHex} isDark={isDark} hasPrimary={true}
+                />
+              </div>
+            )
             : view.cat === "contact"
-            ? <CXContactFooter sent={contactSent} />
+            ? (
+              <div className="cx-btn-row" style={{ display: "flex", gap: 8, alignItems: "flex-end" }}>
+                <CXContactFooter sent={contactSent} />
+                <SharePopover
+                  shareUrl="https://pawper.dev/contact"
+                  title="Contact · pawper.dev"
+                  num="02" primaryHex={primaryHex} secondaryHex={secondaryHex} isDark={isDark} hasPrimary={true}
+                />
+              </div>
+            )
+            : view.cat === "calendar"
+            ? (
+              <SharePopover
+                shareUrl="https://pawper.dev/agenda"
+                title="Agenda · pawper.dev"
+                num="01" primaryHex={primaryHex} secondaryHex={secondaryHex} isDark={isDark} hasPrimary={false}
+              />
+            )
             : undefined
         }
       >
@@ -169,6 +212,7 @@ export default function CXMain({ view, selectEntry, selectCategory, setView, set
         {view.cat === "services"  && view.entry === "speaking"    && <DCServiceEntry id="speaking"    selectEntry={selectEntry} openModal={openModal} />}
         {view.cat === "services"  && view.entry === "mentoring"   && <DCServiceEntry id="mentoring"   selectEntry={selectEntry} openModal={openModal} />}
         {view.cat === "contact"                                && <CXContactCombo onSent={() => setContactSent(true)} onService={(entryId) => selectEntry("services", entryId)} />}
+        {view.cat === "calendar"                               && <DCAgenda scrollToId={agendaScrollTarget} onScrolled={onAgendaScrolled} openModal={openModal} />}
       </CXSectionFrame>
     );
   }

@@ -10,6 +10,7 @@ import CXMain, { StatusBar } from "./CXMain";
 import CXModal from "./CXModal";
 import { extractHeadings } from "./detail/DCLog";
 import { populateHeadingCache } from "../../utils/headingCache";
+import { clampEyebrowColor } from "../../utils/color";
 
 interface AppProps {
   logsHtml: Record<string, string>;
@@ -37,6 +38,7 @@ function statePath(v: View, m: ModalState | null): string {
     case "personnel":return v.entry && v.entry !== "bio"               ? `/about/${v.entry}`    : "/about";
     case "services": return v.entry && v.entry !== "overview"          ? `/services/${v.entry}` : "/services";
     case "contact":  return "/contact";
+    case "calendar": return "/agenda";
     default:         return "/";
   }
 }
@@ -65,6 +67,8 @@ function parseUrl() {
       view = { kind: "entry", cat: "services", entry: seg1 ?? "overview" };
     } else if (seg0 === "contact") {
       view = { kind: "entry", cat: "contact", entry: "all" };
+    } else if (seg0 === "calendar") {
+      view = { kind: "entry", cat: "calendar", entry: "all" };
     } else if (seg0 === "p" && seg1) {
       modalStack.push({ kind: "project", id: seg1, siblings: PROJECTS.map(proj => ({ kind: "project" as const, id: proj.id })) });
     } else if (seg0 === "l" && seg1) {
@@ -120,6 +124,7 @@ function parseUrl() {
     projects: view.cat === "projects",
     logs: view.cat === "logs",
     contact: view.cat === "contact",
+    calendar: view.cat === "calendar",
   };
 
   return { view, modalStack, openCats, headerExpanded: view.kind === "home" };
@@ -160,8 +165,9 @@ function AppInner({ logsHtml }: Pick<AppProps, "logsHtml">) {
   }
   const init = useState(parseUrl)[0];
   const [view, setView] = useState<View>(init?.view ?? { kind: "home" });
+  const [agendaScrollTarget, setAgendaScrollTarget] = useState<string | undefined>(undefined);
   const [openCats, setOpenCats] = useState<Record<string, boolean>>(
-    init?.openCats ?? { personnel: true, services: false, projects: false, logs: false, contact: false }
+    init?.openCats ?? { personnel: true, services: false, projects: false, logs: false, contact: false, calendar: false }
   );
   const [headerExpanded, setHeaderExpanded] = useState(init?.headerExpanded ?? true);
   const [modalStack, setModalStack] = useState<ModalState[]>(init?.modalStack ?? []);
@@ -223,6 +229,15 @@ function AppInner({ logsHtml }: Pick<AppProps, "logsHtml">) {
   };
   // Close leaves history entries in place so the back button can reopen the modal.
   const closeModal = () => { soundClick(); setModalStack([]); };
+
+  const navigateToAgenda = (eventId: string) => {
+    closeModal();
+    setAgendaScrollTarget(eventId);
+    setView({ kind: "entry", cat: "calendar", entry: "all" });
+    setOpenCats(onlyCatOpen("calendar"));
+    setHeaderExpanded(false);
+    soundNav();
+  };
   // Back button inside modal: update state synchronously and skip the resulting popstate.
   const backModal = () => {
     soundClick();
@@ -404,7 +419,7 @@ function AppInner({ logsHtml }: Pick<AppProps, "logsHtml">) {
       style={{
         background: theme === "dark" ? "#04060c" : "#0a1320",
         "--section-accent": theme === "light" ? (sectionMeta.accentLight ?? sectionMeta.accent) : sectionMeta.accent,
-        "--section-deep":   theme === "light" ? (sectionMeta.accentDeepLight ?? sectionMeta.accentDeep) : sectionMeta.accentDeep,
+        "--section-deep":   clampEyebrowColor(theme === "light" ? (sectionMeta.accentDeepLight ?? sectionMeta.accentDeep) : sectionMeta.accentDeep, theme === "dark"),
         "--section-rgb":    theme === "light" ? (sectionMeta.accentRgbLight ?? sectionMeta.accentRgb) : sectionMeta.accentRgb,
       } as React.CSSProperties}
     >
@@ -490,6 +505,10 @@ function AppInner({ logsHtml }: Pick<AppProps, "logsHtml">) {
               setView={setView}
               setHeaderExpanded={setHeaderExpanded}
               openModal={openModal}
+              agendaScrollTarget={agendaScrollTarget}
+              onAgendaScrolled={() => setAgendaScrollTarget(undefined)}
+              navigateToAgenda={navigateToAgenda}
+              theme={theme}
             />
           </div>
           {/* On mobile: tap reading panel to collapse expanded header */}
@@ -562,7 +581,8 @@ function AppInner({ logsHtml }: Pick<AppProps, "logsHtml">) {
 
       {modal && <CXModal modal={modal} previousModal={modalStack.length > 1 ? modalStack[modalStack.length - 2] : undefined} onClose={closeModal} onBack={modalStack.length > 1 ? backModal : undefined} onNavigate={navigateModal} onSiblingNav={replaceModal} onPatchModal={patchModal} logsHtml={logsHtml} theme={theme} onNavigateToCategory={(catId) => { closeModal(); selectEntry("projects", catId); }}
         onNavigateToLogCategory={(catId) => { closeModal(); selectEntry("logs", catId); }}
-        onNavigateToService={(serviceId) => { closeModal(); selectEntry("services", serviceId); }} />}
+        onNavigateToService={(serviceId) => { closeModal(); selectEntry("services", serviceId); }}
+        onNavigateToAgenda={navigateToAgenda} />}
     </div>
   );
 }

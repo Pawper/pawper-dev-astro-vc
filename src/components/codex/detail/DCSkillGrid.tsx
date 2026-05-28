@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import CXCard from "../CXCard";
-import { PROJECTS, LOGS, EXPERIENCES, canonicalizeSkill } from "../../../data/content";
+import { PROJECTS, LOGS, EXPERIENCES, AGENDA_EVENTS, canonicalizeSkill } from "../../../data/content";
 import CollapsiblePills from "../CollapsiblePills";
 import type { PillItem } from "../CollapsiblePills";
 import type { Endorsement } from "../../../data/content";
@@ -11,8 +11,11 @@ const allEndorsements = endorsementsData as Endorsement[];
 import type { ModalSibling } from "../../../types";
 import MixedGrid from "../MixedGrid";
 import Tap from "../../shared/Tap";
+import CXPill from "../CXPill";
 import { soundClick, soundHover } from "../../../context/SoundContext";
 import EndorsementQuote from "../EndorsementQuote";
+import ExperienceCardRow from "./ExperienceCardRow";
+
 
 const WEEKS = 52;
 const CELL = 9;
@@ -27,27 +30,6 @@ function cellBg(count: number, isFuture: boolean, maxCount: number): string {
   return `rgba(var(--section-rgb), ${opacity.toFixed(2)})`;
 }
 
-function getLangDistPct(langName: string): string | null {
-  if (!PROJECTS.length) return null;
-  const lower = langName.toLowerCase();
-  const n = PROJECTS.length;
-  const scores: Record<string, number> = {};
-  for (const p of PROJECTS) {
-    for (const [lang, { percent }] of Object.entries(p.languages)) {
-      const k = lang.toLowerCase();
-      scores[k] = (scores[k] ?? 0) + parseFloat(percent) / n;
-    }
-  }
-  for (const a of LOGS) {
-    for (const tag of a.tags ?? []) {
-      const k = tag.toLowerCase();
-      if (k in scores) scores[k] += 2;
-    }
-  }
-  const total = Object.values(scores).reduce((s, v) => s + v, 0);
-  if (!total || !(lower in scores)) return null;
-  return (scores[lower] / total * 100).toFixed(1);
-}
 
 type Match = { kind: "language"; color: string } | { kind: "topic" } | null;
 function matchSkill(name: string): Match {
@@ -91,7 +73,14 @@ export default function DCSkillGrid({ tag, filterType = "topic", onOpen, onOpenE
   const logSiblings: ModalSibling[] = logs.map(a => ({ kind: "log", id: a.id }));
   const total = projects.length + logs.length;
 
-  const experiences = EXPERIENCES.filter((e) => e.skills?.some((s) => canonicalizeSkill(s).toLowerCase() === lower));
+  const experiences = [...EXPERIENCES, ...AGENDA_EVENTS]
+    .filter((e) => e.skills?.some((s) => canonicalizeSkill(s).toLowerCase() === lower))
+    .sort((a, b) => {
+      if (a.featured !== b.featured) return a.featured ? -1 : 1;
+      // Most recent first — datetimeStart for agenda events, last year in period for hardcoded experiences
+      const key = (e: typeof a) => e.datetimeStart ?? e.period?.match(/(\d{4})[^0-9]*$/)?.[1] ?? "0000";
+      return key(b).localeCompare(key(a));
+    });
   const endorsements = allEndorsements.filter((e) => e.skills?.some((s) => canonicalizeSkill(s).toLowerCase() === lower));
 
   // Derive years from actual skill-relevant commit/log dates, not pushedAt
@@ -109,7 +98,8 @@ export default function DCSkillGrid({ tag, filterType = "topic", onOpen, onOpenE
   const [yearHovered, setYearHovered] = useState(false);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [cellTooltip, setCellTooltip] = useState<{ x: number; y: number; iso: string; projCount: number; logCount: number; color: string } | null>(null);
-  useEffect(() => { setSelectedYear(null); setYearHovered(false); setSelectedDate(null); setCellTooltip(null); }, [tag]);
+  const [expExpanded, setExpExpanded] = useState(false);
+  useEffect(() => { setSelectedYear(null); setYearHovered(false); setSelectedDate(null); setCellTooltip(null); setExpExpanded(false); }, [tag]);
   useEffect(() => { setSelectedDate(null); setCellTooltip(null); }, [selectedYear]);
   const heatmapScrollRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -250,7 +240,6 @@ export default function DCSkillGrid({ tag, filterType = "topic", onOpen, onOpenE
   }
 
   const maxCount = Math.max(1, ...grid.flat().map((c) => c.count));
-  const langPct = filterType === "language" ? getLangDistPct(tag) : null;
   const showYearTabs = years.length > 0;
 
   return (
@@ -502,39 +491,38 @@ export default function DCSkillGrid({ tag, filterType = "topic", onOpen, onOpenE
           <span className="pw-mono" style={{ fontSize: 11, color: "var(--section-deep)", letterSpacing: "0.16em" }}>
             {`${experiences.length} ${experiences.length === 1 ? "EXPERIENCE" : "EXPERIENCES"}`}
           </span>
-          {experiences.map((exp) => (
-            <Tap
-              key={exp.id}
-              className="pw-glass-dim cx-card cx-training-row"
-              style={{
-                padding: "18px 22px", borderRadius: 16,
-                borderLeft: "4px solid var(--section-accent)",
-                display: "grid", gridTemplateColumns: "100px 1fr auto",
-                gap: 18, alignItems: "start", cursor: "pointer",
-              }}
-              onClick={() => { soundClick(); onOpenExperience?.(exp.id); }}
-            >
-              <span className="pw-mono" style={{ fontSize: 12, color: "var(--section-deep)", fontWeight: 600, letterSpacing: "0.08em", paddingTop: 2 }}>
-                {exp.period}
-              </span>
-              <div>
-                <div style={{ fontSize: 16, fontWeight: 600 }}>{exp.title}</div>
-                <div style={{ fontSize: 13, color: "var(--ink-soft)", marginTop: 2 }}>{exp.description}</div>
-                {(exp.skills?.length ?? 0) > 0 && (() => {
-                  const pill: PillItem[] = exp.skills!
-                    .filter((s) => matchSkill(s) !== null)
-                    .map((s) => {
-                      const canonical = canonicalizeSkill(s);
-                      const match = matchSkill(s)!;
-                      return { key: s, label: canonical, color: match.kind === "language" ? match.color : undefined, onClick: () => onOpenSkill?.(canonical, match.kind === "language" ? "language" : "topic", match.kind === "language" ? match.color : undefined) };
-                    });
-                  const plain = exp.skills!.filter((s) => matchSkill(s) === null);
-                  return <div style={{ marginTop: 8 }}><CollapsiblePills pills={pill} plain={plain} size="sm" /></div>;
-                })()}
-              </div>
-              <span style={{ fontSize: 13, color: "var(--ink-mute)", alignSelf: "start", paddingTop: 2 }}>{exp.organization}</span>
-            </Tap>
-          ))}
+          <div
+            style={{
+              display: "flex", flexDirection: "column", gap: 10,
+              ...(experiences.length > 2 ? {
+                maxHeight: expExpanded ? 9999 : 180,
+                overflow: "hidden",
+                transition: "max-height 0.6s cubic-bezier(.2,.7,.3,1)",
+                WebkitMaskImage: expExpanded ? "none" : "linear-gradient(to bottom, black 40%, transparent 100%)",
+                maskImage: expExpanded ? "none" : "linear-gradient(to bottom, black 40%, transparent 100%)",
+              } : {}),
+            }}
+          >
+            {experiences.map((exp) => (
+              <ExperienceCardRow
+                key={exp.id}
+                exp={exp}
+                openModal={(m) => {
+                  if (m.kind === "skill") onOpenSkill?.(m.id, m.filterType!, m.color);
+                  else if (m.kind === "experience") onOpenExperience?.(m.id);
+                }}
+                onCardClick={() => onOpenExperience?.(exp.id)}
+                onOpenSkill={onOpenSkill}
+              />
+            ))}
+          </div>
+          {experiences.length > 2 && (
+            <div style={{ display: "flex", justifyContent: "center", marginTop: expExpanded ? 0 : -14, ...(expExpanded ? { position: "sticky", bottom: 60 } : {}) }}>
+              <CXPill size="md" onClick={() => { soundClick(); setExpExpanded(e => !e); }}>
+                {expExpanded ? "Show less" : `Show all ${experiences.length}`}
+              </CXPill>
+            </div>
+          )}
         </div>
       )}
 

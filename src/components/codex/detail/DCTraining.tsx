@@ -1,6 +1,7 @@
 import React from "react";
 import { EXPERIENCES, PROJECTS, LOGS } from "../../../data/content";
-import type { Endorsement, Experience } from "../../../data/content";
+import { derivePeriod } from "../../../utils/date";
+import type { Endorsement } from "../../../data/content";
 import type { ModalState } from "../../../types";
 import endorsementsData from "../../../data/endorsements.json";
 import CXPill from "../CXPill";
@@ -22,6 +23,7 @@ function matchSkill(name: string): Match {
   if (allEndorsements.some((e) => e.skills?.some((s) => s.toLowerCase() === lower))) return { kind: "topic" };
   return null;
 }
+
 
 function ExperienceSkills({ skills, openModal }: { skills: string[]; openModal: (m: ModalState) => void }) {
   if (!skills.length) return null;
@@ -76,7 +78,7 @@ export default function DCTraining({ openModal }: Props) {
           onClick={() => { soundClick(); openModal({ kind: "experience", id: item.id }); }}
         >
           <span className="pw-mono" style={{ fontSize: 12, color: "var(--section-deep)", fontWeight: 600, letterSpacing: "0.08em", paddingTop: 2 }}>
-            {item.period}
+            {derivePeriod(item.title, item.period)}
           </span>
           <div>
             <div style={{ fontSize: 16, fontWeight: 600 }}>{item.title}</div>

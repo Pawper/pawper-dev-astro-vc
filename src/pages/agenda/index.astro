@@ -1,0 +1,37 @@
+---
+const siteUrl = Astro.site?.toString().replace(/\/$/, '') ?? 'https://pawper.dev';
+const pageUrl = `${siteUrl}/agenda`;
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Agenda · Phillip Wessels / CODEX</title>
+  <meta name="description" content="Upcoming events, workshops, and speaking engagements — Phillip Wessels." />
+  <link rel="canonical" href={pageUrl} />
+
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content={pageUrl} />
+  <meta property="og:title" content="Agenda · Phillip Wessels / CODEX" />
+  <meta property="og:description" content="Upcoming events, workshops, and speaking engagements — Phillip Wessels." />
+  <meta property="og:site_name" content="pawper.dev · CODEX" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Agenda · Phillip Wessels / CODEX" />
+  <meta name="twitter:description" content="Upcoming events, workshops, and speaking engagements — Phillip Wessels." />
+
+  <script is:inline>
+    window.location.replace('/?v=entry&cat=calendar&entry=all');
+  </script>
+
+  <style>
+    body { font-family: monospace; background: #0e0e12; color: #f0f0f0; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
+    a { color: #f55a28; }
+  </style>
+</head>
+<body>
+  <p>Redirecting… <a href="/?v=entry&cat=calendar&entry=all">Click here if not redirected.</a></p>
+</body>
+</html>

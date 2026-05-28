@@ -1,0 +1,182 @@
+[
+  {
+    "id": "recS7hEyUE6DvaCSj",
+    "title": "Open for new clients",
+    "date": "2026-05-10",
+    "time": "5 PM",
+    "type": "available",
+    "note": "Announcing availability for new freelance projects."
+  },
+  {
+    "id": "recdiTz5DBCv0hNzY",
+    "title": "Conference talk: Modern Web APIs",
+    "date": "2026-06-15",
+    "time": "5 PM",
+    "type": "speaking",
+    "note": "Speaking at DevCon 2026 about modern web APIs.",
+    "location": "Grand Convention Hall"
+  },
+  {
+    "id": "recGrgQTm6WrJWDhU",
+    "title": "React Workshop",
+    "date": "2026-06-22",
+    "time": "5 PM",
+    "type": "workshop",
+    "note": "Leading a hands-on React.js workshop for developers.",
+    "location": "TechHub Conference Center",
+    "registerUrl": "https://example.com/register-react-workshop",
+    "parentId": "recKGopnlWuyPYkat"
+  },
+  {
+    "id": "recQ0Abdo54Ha9TrB",
+    "title": "Workshop: Advanced CSS",
+    "date": "2026-07-10",
+    "time": "5 PM",
+    "type": "workshop",
+    "note": "Teaching advanced CSS techniques and layout strategies.",
+    "location": "Digital Creators Lab",
+    "registerUrl": "https://example.com/register-advanced-css"
+  },
+  {
+    "id": "recd8EW7oBcKpTdSn",
+    "title": "Workshop: API Integration",
+    "date": "2026-08-12",
+    "time": "5 PM",
+    "type": "workshop",
+    "note": "Interactive session on integrating third-party APIs.",
+    "location": "Metro Learning Center"
+  },
+  {
+    "id": "recKGopnlWuyPYkat",
+    "title": "Annual planning session",
+    "date": "2026-08-20",
+    "time": "5 PM",
+    "type": "speaking",
+    "note": "Strategic planning for the next year’s freelance goals.",
+    "location": "Summit Hall, City Expo",
+    "registerUrl": "https://example.com/register-annual-planning"
+  },
+  {
+    "id": "recLxenxzd1hXuukU",
+    "title": "JavaScript Bootcamp",
+    "date": "2026-09-05",
+    "time": "5 PM",
+    "type": "workshop",
+    "note": "Intensive bootcamp covering modern JavaScript features and best practices.",
+    "location": "Innovation Campus Auditorium",
+    "registerUrl": "https://example.com/register-js-bootcamp"
+  },
+  {
+    "id": "recN7cp36YmnXj14F",
+    "title": "Client Onboarding Webinar",
+    "date": "2026-09-12",
+    "time": "5 PM",
+    "type": "speaking",
+    "note": "Webinar for new clients to introduce services and processes.",
+    "registerUrl": "https://example.com/register-onboarding-webinar"
+  },
+  {
+    "id": "recLGXh3OX8NXqCJa",
+    "title": "Tech Conference Attendance",
+    "date": "2026-09-15",
+    "time": "2 AM",
+    "type": "attending",
+    "note": "Attending the annual Tech Innovators Conference to network and learn about the latest industry trends."
+  },
+  {
+    "id": "recDy0WxlQN9QwAyN",
+    "title": "Tech Community Meetup",
+    "date": "2026-09-20",
+    "time": "5 PM",
+    "type": "attending",
+    "note": "Monthly meetup for local tech professionals to network and share insights.",
+    "registerUrl": "https://example.com/register-tech-meetup"
+  },
+  {
+    "id": "recsX4hxrmZrkz7cB",
+    "title": "UX/UI Design Workshop",
+    "date": "2026-10-03",
+    "time": "5 PM",
+    "type": "workshop",
+    "note": "Hands-on workshop focusing on user experience and interface design.",
+    "location": "Design District Studio"
+  },
+  {
+    "id": "recMhMBczXQVextUw",
+    "title": "Open Office Hours",
+    "date": "2026-10-10",
+    "time": "5 PM",
+    "type": "available",
+    "note": "Weekly open office hours for client questions and project discussions. These sessions are designed to provide a welcoming environment for both new and existing clients to ask questions, discuss ongoing projects, and explore new collaboration opportunities. Whether you have a specific technical challenge or want to brainstorm ideas, feel free to join and make the most of this dedicated time.",
+    "registerUrl": "https://example.com/register-office-hours"
+  },
+  {
+    "id": "recJfQWJvzUgJkghD",
+    "title": "Web Summit Participation",
+    "date": "2026-10-10",
+    "time": "3 AM",
+    "type": "attending",
+    "note": "Participating in Web Summit 2026 to connect with professionals and attend keynote sessions.",
+    "parentId": "recLGXh3OX8NXqCJa"
+  },
+  {
+    "id": "rec1r7MlXBsyZks9A",
+    "title": "Freelancer Q&A Panel",
+    "date": "2026-10-17",
+    "time": "5 PM",
+    "type": "speaking",
+    "note": "Panel discussion with experienced freelancers sharing advice and stories.",
+    "registerUrl": "https://example.com/register-qa-panel"
+  },
+  {
+    "id": "recaWtboKq6GvFZni",
+    "title": "Frontend Bootcamp",
+    "date": "2026-11-01",
+    "time": "1 AM",
+    "type": "bootcamp",
+    "note": "Enrolling in an intensive bootcamp focused on advanced frontend development skills and best practices."
+  },
+  {
+    "id": "recSlD9XQFn0PLAGk",
+    "title": "Remote Work Best Practices",
+    "date": "2026-11-05",
+    "time": "4 PM",
+    "type": "speaking",
+    "note": "Seminar on effective strategies for remote work and collaboration."
+  },
+  {
+    "id": "recMHtaGNSyLWQouh",
+    "title": "Client Appreciation Event",
+    "date": "2026-11-20",
+    "time": "4 PM",
+    "type": "attending",
+    "note": "Special event to thank clients for their continued partnership.",
+    "registerUrl": "https://example.com/register-client-appreciation"
+  },
+  {
+    "id": "recypAlKmnys9ls6t",
+    "title": "API Security Workshop",
+    "date": "2026-12-01",
+    "time": "4 PM",
+    "type": "workshop",
+    "note": "Workshop on securing APIs and protecting client data.",
+    "location": "Cybersecurity Training Arena"
+  },
+  {
+    "id": "rec7n8CtdEzR8w57r",
+    "title": "AI Bootcamp",
+    "date": "2026-12-05",
+    "time": "1 AM",
+    "type": "bootcamp",
+    "note": "Joining a bootcamp dedicated to artificial intelligence, covering machine learning and data science fundamentals.",
+    "parentId": "recLxenxzd1hXuukU"
+  },
+  {
+    "id": "recueAVFtkS7HVKQS",
+    "title": "End-of-Year Review",
+    "date": "2026-12-15",
+    "time": "4 PM",
+    "type": "workshop",
+    "note": "Reviewing achievements and setting goals for the upcoming year. This annual review session will focus on reflecting on key milestones, analyzing what worked well, and identifying areas for growth. Participants are encouraged to share their experiences and aspirations, fostering a supportive environment for professional development and strategic planning."
+  }
+]
