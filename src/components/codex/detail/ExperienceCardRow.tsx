@@ -7,7 +7,7 @@
  * • Everything else → training-row layout with period + organization.
  */
 
-import { EXPERIENCES, PROJECTS, LOGS, PROFILE, canonicalizeSkill } from "../../../data/content";
+import { EXPERIENCES, AGENDA_EVENTS, PROJECTS, LOGS, PROFILE, canonicalizeSkill } from "../../../data/content";
 import type { Endorsement, Experience, ExperienceCategory } from "../../../data/content";
 import type { ModalState } from "../../../types";
 import endorsementsData from "../../../data/endorsements.json";
@@ -121,6 +121,12 @@ export default function ExperienceCardRow({ exp, openModal, onCardClick, onOpenS
   const past = isAgenda ? isEventPast(exp.datetimeStart!, exp.datetimeEnd, exp.time, now) : false;
   const inProgress = isAgenda ? isEventInProgress(exp.datetimeStart!, exp.datetimeEnd, exp.time, now) : false;
   const upcoming = isAgenda && !past;
+  // Child events inherit the parent's register URL when they don't have one
+  // of their own — prefer parent (broader event) over child (specific session).
+  const parent = exp.parentId
+    ? [...EXPERIENCES, ...AGENDA_EVENTS].find((e) => e.id === exp.parentId)
+    : undefined;
+  const actionSource = parent ?? exp;
   const descSummary = summaryForDescription(exp.description ?? "");
   const roleLabel = categoryLabel(exp.category, past);
 
@@ -216,9 +222,9 @@ export default function ExperienceCardRow({ exp, openModal, onCardClick, onOpenS
           Endorse <span style={{ marginLeft: 2, display: "inline-block", transform: "scale(1.4)", transformOrigin: "center", position: "relative", top: -2 }}>✦</span>
         </CXPill>
       </a>
-    ) : exp.registerUrl ? (
+    ) : actionSource.registerUrl ? (
       <a
-        href={exp.registerUrl}
+        href={actionSource.registerUrl}
         target="_blank"
         rel="noopener noreferrer"
         onClick={(e) => { e.stopPropagation(); soundClick(); }}

@@ -176,7 +176,8 @@ export default function DCCalendar() {
     grouped.get(key)!.push(e);
   }
 
-  function renderCard(e: CalendarEvent, indent = false) {
+  function renderCard(e: CalendarEvent, indent = false, parent?: CalendarEvent) {
+    const actionSource = parent ?? e;
     const tc = TYPE_COLORS[e.type] ?? TYPE_COLORS.workshop;
     const past = isEventPast(e.date, e.endDate, e.time, now);
     const expanded = expandedIds.has(e.id);
@@ -228,10 +229,10 @@ export default function DCCalendar() {
           eyebrow={[tc.label, dateStr, e.time].filter(Boolean).join(" · ")}
           eyebrowColor={tc.accent}
           headerRight={!past ? (
-            e.registerUrl
+            actionSource.registerUrl
               ? (
                 <a
-                  href={e.registerUrl}
+                  href={actionSource.registerUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={() => soundClick()}
@@ -241,7 +242,7 @@ export default function DCCalendar() {
                   <CXPill size="lg" variant="primary" style={{ cursor: "pointer" }}>Register <span style={{ marginLeft: 2, display: "inline-block", transform: "scale(1.4)", transformOrigin: "center", position: "relative", top: -2 }}>↗</span></CXPill>
                 </a>
               )
-              : <AddToCalendarDropdown event={e} accent={tc.accent} />
+              : <AddToCalendarDropdown event={actionSource} accent={tc.accent} />
           ) : undefined}
           title={e.title}
           titleSize={15}
@@ -263,7 +264,7 @@ export default function DCCalendar() {
           {items.map((e) => (
             <div key={e.id} style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               {renderCard(e, false)}
-              {childrenByParent.get(e.id)?.map((child) => renderCard(child, true))}
+              {childrenByParent.get(e.id)?.map((child) => renderCard(child, true, e))}
             </div>
           ))}
         </div>
