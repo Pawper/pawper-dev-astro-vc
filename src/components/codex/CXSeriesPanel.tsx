@@ -130,7 +130,7 @@ export default function CXSeriesPanel({ openModal }: CXSeriesPanelProps) {
                   {(logs.length > 3 || unreleased > 0) && (
                     <div className="pw-mono" style={{ fontSize: 10, letterSpacing: "0.16em", opacity: 0.55, display: "flex", gap: 10 }}>
                       {logs.length > 3 && <span style={{ color: "var(--ink-mute)" }}>+{logs.length - 3} MORE</span>}
-                      {unreleased > 0 && <span style={{ color: "var(--section-accent)" }}>· {unreleased} COMING SOON</span>}
+                      {unreleased > 0 && <span style={{ color: "var(--section-deep)" }}>· {unreleased} COMING SOON</span>}
                     </div>
                   )}
                   <ArticleProgressRing

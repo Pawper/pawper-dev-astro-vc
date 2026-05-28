@@ -49,7 +49,7 @@ function createSeriesCard(name: string, logs: Log[], total: number, onClick: () 
   if (unreleased > 0) {
     const soon = document.createElement("div");
     soon.className = "pw-mono";
-    soon.style.cssText = `font-size: 10px; letter-spacing: 0.16em; color: ${accent}; opacity: 0.55; margin-top: 2px;`;
+    soon.style.cssText = `font-size: 10px; letter-spacing: 0.16em; color: var(--section-deep); opacity: 0.55; margin-top: 2px;`;
     soon.textContent = `· ${unreleased} MORE COMING SOON`;
     body.appendChild(soon);
   }
