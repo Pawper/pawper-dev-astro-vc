@@ -1,4 +1,4 @@
-import { AGENDA_EVENTS } from "../data/content";
+import { AGENDA_EVENTS, EXPERIENCES, type Experience } from "../data/content";
 
 /** Default duration (minutes) assumed when an event has a parseable start `time`
  *  but no explicit end time. Used to compute "past" and "in-progress" status. */
@@ -70,6 +70,37 @@ export function isEventInProgress(datetimeStart: string, datetimeEnd: string | u
   const end = eventEndDate(datetimeStart, datetimeEnd, time);
   if (!start || !end) return false;
   return now >= start && now <= end;
+}
+
+/**
+ * Series-aware lookup for an experience title. Scans both EXPERIENCES (historical,
+ * dateless) and AGENDA_EVENTS (dated) for entries sharing `title` — these are
+ * treated as instances of the same series.
+ *
+ * - Dateless EXPERIENCES count as `past` (the underlying engagement happened).
+ * - `nextFuture` is the earliest instance that is neither past nor in-progress.
+ */
+export function getExperienceSeriesInfo(title: string, now: Date = new Date()): {
+  instances: Experience[];
+  anyPastOrInProgress: boolean;
+  anyInProgress: boolean;
+  nextFuture: Experience | null;
+} {
+  const instances = [...EXPERIENCES, ...AGENDA_EVENTS].filter(e => e.title === title);
+  let anyPastOrInProgress = false;
+  let anyInProgress = false;
+  let nextFuture: Experience | null = null;
+
+  for (const e of instances) {
+    if (!e.datetimeStart) { anyPastOrInProgress = true; continue; }
+    const inProgress = isEventInProgress(e.datetimeStart, e.datetimeEnd, e.time, now);
+    const past = isEventPast(e.datetimeStart, e.datetimeEnd, e.time, now);
+    if (inProgress) anyInProgress = true;
+    if (past || inProgress) { anyPastOrInProgress = true; continue; }
+    if (!nextFuture || e.datetimeStart < nextFuture.datetimeStart!) nextFuture = e;
+  }
+
+  return { instances, anyPastOrInProgress, anyInProgress, nextFuture };
 }
 
 /**

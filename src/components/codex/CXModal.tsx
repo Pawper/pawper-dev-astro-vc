@@ -16,7 +16,7 @@ import CXBtn, { RssIcon } from "./CXBtn";
 import { PROJECTS, LOGS, EXPERIENCES, AGENDA_EVENTS, SERVICES, slugify, getPrimaryColor } from "../../data/content";
 import type { Experience } from "../../data/content";
 import { isServiceCategory } from "./detail/ExperienceCardRow";
-import { isEventPast } from "../../utils/date";
+import { isEventPast, getExperienceSeriesInfo } from "../../utils/date";
 import { useNow } from "../../hooks/useNow";
 import { contrastText } from "./CXPill";
 import { getProgress } from "../../utils/logProgress";
@@ -408,62 +408,79 @@ function ModalFooterButtons({ modal, proj, primaryHex, secondaryHex, isDark, onN
 
   if (modal.kind === "experience") {
     const _expData = [...EXPERIENCES, ...AGENDA_EVENTS].find(e => e.id === modal.id);
-    const expIsAgenda = !!_expData?.datetimeStart;
-    const expPast = expIsAgenda && isEventPast(_expData?.datetimeStart ?? "", _expData?.datetimeEnd, _expData?.time, now);
-    const expUpcoming = expIsAgenda && !expPast;
 
-    // Show endorse for: non-agenda experiences (always historical) OR agenda events that have started
-    const showEndorse = !!_expData && (!expIsAgenda || !expUpcoming);
+    if (!_expData) return null;
 
-    // When endorse is shown it takes the primary slot; action button becomes secondary
-    const actionNum  = showEndorse ? "02" : "01";
-    const actionPrimary = !showEndorse;
-    const actionColor   = showEndorse ? secondaryHex : primaryHex;
+    const { anyPastOrInProgress, anyInProgress, nextFuture } = getExperienceSeriesInfo(_expData.title, now);
 
-    let btnAction: React.ReactNode;
-    if (expUpcoming && _expData) {
-      const dateLabel = expJoinDateLabel(_expData);
-      if (_expData.registerUrl) {
-        btnAction = (
-          <CXBtn num={actionNum} label={`Join ${dateLabel}`} primary={actionPrimary} bgHex={actionColor} isDark={isDark}
-            href={_expData.registerUrl} />
-        );
-      } else {
-        btnAction = (
-          <CXBtn num={actionNum} label={`Join ${dateLabel}`} primary={actionPrimary} bgHex={actionColor} isDark={isDark}
-            icon={<span className="cx-btn-icon" style={{ fontWeight: 300, fontSize: 15 }}>+</span>}
-            href={makeExpIcs(_expData)} download />
-        );
-      }
-    } else if (_expData && isServiceCategory(_expData.category)) {
-      const svc = SERVICES.find(s => s.id === _expData.category);
-      btnAction = (
-        <CXBtn num={actionNum} label={`Explore ${svc?.label ?? _expData.category}`} primary={actionPrimary} bgHex={actionColor} isDark={isDark}
-          icon={null} onClick={() => onNavigateToService?.(_expData.category)} />
-      );
-    } else {
-      btnAction = (
-        <CXBtn num={actionNum} label="Open to work" primary={actionPrimary} bgHex={actionColor} isDark={isDark}
-          icon={null} onClick={() => onNavigateToService?.("overview")} />
-      );
-    }
+    // Slot conditions (spec):
+    //  01 Join    — next future instance exists AND no in-progress instance
+    //  02 Endorse — any instance in series is past or in-progress
+    //  03 Explore — Join doesn't apply AND category is a service
+    //  04 Share   — Join doesn't apply
+    const showJoin    = !!nextFuture && !anyInProgress;
+    const showEndorse = anyPastOrInProgress;
+    const showExplore = !showJoin && isServiceCategory(_expData.category);
+    const showShare   = !showJoin;
+
+    const fmtSlot = (n: number) => String(n).padStart(2, "0");
+    let slot = 1;
+    const joinNum    = showJoin    ? fmtSlot(slot++) : null;
+    const endorseNum = showEndorse ? fmtSlot(slot++) : null;
+    const exploreNum = showExplore ? fmtSlot(slot++) : null;
+    const shareNum   = showShare   ? fmtSlot(slot++) : null;
+
+    const primarySlot: "join" | "endorse" | "explore" | "share" | null =
+      showJoin ? "join" : showEndorse ? "endorse" : showExplore ? "explore" : showShare ? "share" : null;
+
+    // Join target: parent event's registerUrl takes precedence over the instance's own
+    const joinParent = nextFuture?.parentId
+      ? [...EXPERIENCES, ...AGENDA_EVENTS].find(e => e.id === nextFuture.parentId)
+      : null;
+    const joinRegisterUrl = joinParent?.registerUrl ?? nextFuture?.registerUrl;
 
     return (
       <div className="cx-btn-row" style={{ position: "absolute", bottom: 7, right: 24, display: "flex", gap: 8, zIndex: 20 }}>
-        {showEndorse && _expData && (
-          <CXBtn num="01" label="Endorse Phillip" primary bgHex={primaryHex} isDark={isDark}
+        {showJoin && nextFuture && (() => {
+          const isPrimary = primarySlot === "join";
+          const color = isPrimary ? primaryHex : secondaryHex;
+          const dateLabel = expJoinDateLabel(nextFuture);
+          return joinRegisterUrl ? (
+            <CXBtn num={joinNum!} label={`Join ${dateLabel}`} primary={isPrimary} bgHex={color} isDark={isDark}
+              href={joinRegisterUrl} />
+          ) : (
+            <CXBtn num={joinNum!} label={`Join ${dateLabel}`} primary={isPrimary} bgHex={color} isDark={isDark}
+              icon={<span className="cx-btn-icon" style={{ fontWeight: 300, fontSize: 15 }}>+</span>}
+              href={makeExpIcs(nextFuture)} download />
+          );
+        })()}
+        {showEndorse && (
+          <CXBtn num={endorseNum!} label="Endorse Phillip"
+            primary={primarySlot === "endorse"}
+            bgHex={primarySlot === "endorse" ? primaryHex : secondaryHex} isDark={isDark}
             href={endorseUrl(_expData)} />
         )}
-        {btnAction}
-        <SharePopover
-          shareUrl={`https://pawper.dev/xp/${modal.id}`}
-          title={_expData?.title ?? modal.id}
-          num={showEndorse ? "03" : "02"}
-          primaryHex={primaryHex}
-          secondaryHex={secondaryHex}
-          isDark={isDark}
-          hasPrimary={true}
-        />
+        {showExplore && (() => {
+          const isPrimary = primarySlot === "explore";
+          const color = isPrimary ? primaryHex : secondaryHex;
+          const svc = SERVICES.find(s => s.id === _expData.category);
+          return (
+            <CXBtn num={exploreNum!} label={`Explore ${svc?.label ?? _expData.category}`}
+              primary={isPrimary} bgHex={color} isDark={isDark}
+              icon={null} onClick={() => onNavigateToService?.(_expData.category)} />
+          );
+        })()}
+        {showShare && (
+          <SharePopover
+            shareUrl={`https://pawper.dev/xp/${modal.id}`}
+            title={_expData.title}
+            num={shareNum!}
+            primaryHex={primaryHex}
+            secondaryHex={secondaryHex}
+            isDark={isDark}
+            hasPrimary={primarySlot !== "share"}
+          />
+        )}
       </div>
     );
   }
