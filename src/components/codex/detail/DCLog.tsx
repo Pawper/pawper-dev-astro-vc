@@ -333,33 +333,46 @@ export default function DCLog({ id, html, anchor, onOpenLog, onOpenProject, onOp
         if (!svc) return null;
         return (
           <div style={mentorPurpleVars}>
-            <CXCard style={{
-              padding: "16px 20px", borderRadius: 12,
+            <CXCard className="cx-endorsement-card" style={{
+              borderRadius: 12,
               borderLeft: "3px solid #9055e8",
-              display: "flex", flexDirection: "column", gap: 10,
+              display: "flex",
+              gap: 18,
+              paddingLeft: 20,
             }}>
-              <div className="pw-eyebrow" style={{ color: "var(--section-deep)" }}>
-                About your mentor
-              </div>
-              <p style={{ fontSize: 13, lineHeight: 1.65, color: "var(--ink-soft)", margin: 0 }}>
-                {PROFILE.intro}
-              </p>
-              <div className="cx-mentor-card-footer" style={{
-                display: "flex", alignItems: "center", justifyContent: "space-between",
-                gap: 12, flexWrap: "wrap", marginTop: 2,
-              }}>
-                <div style={{
-                  display: "inline-flex", alignItems: "center", gap: 4,
-                  fontSize: 10, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase",
-                  color: "var(--section-deep)",
-                }}>
-                  <span style={{ fontSize: 12, fontWeight: 300 }}>◈</span>
-                  <span>Mentoring · Open</span>
+              {PROFILE.photo && (
+                <img
+                  src={PROFILE.photo}
+                  alt={PROFILE.name}
+                  className="cx-endorsement-photo"
+                  style={{ width: 144, height: 144, objectFit: "cover", objectPosition: "center 35%", borderRadius: "40px 8px 40px 8px", marginTop: "16px", flexShrink: 0 }}
+                />
+              )}
+              <div className="cx-endorsement-content" style={{ padding: "16px 20px 16px 0", display: "flex", flexDirection: "column", flex: 1 }}>
+                <div className="pw-eyebrow" style={{ color: "var(--section-deep)", marginBottom: 10 }}>
+                  About your mentor
                 </div>
-                <div style={{ display: "flex", gap: 14, alignItems: "center", flexWrap: "wrap" }}>
-                  <MentorLink href="/contact/">Ask about mentoring</MentorLink>
-                  <span style={{ color: "var(--ink-mute)", fontSize: 12 }}>·</span>
-                  <MentorLink href={KOFI_URL}>Tip on Ko-fi</MentorLink>
+                <p style={{ fontSize: 13, lineHeight: 1.65, color: "var(--ink-soft)", margin: "0 0 12px" }}>
+                  {PROFILE.intro}
+                </p>
+                <div style={{ flex: 1 }} />
+                <div className="cx-mentor-card-footer" style={{
+                  display: "flex", alignItems: "center", justifyContent: "space-between",
+                  gap: 12, flexWrap: "wrap",
+                }}>
+                  <div style={{
+                    display: "inline-flex", alignItems: "center", gap: 4,
+                    fontSize: 10, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase",
+                    color: "var(--section-deep)",
+                  }}>
+                    <span style={{ fontSize: 12, fontWeight: 300 }}>◈</span>
+                    <span>Mentoring · Open</span>
+                  </div>
+                  <div style={{ display: "flex", gap: 14, alignItems: "center", flexWrap: "wrap" }}>
+                    <MentorLink href="/contact/">Ask about mentoring</MentorLink>
+                    <span style={{ color: "var(--ink-mute)", fontSize: 12 }}>·</span>
+                    <MentorLink href={KOFI_URL}>Tip on Ko-fi</MentorLink>
+                  </div>
                 </div>
               </div>
             </CXCard>
