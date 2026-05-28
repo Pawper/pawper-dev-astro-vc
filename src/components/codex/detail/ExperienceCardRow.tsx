@@ -18,6 +18,8 @@ import Tap from "../../shared/Tap";
 import { soundClick, soundHover } from "../../../context/SoundContext";
 import { derivePeriod, isEventPast, isEventInProgress } from "../../../utils/date";
 import { useNow } from "../../../hooks/useNow";
+import { useTheme } from "../../../hooks/useTheme";
+import { clampEyebrowColor } from "../../../utils/color";
 
 const allEndorsements = endorsementsData as Endorsement[];
 
@@ -113,6 +115,8 @@ interface Props {
 
 export default function ExperienceCardRow({ exp, openModal, onCardClick, onOpenSkill, noDim }: Props) {
   const now = useNow();
+  const theme = useTheme();
+  const isDark = theme === "dark";
   const isAgenda = !!exp.datetimeStart;
   const past = isAgenda ? isEventPast(exp.datetimeStart!, exp.datetimeEnd, exp.time, now) : false;
   const inProgress = isAgenda ? isEventInProgress(exp.datetimeStart!, exp.datetimeEnd, exp.time, now) : false;
@@ -126,13 +130,13 @@ export default function ExperienceCardRow({ exp, openModal, onCardClick, onOpenS
   const cardVars: React.CSSProperties = isServiceCategory(exp.category)
     ? {
         "--section-accent": "#9055e8",
-        "--section-deep":   "#c49ef8",
+        "--section-deep":   clampEyebrowColor(isDark ? "#c49ef8" : "#9055e8", isDark),
         "--section-rgb":    "144, 85, 232",
       } as React.CSSProperties
     : isAgenda
     ? {
         "--section-accent": past ? "#e84455" : "#f55a28",
-        "--section-deep":   past ? "#e84455" : "#f55a28",
+        "--section-deep":   clampEyebrowColor(past ? "#e84455" : "#f55a28", isDark),
         "--section-rgb":    past ? "232, 68, 85" : "245, 90, 40",
       } as React.CSSProperties
     : {};

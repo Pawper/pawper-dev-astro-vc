@@ -10,6 +10,8 @@ import Tap from "../../shared/Tap";
 import { summaryForDescription, categoryLabel, isServiceCategory } from "./ExperienceCardRow";
 import { isEventPast, isEventInProgress } from "../../../utils/date";
 import { useNow } from "../../../hooks/useNow";
+import { useTheme } from "../../../hooks/useTheme";
+import { clampEyebrowColor } from "../../../utils/color";
 import { PROFILE } from "../../../data/content";
 
 const allEndorsements = endorsementsData as Endorsement[];
@@ -158,6 +160,8 @@ export default function DCAgenda({ scrollToId, onScrolled, openModal }: Props) {
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
   const [bottomPad, setBottomPad] = useState(600);
   const now = useNow();
+  const theme = useTheme();
+  const isDark = theme === "dark";
 
   function toggleExpanded(id: string) {
     setExpandedIds(prev => {
@@ -237,8 +241,8 @@ export default function DCAgenda({ scrollToId, onScrolled, openModal }: Props) {
     const inProgress = isEventInProgress(e.datetimeStart ?? "", e.datetimeEnd, e.time, now);
     const roleLabel = categoryLabel(e.category, past);
     const cardVars: React.CSSProperties = isServiceCategory(e.category)
-      ? { "--section-accent": "#9055e8", "--section-deep": "#c49ef8", "--section-rgb": "144, 85, 232" } as React.CSSProperties
-      : { "--section-accent": past ? "#e84455" : "#f55a28", "--section-deep": past ? "#e84455" : "#f55a28", "--section-rgb": past ? "232, 68, 85" : "245, 90, 40" } as React.CSSProperties;
+      ? { "--section-accent": "#9055e8", "--section-deep": clampEyebrowColor(isDark ? "#c49ef8" : "#9055e8", isDark), "--section-rgb": "144, 85, 232" } as React.CSSProperties
+      : { "--section-accent": past ? "#e84455" : "#f55a28", "--section-deep": clampEyebrowColor(past ? "#e84455" : "#f55a28", isDark), "--section-rgb": past ? "232, 68, 85" : "245, 90, 40" } as React.CSSProperties;
     const expanded = expandedIds.has(e.id);
     const descText = summaryForDescription(e.description ?? "") ?? "";
     const hasLongNote = descText.length > HOOK_CLAMP_THRESHOLD;
