@@ -67,7 +67,7 @@ function parseUrl() {
       view = { kind: "entry", cat: "services", entry: seg1 ?? "overview" };
     } else if (seg0 === "contact") {
       view = { kind: "entry", cat: "contact", entry: "all" };
-    } else if (seg0 === "calendar") {
+    } else if (seg0 === "agenda") {
       view = { kind: "entry", cat: "calendar", entry: "all" };
     } else if (seg0 === "p" && seg1) {
       modalStack.push({ kind: "project", id: seg1, siblings: PROJECTS.map(proj => ({ kind: "project" as const, id: proj.id })) });
