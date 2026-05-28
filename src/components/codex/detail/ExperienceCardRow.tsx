@@ -166,21 +166,19 @@ export default function ExperienceCardRow({ exp, openModal, onCardClick, onOpenS
               })
           : [];
         const plain = hasPills ? exp.skills!.filter((s) => matchSkill(s) === null) : [];
-        return (
-          <div style={{ marginTop: 8, display: "flex", alignItems: "flex-start", flexWrap: "wrap", gap: 6 }}>
-            {roleLabel && (
-              <span style={{ fontSize: 11, color: "var(--section-deep)", fontWeight: 700, letterSpacing: "0.02em", whiteSpace: "nowrap" }}>
-                {roleLabel}
-              </span>
-            )}
-            {roleLabel && hasPills && (
+        const lead = roleLabel ? (
+          <>
+            <span style={{ fontSize: 11, color: "var(--section-deep)", fontWeight: 700, letterSpacing: "0.02em", whiteSpace: "nowrap" }}>
+              {roleLabel}
+            </span>
+            {hasPills && (
               <span style={{ fontSize: 11, color: "var(--ink-mute)", flexShrink: 0 }}>•</span>
             )}
-            {hasPills && (
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <CollapsiblePills pills={pills} plain={plain} size="sm" />
-              </div>
-            )}
+          </>
+        ) : null;
+        return (
+          <div style={{ marginTop: 8 }}>
+            <CollapsiblePills pills={pills} plain={plain} size="sm" lead={lead} />
           </div>
         );
       })()

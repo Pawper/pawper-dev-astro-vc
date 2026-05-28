@@ -12,9 +12,12 @@ interface Props {
   pills: PillItem[];
   plain?: string[];
   size?: "sm" | "md";
+  /** Optional content rendered as the first flex item, so it wraps and centers
+   *  on the same row as the first line of pills. */
+  lead?: React.ReactNode;
 }
 
-export default function CollapsiblePills({ pills, plain = [], size = "sm" }: Props) {
+export default function CollapsiblePills({ pills, plain = [], size = "sm", lead }: Props) {
   const [expanded, setExpanded] = useState(false);
   const [cutoff, setCutoff] = useState<number | null>(null);
   const ref = useRef<HTMLDivElement>(null);
@@ -40,6 +43,7 @@ export default function CollapsiblePills({ pills, plain = [], size = "sm" }: Pro
       ref={ref}
       style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 5 }}
     >
+      {lead}
       {shown.map((p) => (
         <span key={p.key} data-p>
           <CXPill size={size} color={p.color} onClick={p.onClick}>{p.label}</CXPill>
