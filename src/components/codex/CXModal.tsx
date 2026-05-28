@@ -416,12 +416,13 @@ function ModalFooterButtons({ modal, proj, primaryHex, secondaryHex, isDark, onN
     // Slot conditions (spec):
     //  01 Join    — next future instance exists AND no in-progress instance
     //  02 Endorse — any instance in series is past or in-progress
-    //  03 Explore — Join doesn't apply AND category is a service
-    //  04 Share   — Join doesn't apply
+    //  03 Explore — category is a service
+    //  04 Share   — always visible
+    // Buttons cascade left to fill from slot 01 based on visibility.
     const showJoin    = !!nextFuture && !anyInProgress;
     const showEndorse = anyPastOrInProgress;
-    const showExplore = !showJoin && isServiceCategory(_expData.category);
-    const showShare   = !showJoin;
+    const showExplore = isServiceCategory(_expData.category);
+    const showShare   = true;
 
     const fmtSlot = (n: number) => String(n).padStart(2, "0");
     let slot = 1;
@@ -439,8 +440,14 @@ function ModalFooterButtons({ modal, proj, primaryHex, secondaryHex, isDark, onN
       : null;
     const joinRegisterUrl = joinParent?.registerUrl ?? nextFuture?.registerUrl;
 
+    // Use fluid layout only when all 4 buttons render — otherwise the row overflows
+    // leftward past the modal edge at right:24. With fewer buttons, the natural
+    // right-aligned layout fits and keeps buttons content-sized.
+    const visibleCount = Number(showJoin) + Number(showEndorse) + Number(showExplore) + Number(showShare);
+    const useFluid = visibleCount >= 4;
+
     return (
-      <div className="cx-btn-row" style={{ position: "absolute", bottom: 7, right: 24, display: "flex", gap: 8, zIndex: 20 }}>
+      <div className={`cx-btn-row${useFluid ? " cx-btn-row-fluid" : ""}`} style={{ position: "absolute", bottom: 7, left: useFluid ? 24 : undefined, right: 24, display: "flex", gap: 8, zIndex: 20, alignItems: "flex-end" }}>
         {showJoin && nextFuture && (() => {
           const isPrimary = primarySlot === "join";
           const color = isPrimary ? primaryHex : secondaryHex;
