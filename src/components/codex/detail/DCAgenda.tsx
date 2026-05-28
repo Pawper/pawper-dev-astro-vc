@@ -236,7 +236,8 @@ export default function DCAgenda({ scrollToId, onScrolled, openModal }: Props) {
   const hasPastTopLevel = topLevel.some((e) => isEventPast(e.datetimeStart ?? "", e.datetimeEnd, e.time, now));
   const showDivider = !!firstUpcomingTopLevelId && hasPastTopLevel;
 
-  function renderCard(e: Experience, indent = false) {
+  function renderCard(e: Experience, indent = false, parent?: Experience) {
+    const actionSource = parent ?? e;
     const past = isEventPast(e.datetimeStart ?? "", e.datetimeEnd, e.time, now);
     const inProgress = isEventInProgress(e.datetimeStart ?? "", e.datetimeEnd, e.time, now);
     const roleLabel = categoryLabel(e.category, past);
@@ -299,10 +300,10 @@ export default function DCAgenda({ scrollToId, onScrolled, openModal }: Props) {
         </CXPill>
       </a>
     ) : !past ? (
-      e.registerUrl
+      actionSource.registerUrl
         ? (
           <a
-            href={e.registerUrl}
+            href={actionSource.registerUrl}
             target="_blank"
             rel="noopener noreferrer"
             onClick={(ev) => { ev.stopPropagation(); soundClick(); }}
@@ -314,7 +315,7 @@ export default function DCAgenda({ scrollToId, onScrolled, openModal }: Props) {
             </CXPill>
           </a>
         )
-        : <AddToCalendarDropdown event={e} />
+        : <AddToCalendarDropdown event={actionSource} />
     ) : null;
 
     return (
@@ -438,7 +439,7 @@ export default function DCAgenda({ scrollToId, onScrolled, openModal }: Props) {
                   )}
                   <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                     {renderCard(e, false)}
-                    {childrenByParent.get(e.id)?.map((child) => renderCard(child, true))}
+                    {childrenByParent.get(e.id)?.map((child) => renderCard(child, true, e))}
                   </div>
                 </React.Fragment>
               ))}
