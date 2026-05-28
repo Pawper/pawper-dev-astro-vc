@@ -12,7 +12,7 @@
       "Nebius",
       "ClawMax"
     ],
-    "datetimeStart": "2026-05-19",
+    "datetimeStart": "2026-05-18",
     "time": "6 PM",
     "location": "995 Market Street, San Francisco",
     "locationName": "Frontier Tower @ Lounge",
@@ -34,10 +34,9 @@
       "Claude",
       "Discord Bots"
     ],
-    "datetimeStart": "2026-05-19",
+    "datetimeStart": "2026-05-18",
     "time": "6 PM",
-    "parentId": "rec7BIdUVTAU1HmSg",
-    "endorsementIds": ["oliver-mellan"]
+    "parentId": "rec7BIdUVTAU1HmSg"
   },
   {
     "id": "recumlhmlxNw7Vn6X",
@@ -51,7 +50,7 @@
       "Memory",
       "Claude"
     ],
-    "datetimeStart": "2026-05-21",
+    "datetimeStart": "2026-05-20",
     "time": "7 PM",
     "location": "995 Market Street, San Francisco",
     "locationName": "Frontier Tower @ 10th Floor",
@@ -122,9 +121,17 @@
     "description": "",
     "featured": false,
     "skills": [
-      "MCP"
+      "MCP",
+      "FastMCP",
+      "Python",
+      "JSON-RPC 2.0",
+      "Stream HTTP",
+      "OAuth 2.0",
+      "Clerk",
+      "ngrok",
+      "Agent Integration"
     ],
-    "datetimeStart": "2026-05-28",
+    "datetimeStart": "2026-05-27",
     "time": "7 PM",
     "location": "995 Market Street, San Francisco",
     "locationName": "Frontier Tower @ 9th Floor",
@@ -141,7 +148,7 @@
     "skills": [
       "OpenClaw"
     ],
-    "datetimeStart": "2026-06-04",
+    "datetimeStart": "2026-06-03",
     "time": "5:15 PM",
     "location": "275 Brannan St, San Francisco, CA 94107",
     "locationName": "GitHub QA",

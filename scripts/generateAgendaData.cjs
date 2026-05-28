@@ -122,17 +122,47 @@ function stripMd(text) {
 }
 
 // ── Airtable date helpers ─────────────────────────────────────────────────────
+// Airtable returns datetime fields as UTC ISO strings. Format them in Pacific
+// time so builds on Netlify (UTC) match builds on a Pacific dev machine.
+const AIRTABLE_TIMEZONE = "America/Los_Angeles";
 
-const toDateStr = (v) => v ? String(v).slice(0, 10) : undefined;
+const toDateStr = (v) => {
+  if (!v) return undefined;
+  const s = String(v);
+  // Airtable date-only fields ("YYYY-MM-DD") have no timezone — pass through.
+  if (!s.includes("T")) return s.slice(0, 10);
+  const d = new Date(s);
+  if (isNaN(d.getTime())) return undefined;
+  try {
+    return new Intl.DateTimeFormat("en-CA", { timeZone: AIRTABLE_TIMEZONE }).format(d);
+  } catch {
+    return s.slice(0, 10);
+  }
+};
+
 const toTimeStr = (v) => {
   if (!v) return undefined;
-  const d = new Date(String(v));
+  const s = String(v);
+  if (!s.includes("T")) return undefined; // date-only = no time
+  const d = new Date(s);
   if (isNaN(d.getTime())) return undefined;
-  const h = d.getHours(), m = d.getMinutes();
-  if (h === 0 && m === 0) return undefined; // local midnight = no time set
-  const period = h >= 12 ? "PM" : "AM";
-  const h12 = h % 12 || 12;
-  return m === 0 ? `${h12} ${period}` : `${h12}:${String(m).padStart(2, "0")} ${period}`;
+  try {
+    const parts = new Intl.DateTimeFormat("en-US", {
+      timeZone: AIRTABLE_TIMEZONE,
+      hour: "numeric",
+      minute: "2-digit",
+      hour12: true,
+    }).formatToParts(d);
+    const h  = parts.find(p => p.type === "hour")?.value;
+    const m  = parts.find(p => p.type === "minute")?.value;
+    const ap = parts.find(p => p.type === "dayPeriod")?.value?.toUpperCase();
+    if (!h || !ap) return undefined;
+    if (h === "12" && m === "00" && ap === "AM") return undefined; // PT midnight = no time set
+    if (m === "00") return `${h} ${ap}`;
+    return `${h}:${m} ${ap}`;
+  } catch {
+    return undefined;
+  }
 };
 
 // ── Main ──────────────────────────────────────────────────────────────────────

@@ -106,5 +106,113 @@
     "description": null,
     "image": "/web/20240226110454im_/https://www.itprotoday.com/sites/all/themes/penton_subtheme_itprotoday/images/logos/share-logo.png",
     "domain": "web.archive.org"
+  },
+  "https://code.visualstudio.com/docs/setup/setup-overview": {
+    "title": "Setting up Visual Studio Code",
+    "description": "Install Visual Studio Code on Windows, macOS, or Linux and choose related setup options for your workflow.",
+    "image": "https://code.visualstudio.com/opengraphimg/generated/docs/setup/setup-overview.webp",
+    "domain": "code.visualstudio.com"
+  },
+  "https://code.visualstudio.com/docs/configure/settings": {
+    "title": "User and workspace settings",
+    "description": "How to modify Visual Studio Code User and Workspace Settings.",
+    "image": "https://code.visualstudio.com/opengraphimg/generated/docs/configure/settings.webp",
+    "domain": "code.visualstudio.com"
+  },
+  "https://code.visualstudio.com/docs/configure/keybindings": {
+    "title": "Keyboard shortcuts for Visual Studio Code",
+    "description": "Here you will find the complete list of keyboard shortcuts for Visual Studio Code and how to change them.",
+    "image": "https://code.visualstudio.com/opengraphimg/generated/docs/configure/keybindings.webp",
+    "domain": "code.visualstudio.com"
+  },
+  "https://haveibeenpwned.com": {
+    "title": "Have I Been Pwned: Check if your email address has been exposed in a data breach",
+    "description": "Have I Been Pwned allows you to check whether your email address has been exposed in a data breach.",
+    "image": "https://haveibeenpwned.com/Images/OpenGraphPreview.jpg",
+    "domain": "haveibeenpwned.com"
+  },
+  "https://bitwarden.com": {
+    "title": "Best Password Manager for Business, Enterprise & Personal | Bitwarden",
+    "description": "Bitwarden is the most trusted password manager for passwords and passkeys at home or at work, on any browser or device. Start with a free trial.",
+    "image": "https://bitwarden.com/assets/7fzQJmr0qt5ggGZp3t66Y/7bf59a6a2379d49fc580ff49e8510efb/bitwarden.com_og_image.png",
+    "domain": "bitwarden.com"
+  },
+  "https://cheatsheetseries.owasp.org/": {
+    "title": "Introduction - OWASP Cheat Sheet Series",
+    "description": "Website with the collection of all the cheat sheets of the project.",
+    "image": null,
+    "domain": "cheatsheetseries.owasp.org"
+  },
+  "https://nodejs.org/en/download": {
+    "title": "Node.js — Download Node.js®",
+    "description": "Node.js® is a free, open-source, cross-platform JavaScript runtime environment that lets developers create servers, web apps, command line tools and scripts.",
+    "image": "https://nodejs.org/en/next-data/og/announcement/Node.js%20%E2%80%94%20Download%20Node.js%C2%AE",
+    "domain": "nodejs.org"
+  },
+  "https://docs.npmjs.com/": {
+    "title": "npm Docs",
+    "description": "Documentation for the npm registry, website, and command-line interface",
+    "image": "https://user-images.githubusercontent.com/29712634/81721690-e2fb5d80-9445-11ea-8602-4b2294c964f3.png",
+    "domain": "docs.npmjs.com"
+  },
+  "https://nodejs.org/en/docs/": {
+    "title": "Index | Node.js v26.2.0 Documentation",
+    "description": null,
+    "image": null,
+    "domain": "nodejs.org"
+  },
+  "https://docs.npmjs.com/cli/v9/configuring-npm/package-json": {
+    "title": "package.json | npm Docs",
+    "description": "Specifics of npm's package.json handling",
+    "image": "https://user-images.githubusercontent.com/29712634/81721690-e2fb5d80-9445-11ea-8602-4b2294c964f3.png",
+    "domain": "docs.npmjs.com"
+  },
+  "https://docs.npmjs.com/downloading-and-installing-packages-locally": {
+    "title": "Downloading and installing packages locally | npm Docs",
+    "description": "Documentation for the npm registry, website, and command-line interface",
+    "image": "https://user-images.githubusercontent.com/29712634/81721690-e2fb5d80-9445-11ea-8602-4b2294c964f3.png",
+    "domain": "docs.npmjs.com"
+  },
+  "http://pawper.dev/l/guide-password-management-cybersecurity-beginners": {
+    "title": "Password Management & Cybersecurity for Beginners",
+    "description": "Practical security fundamentals every developer should know: password managers, strong passwords, phishing attacks, spoofs, malware, and how to safely store secrets in your code...",
+    "image": "https://res.cloudinary.com/dr1sonbsi/image/upload/v1779694391/pawper.dev/og/guide-password-management-cybersecurity-beginners.png",
+    "domain": "pawper.dev"
+  },
+  "https://code.visualstudio.com/docs/editor/command-line": {
+    "title": "Command Line Interface (CLI)",
+    "description": "Visual Studio Code command-line interface (switches).",
+    "image": "https://code.visualstudio.com/opengraphimg/generated/docs/configure/command-line.webp",
+    "domain": "code.visualstudio.com"
+  },
+  "https://code.visualstudio.com/docs/editor/integrated-terminal": {
+    "title": "Terminal Basics",
+    "description": "Visual Studio Code has an integrated terminal to enable working in your shell of choice without leaving the editor.",
+    "image": "https://code.visualstudio.com/opengraphimg/generated/docs/terminal/basics.webp",
+    "domain": "code.visualstudio.com"
+  },
+  "https://github.com/microsoft/vscode/wiki/Terminal-Profiles": {
+    "title": "Home",
+    "description": "Visual Studio Code. Contribute to microsoft/vscode development by creating an account on GitHub.",
+    "image": "https://opengraph.githubassets.com/aa4063f4560ca943a0ef3b980871940675c3257cba7a718a12e79ec75b4f258c/microsoft/vscode",
+    "domain": "github.com"
+  },
+  "https://code.visualstudio.com/docs/remote/remote-overview": {
+    "title": "VS Code Remote Development",
+    "description": "Visual Studio Code Remote Development",
+    "image": "https://code.visualstudio.com/opengraphimg/generated/docs/remote/remote-overview.webp",
+    "domain": "code.visualstudio.com"
+  },
+  "https://code.visualstudio.com/docs/remote/wsl": {
+    "title": "Developing in WSL",
+    "description": "Using Visual Studio Code Remote Development with the Windows Subsystem for Linux (WSL)",
+    "image": "https://code.visualstudio.com/opengraphimg/generated/docs/remote/wsl.webp",
+    "domain": "code.visualstudio.com"
+  },
+  "https://code.visualstudio.com/docs/remote/wsl-tutorial": {
+    "title": "Remote development in WSL",
+    "description": "Work in Windows Subsystem for Linux with Visual Studio Code",
+    "image": "https://code.visualstudio.com/opengraphimg/generated/docs/remote/wsl-tutorial.webp",
+    "domain": "code.visualstudio.com"
   }
 }
