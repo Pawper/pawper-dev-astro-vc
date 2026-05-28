@@ -8,12 +8,16 @@ import { enhanceProse } from "./proseEnhance";
 import { SidebarTagGroups, SidebarTOC, ProgressDot, ArticleProgressRing } from "./DCDetailSidebar";
 import { soundClick } from "../../../context/SoundContext";
 import { getProgress, checkSection, uncheckSection } from "../../../utils/logProgress";
+import { useTheme } from "../../../hooks/useTheme";
+import { clampEyebrowColor } from "../../../utils/color";
 
-const MENTOR_PURPLE_VARS = {
-  "--section-accent": "#9055e8",
-  "--section-deep": "#c49ef8",
-  "--section-rgb": "144, 85, 232",
-} as React.CSSProperties;
+function getMentorPurpleVars(isDark: boolean): React.CSSProperties {
+  return {
+    "--section-accent": "#9055e8",
+    "--section-deep": clampEyebrowColor(isDark ? "#c49ef8" : "#9055e8", isDark),
+    "--section-rgb": "144, 85, 232",
+  } as React.CSSProperties;
+}
 
 const KOFI_URL = "https://ko-fi.com/pawper";
 
@@ -90,6 +94,9 @@ export function extractHeadings(html: string): Array<{ text: string; anchorId: s
 
 export default function DCLog({ id, html, anchor, onOpenLog, onOpenProject, onOpenSeries, onOpenService, onOpenMedia }: DCLogProps) {
   const a = LOGS.find((x) => x.id === id) ?? LOGS[0];
+  const theme = useTheme();
+  const isDark = theme === "dark";
+  const mentorPurpleVars = getMentorPurpleVars(isDark);
   const proseRef = useRef<HTMLDivElement>(null);
   const tocRef = useRef<HTMLDivElement>(null);
   const [tocExpanded, setTocExpanded] = useState(false);
@@ -185,7 +192,7 @@ export default function DCLog({ id, html, anchor, onOpenLog, onOpenProject, onOp
       <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
         {a.updated && (
           <>
-            <span className="pw-mono" style={{ fontSize: 12, color: "var(--section-accent)" }}>
+            <span className="pw-mono" style={{ fontSize: 12, color: "var(--section-deep)" }}>
               <span style={{ fontSize: 9, letterSpacing: "0.12em", opacity: 0.7, marginRight: 4 }}>UPDATED</span>{a.updated}
             </span>
             <span className="pw-mono" style={{ fontSize: 12, color: "var(--ink-mute)" }}>·</span>
@@ -206,7 +213,7 @@ export default function DCLog({ id, html, anchor, onOpenLog, onOpenProject, onOp
               const remaining = Math.round(a.words * (1 - progress.checked.length / headings.length));
               return (
                 <>
-                  <span className="pw-mono" style={{ fontSize: 11, color: "var(--section-accent)" }}>
+                  <span className="pw-mono" style={{ fontSize: 11, color: "var(--section-deep)" }}>
                     ~{remaining}w · ~{Math.round(remaining / 240)} min left
                   </span>
                   <span className="pw-mono" style={{ fontSize: 11, color: "var(--ink-mute)" }}>·</span>
@@ -226,7 +233,7 @@ export default function DCLog({ id, html, anchor, onOpenLog, onOpenProject, onOp
             style={{ display: "flex", flexDirection: "column", gap: 3, margin: "-12px -16px 6px", padding: "12px 16px 8px", borderRadius: "14px 14px 0 0" }}
           >
             <div className="pw-eyebrow" style={{ color: "var(--section-deep)", display: "flex", alignItems: "center", gap: 5 }}>
-              <svg width="11" height="10" viewBox="0 0 122.88 111.96" fill="var(--section-accent)">
+              <svg width="11" height="10" viewBox="0 0 122.88 111.96" fill="var(--section-deep)">
                 <path d="M61.15,0L0,26.52l61.41,24.96l61.47-24.88L61.15,0L61.15,0z M122.88,57.12L95.46,45.31L62.73,58.56c-0.88,0.36-1.83,0.33-2.65,0L27.27,45.22L0,57.05L61.41,82L122.88,57.12L122.88,57.12z M96.14,75.56L62.73,89.08c-0.88,0.36-1.83,0.33-2.65,0L26.59,75.47L0,87.01l61.41,24.96l61.47-24.88L96.14,75.56L96.14,75.56z"/>
               </svg>
               Series
@@ -242,7 +249,7 @@ export default function DCLog({ id, html, anchor, onOpenLog, onOpenProject, onOp
                 onClick={() => onOpenLog?.(s.id)}
                 style={{ padding: "4px 8px", display: "flex", gap: 8, alignItems: "flex-start", background: isCurrent ? "rgba(var(--section-rgb), 0.15)" : undefined, borderRadius: 6 }}
               >
-                <span style={{ fontFamily: "'Bebas Neue', var(--font-sans)", fontSize: 26, lineHeight: 1, color: "var(--section-accent)", transform: "scaleY(1.12)", transformOrigin: "top center", flexShrink: 0 }}>
+                <span style={{ fontFamily: "'Bebas Neue', var(--font-sans)", fontSize: 26, lineHeight: 1, color: "var(--section-deep)", transform: "scaleY(1.12)", transformOrigin: "top center", flexShrink: 0 }}>
                   {String(s.series!.part).padStart(2, "0")}
                 </span>
                 <span style={{ flex: 1, display: "flex", flexDirection: "column", gap: 2 }}>
@@ -254,7 +261,7 @@ export default function DCLog({ id, html, anchor, onOpenLog, onOpenProject, onOp
           })}
           {seriesUnreleased > 0 && currentIdx === seriesLogs.length - 1 && (
             <div style={{ padding: "4px 8px", display: "flex", gap: 8, alignItems: "flex-start", opacity: 0.45 }}>
-              <span style={{ fontFamily: "'Bebas Neue', var(--font-sans)", fontSize: 26, lineHeight: 1, color: "var(--section-accent)", transform: "scaleY(1.12)", transformOrigin: "top center", flexShrink: 0 }}>
+              <span style={{ fontFamily: "'Bebas Neue', var(--font-sans)", fontSize: 26, lineHeight: 1, color: "var(--section-deep)", transform: "scaleY(1.12)", transformOrigin: "top center", flexShrink: 0 }}>
                 {String(seriesLogs[seriesLogs.length - 1].series!.part + 1).padStart(2, "0")}
               </span>
               <span style={{ flex: 1, display: "flex", alignItems: "center" }}>
@@ -330,7 +337,7 @@ export default function DCLog({ id, html, anchor, onOpenLog, onOpenProject, onOp
         const svc = SERVICES.find((s) => s.id === "mentoring");
         if (!svc) return null;
         return (
-          <div style={MENTOR_PURPLE_VARS}>
+          <div style={mentorPurpleVars}>
             <CXCard style={{
               padding: "16px 20px", borderRadius: 12,
               borderLeft: "3px solid #9055e8",
@@ -371,7 +378,7 @@ export default function DCLog({ id, html, anchor, onOpenLog, onOpenProject, onOp
         const svc = SERVICES.find((s) => s.id === "mentoring");
         if (!svc) return null;
         return (
-          <div style={MENTOR_PURPLE_VARS}>
+          <div style={mentorPurpleVars}>
             <CXCard style={{
               padding: "24px 26px", borderRadius: 14,
               borderLeft: "4px solid #9055e8",
@@ -442,7 +449,7 @@ export function DCLogSidebar({ id, headings, onOpenSkill, onOpenLog, onOpenSerie
             style={{ display: "flex", flexDirection: "column", gap: 3, margin: "-12px -16px 6px", padding: "12px 16px 8px", borderRadius: "14px 14px 0 0" }}
           >
             <div className="pw-eyebrow" style={{ color: "var(--section-deep)", display: "flex", alignItems: "center", gap: 5 }}>
-              <svg width="11" height="10" viewBox="0 0 122.88 111.96" fill="var(--section-accent)">
+              <svg width="11" height="10" viewBox="0 0 122.88 111.96" fill="var(--section-deep)">
                 <path d="M61.15,0L0,26.52l61.41,24.96l61.47-24.88L61.15,0L61.15,0z M122.88,57.12L95.46,45.31L62.73,58.56c-0.88,0.36-1.83,0.33-2.65,0L27.27,45.22L0,57.05L61.41,82L122.88,57.12L122.88,57.12z M96.14,75.56L62.73,89.08c-0.88,0.36-1.83,0.33-2.65,0L26.59,75.47L0,87.01l61.41,24.96l61.47-24.88L96.14,75.56L96.14,75.56z"/>
               </svg>
               Series
@@ -461,7 +468,7 @@ export function DCLogSidebar({ id, headings, onOpenSkill, onOpenLog, onOpenSerie
                 <span style={{
                   fontFamily: "'Bebas Neue', var(--font-sans)",
                   fontSize: 26, lineHeight: 1,
-                  color: "var(--section-accent)",
+                  color: "var(--section-deep)",
                   transform: "scaleY(1.12)", transformOrigin: "top center",
                   flexShrink: 0,
                 }}>
@@ -483,7 +490,7 @@ export function DCLogSidebar({ id, headings, onOpenSkill, onOpenLog, onOpenSerie
               <span style={{
                 fontFamily: "'Bebas Neue', var(--font-sans)",
                 fontSize: 26, lineHeight: 1,
-                color: "var(--section-accent)",
+                color: "var(--section-deep)",
                 transform: "scaleY(1.12)", transformOrigin: "top center",
                 flexShrink: 0,
               }}>

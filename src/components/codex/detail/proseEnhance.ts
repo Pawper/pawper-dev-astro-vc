@@ -385,7 +385,7 @@ function makeExternalArrow(): HTMLSpanElement {
   const arrow = document.createElement("span");
   arrow.textContent = "↗";
   arrow.className = "cx-btn-icon";
-  arrow.style.cssText = "position: absolute; top: 10px; right: 12px; font-family: var(--font-mono); font-size: 12px; font-weight: 700; letter-spacing: 0.08em; color: var(--section-accent); opacity: 0.5; pointer-events: none;";
+  arrow.style.cssText = "position: absolute; top: 10px; right: 12px; font-family: var(--font-mono); font-size: 12px; font-weight: 700; letter-spacing: 0.08em; color: var(--section-deep); opacity: 0.5; pointer-events: none;";
   return arrow;
 }
 
@@ -413,7 +413,7 @@ function createLinkCard(href: string, og: OgData | null): HTMLAnchorElement {
     fav.style.cssText = "width: 12px; height: 12px; flex-shrink: 0; opacity: 0.7; display: inline; margin: 0; border-radius: 2px;";
     fav.addEventListener("error", () => { fav.style.display = "none"; });
     const txt = document.createElement("span");
-    txt.style.cssText = "color: var(--section-accent); font-size: 13px; font-family: var(--font-mono, monospace);";
+    txt.style.cssText = "color: var(--section-deep); font-size: 13px; font-family: var(--font-mono, monospace);";
     txt.textContent = displayUrl;
     link.appendChild(fav);
     link.appendChild(txt);
@@ -473,7 +473,7 @@ function createLinkCard(href: string, og: OgData | null): HTMLAnchorElement {
   favicon.addEventListener("error", () => { favicon.style.display = "none"; });
   const domainSpan = document.createElement("span");
   domainSpan.className = "pw-eyebrow";
-  domainSpan.style.color = "var(--section-accent)";
+  domainSpan.style.color = "var(--section-deep)";
   domainSpan.textContent = domain;
   eyebrowRow.appendChild(favicon);
   eyebrowRow.appendChild(domainSpan);
