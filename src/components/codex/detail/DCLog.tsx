@@ -30,18 +30,17 @@ function MentorLink({
   onClick?: () => void;
   href?: string;
 }) {
-  const [hover, setHover] = useState(false);
+  const theme = useTheme();
+  const isDark = theme === "dark";
+  const color = isDark ? "#b48bff" : "#5b2eb8";
   const style: React.CSSProperties = {
-    color: hover ? "#c49ef8" : "#9055e8",
-    textDecoration: hover ? "underline" : "none",
+    color,
+    textDecoration: "none",
     background: "none",
     border: "none",
-    padding: 0,
     font: "inherit",
     fontSize: 13,
     fontWeight: 500,
-    cursor: "pointer",
-    display: "inline",
   };
   if (href) {
     const external = /^https?:\/\//.test(href);
@@ -49,9 +48,8 @@ function MentorLink({
       <a
         href={href}
         {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+        className="cx-section-eyebrow-link"
         style={style}
-        onMouseEnter={() => setHover(true)}
-        onMouseLeave={() => setHover(false)}
       >
         {children}
       </a>
@@ -61,9 +59,8 @@ function MentorLink({
     <button
       type="button"
       onClick={onClick}
+      className="cx-section-eyebrow-link"
       style={style}
-      onMouseEnter={() => setHover(true)}
-      onMouseLeave={() => setHover(false)}
     >
       {children}
     </button>
@@ -362,9 +359,9 @@ export default function DCLog({ id, html, anchor, onOpenLog, onOpenProject, onOp
                   <span>Mentoring · Open</span>
                 </div>
                 <div style={{ display: "flex", gap: 14, alignItems: "center", flexWrap: "wrap" }}>
-                  <MentorLink href="/contact/">Ask about mentoring →</MentorLink>
+                  <MentorLink href="/contact/">Ask about mentoring</MentorLink>
                   <span style={{ color: "var(--ink-mute)", fontSize: 12 }}>·</span>
-                  <MentorLink href={KOFI_URL}>Tip on Ko-fi ↗</MentorLink>
+                  <MentorLink href={KOFI_URL}>Tip on Ko-fi</MentorLink>
                 </div>
               </div>
             </CXCard>
@@ -409,9 +406,9 @@ export default function DCLog({ id, html, anchor, onOpenLog, onOpenProject, onOp
                 </p>
               ))}
               <div style={{ display: "flex", gap: 14, marginTop: 8, justifyContent: "flex-end", flexWrap: "wrap", alignItems: "center" }}>
-                <MentorLink href="/contact/">Receive Mentoring →</MentorLink>
+                <MentorLink href="/contact/">Receive Mentoring</MentorLink>
                 <span style={{ color: "var(--ink-mute)", fontSize: 12 }}>·</span>
-                <MentorLink href={KOFI_URL}>Tip on Ko-fi ↗</MentorLink>
+                <MentorLink href={KOFI_URL}>Tip on Ko-fi</MentorLink>
               </div>
             </CXCard>
           </div>
