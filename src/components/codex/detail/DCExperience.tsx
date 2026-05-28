@@ -268,25 +268,6 @@ export function DCExperienceSidebar({ id, onOpen, onNavigateToAgenda, onOpenExpe
 
   return (
     <div style={{ width: 230, flexShrink: 0, display: "flex", flexDirection: "column", gap: 12 }}>
-      {parentEvents.length > 0 && onOpenExperience && (
-        <div className="pw-glass-dim" style={{ borderRadius: 14, padding: "14px 16px", display: "flex", flexDirection: "column", gap: 8 }}>
-          <div className="pw-eyebrow" style={{ color: "var(--section-deep)", marginBottom: 2 }}>Experienced at</div>
-          {parentEvents.map((e) => (
-            <div
-              key={e.id}
-              className="cx-toc-item"
-              onClick={() => { soundClick(); onOpenExperience(e.id); }}
-              onMouseEnter={soundHover}
-              style={{ padding: "4px 6px", marginLeft: -6, borderRadius: 6, cursor: "pointer" }}
-            >
-              <div style={{ fontSize: 12, color: "var(--ink-soft)", lineHeight: 1.3, fontWeight: 500 }}>{e.title}</div>
-              {e.organization && (
-                <div style={{ fontSize: 11, color: "var(--ink-mute)", marginTop: 1 }}>{e.organization}</div>
-              )}
-            </div>
-          ))}
-        </div>
-      )}
       {upcomingDates.length > 0 && onNavigateToAgenda && (
         <div className="pw-glass-dim" style={{ borderRadius: 14, padding: "14px 16px", display: "flex", flexDirection: "column", gap: 8 }}>
           <div className="pw-eyebrow" style={{ color: "var(--section-deep)", marginBottom: 2 }}>Upcoming Dates</div>
@@ -310,6 +291,33 @@ export function DCExperienceSidebar({ id, onOpen, onNavigateToAgenda, onOpenExpe
                 )}
                 {e.location && (
                   <div style={{ fontSize: 11, color: "var(--ink-mute)", marginTop: 1 }}>{e.location}</div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
+      {parentEvents.length > 0 && onOpenExperience && (
+        <div className="pw-glass-dim" style={{ borderRadius: 14, padding: "14px 16px", display: "flex", flexDirection: "column", gap: 8 }}>
+          <div className="pw-eyebrow" style={{ color: "var(--section-deep)", marginBottom: 2 }}>Experienced at</div>
+          {parentEvents.map((e) => {
+            const parentPeriod = derivePeriod(e.title, e.period ?? "");
+            return (
+              <div
+                key={e.id}
+                className="cx-toc-item"
+                onClick={() => { soundClick(); onOpenExperience(e.id); }}
+                onMouseEnter={soundHover}
+                style={{ padding: "4px 6px", marginLeft: -6, borderRadius: 6, cursor: "pointer" }}
+              >
+                {parentPeriod && (
+                  <div className="pw-mono" style={{ fontSize: 11, color: upcomingDateColor, fontWeight: 600 }}>
+                    {parentPeriod}
+                  </div>
+                )}
+                <div style={{ fontSize: 12, color: "var(--ink-soft)", lineHeight: 1.3, fontWeight: 500, marginTop: parentPeriod ? 1 : 0 }}>{e.title}</div>
+                {e.organization && (
+                  <div style={{ fontSize: 11, color: "var(--ink-mute)", marginTop: 1 }}>{e.organization}</div>
                 )}
               </div>
             );
