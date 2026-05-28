@@ -4,6 +4,8 @@ import type { CalendarEvent } from "../../../data/content";
 import CXCard from "../CXCard";
 import CXPill from "../CXPill";
 import { soundClick, soundHover } from "../../../context/SoundContext";
+import { isEventPast } from "../../../utils/date";
+import { useNow } from "../../../hooks/useNow";
 
 const TYPE_COLORS: Record<string, { accent: string; label: string }> = {
   available: { accent: "var(--section-accent)", label: "Available" },
@@ -49,14 +51,6 @@ function monthKey(iso: string): string {
 function monthLabel(key: string): string {
   const [year, month] = key.split("-").map(Number);
   return new Date(year, month - 1, 1).toLocaleDateString("en-US", { month: "long", year: "numeric" });
-}
-
-function isPast(iso: string): boolean {
-  const [year, month, day] = iso.split("-").map(Number);
-  const d = new Date(year, month - 1, day);
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  return d < today;
 }
 
 function makeGoogleUrl(e: CalendarEvent): string {
@@ -129,6 +123,7 @@ const HOOK_CLAMP_THRESHOLD = 140;
 export default function DCCalendar() {
   const nextRef = useRef<HTMLDivElement>(null);
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
+  const now = useNow();
   function toggleExpanded(id: string) {
     setExpandedIds(prev => {
       const next = new Set(prev);
@@ -162,7 +157,7 @@ export default function DCCalendar() {
     );
   }
 
-  const firstUpcomingId = events.find((e) => !isPast(e.endDate ?? e.date))?.id ?? null;
+  const firstUpcomingId = events.find((e) => !isEventPast(e.date, e.endDate, e.time, now))?.id ?? null;
 
   const childrenByParent = new Map<string, CalendarEvent[]>();
   for (const e of events) {
@@ -183,7 +178,7 @@ export default function DCCalendar() {
 
   function renderCard(e: CalendarEvent, indent = false) {
     const tc = TYPE_COLORS[e.type] ?? TYPE_COLORS.workshop;
-    const past = isPast(e.endDate ?? e.date);
+    const past = isEventPast(e.date, e.endDate, e.time, now);
     const expanded = expandedIds.has(e.id);
     const hasLongNote = !!(e.note && e.note.length > HOOK_CLAMP_THRESHOLD);
     const dateStr = e.endDate && e.endDate !== e.date

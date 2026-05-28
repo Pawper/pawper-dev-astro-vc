@@ -15,7 +15,9 @@ import { soundClick, soundHover } from "../../context/SoundContext";
 import CXBtn, { RssIcon } from "./CXBtn";
 import { PROJECTS, LOGS, EXPERIENCES, AGENDA_EVENTS, SERVICES, slugify, getPrimaryColor } from "../../data/content";
 import type { Experience } from "../../data/content";
-import { isPastDate, isServiceCategory } from "./detail/ExperienceCardRow";
+import { isServiceCategory } from "./detail/ExperienceCardRow";
+import { isEventPast } from "../../utils/date";
+import { useNow } from "../../hooks/useNow";
 import { contrastText } from "./CXPill";
 import { getProgress } from "../../utils/logProgress";
 import devtoSeriesRaw from "../../data/devto-series.json";
@@ -370,6 +372,7 @@ function ModalFooterButtons({ modal, proj, primaryHex, secondaryHex, isDark, onN
   onNavigateToService?: (serviceId: string) => void;
   onNavigate?: (m: ModalState) => void;
 }) {
+  const now = useNow();
   const [, setTick] = useState(0);
   useEffect(() => {
     if (modal.kind !== "series") return;
@@ -406,7 +409,7 @@ function ModalFooterButtons({ modal, proj, primaryHex, secondaryHex, isDark, onN
   if (modal.kind === "experience") {
     const _expData = [...EXPERIENCES, ...AGENDA_EVENTS].find(e => e.id === modal.id);
     const expIsAgenda = !!_expData?.datetimeStart;
-    const expPast = expIsAgenda && isPastDate(_expData?.datetimeEnd ?? _expData?.datetimeStart ?? "");
+    const expPast = expIsAgenda && isEventPast(_expData?.datetimeStart ?? "", _expData?.datetimeEnd, _expData?.time, now);
     const expUpcoming = expIsAgenda && !expPast;
 
     // Show endorse for: non-agenda experiences (always historical) OR agenda events that have started
@@ -635,6 +638,7 @@ interface CXModalProps {
 }
 
 export default function CXModal({ modal, previousModal, onClose, onBack, onNavigate, onSiblingNav, onPatchModal, logsHtml, theme, onNavigateToCategory, onNavigateToLogCategory, onNavigateToService, onNavigateToAgenda }: CXModalProps) {
+  const now = useNow();
   function handleBackdropClick() { soundClick(); onBack ? onBack() : onClose(); }
 
   const skillHasContent = modal.kind === "skill" && (
@@ -716,7 +720,7 @@ export default function CXModal({ modal, previousModal, onClose, onBack, onNavig
                        : modal.kind === "experience" ? (() => {
                            const _exp = [...EXPERIENCES, ...AGENDA_EVENTS].find(e => e.id === modal.id);
                            if (isServiceCategory(_exp?.category)) return "#9055e8";
-                           if (_exp?.datetimeStart) return isPastDate(_exp.datetimeEnd ?? _exp.datetimeStart) ? "#e84455" : "#f55a28";
+                           if (_exp?.datetimeStart) return isEventPast(_exp.datetimeStart, _exp.datetimeEnd, _exp.time, now) ? "#e84455" : "#f55a28";
                            return "#e84455";
                          })()
                        : modal.kind === "media"      ? LOG_CAT.accent

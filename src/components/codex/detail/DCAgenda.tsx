@@ -8,6 +8,9 @@ import CollapsiblePills from "../CollapsiblePills";
 import type { PillItem } from "../CollapsiblePills";
 import Tap from "../../shared/Tap";
 import { summaryForDescription, categoryLabel, isServiceCategory } from "./ExperienceCardRow";
+import { isEventPast, isEventInProgress } from "../../../utils/date";
+import { useNow } from "../../../hooks/useNow";
+import { PROFILE } from "../../../data/content";
 
 const allEndorsements = endorsementsData as Endorsement[];
 type Match = { kind: "language"; color: string } | { kind: "topic" } | null;
@@ -64,12 +67,10 @@ function monthLabel(key: string): string {
   return new Date(year, month - 1, 1).toLocaleDateString("en-US", { month: "long", year: "numeric" });
 }
 
-function isPast(iso: string): boolean {
-  const [year, month, day] = iso.split("-").map(Number);
-  const d = new Date(year, month - 1, day);
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  return d < today;
+function mailtoEndorse(e: Experience): string {
+  const subject = `Endorsement: ${e.title}`;
+  const body = `Hi Phillip,\n\nI'd like to leave an endorsement for "${e.title}"${e.organization ? ` (${e.organization})` : ""}.\n\n`;
+  return `mailto:${PROFILE.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 }
 
 function makeGoogleUrl(e: Experience): string {
@@ -156,6 +157,7 @@ export default function DCAgenda({ scrollToId, onScrolled, openModal }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
   const [bottomPad, setBottomPad] = useState(600);
+  const now = useNow();
 
   function toggleExpanded(id: string) {
     setExpandedIds(prev => {
@@ -205,7 +207,7 @@ export default function DCAgenda({ scrollToId, onScrolled, openModal }: Props) {
     );
   }
 
-  const firstUpcomingId = events.find((e) => !isPast(e.datetimeEnd ?? e.datetimeStart ?? ""))?.id ?? null;
+  const firstUpcomingId = events.find((e) => !isEventPast(e.datetimeStart ?? "", e.datetimeEnd, e.time, now))?.id ?? null;
   const scrollTargetId = scrollToId ?? firstUpcomingId;
 
   const childrenByParent = new Map<string, Experience[]>();
@@ -226,12 +228,13 @@ export default function DCAgenda({ scrollToId, onScrolled, openModal }: Props) {
   }
 
   // Divider: only show if there are both past and upcoming top-level events
-  const firstUpcomingTopLevelId = topLevel.find((e) => !isPast(e.datetimeEnd ?? e.datetimeStart ?? ""))?.id;
-  const hasPastTopLevel = topLevel.some((e) => isPast(e.datetimeEnd ?? e.datetimeStart ?? ""));
+  const firstUpcomingTopLevelId = topLevel.find((e) => !isEventPast(e.datetimeStart ?? "", e.datetimeEnd, e.time, now))?.id;
+  const hasPastTopLevel = topLevel.some((e) => isEventPast(e.datetimeStart ?? "", e.datetimeEnd, e.time, now));
   const showDivider = !!firstUpcomingTopLevelId && hasPastTopLevel;
 
   function renderCard(e: Experience, indent = false) {
-    const past = isPast(e.datetimeEnd ?? e.datetimeStart ?? "");
+    const past = isEventPast(e.datetimeStart ?? "", e.datetimeEnd, e.time, now);
+    const inProgress = isEventInProgress(e.datetimeStart ?? "", e.datetimeEnd, e.time, now);
     const roleLabel = categoryLabel(e.category, past);
     const cardVars: React.CSSProperties = isServiceCategory(e.category)
       ? { "--section-accent": "#9055e8", "--section-deep": "#c49ef8", "--section-rgb": "144, 85, 232" } as React.CSSProperties
@@ -280,7 +283,18 @@ export default function DCAgenda({ scrollToId, onScrolled, openModal }: Props) {
 
     const isScrollTarget = e.id === scrollTargetId;
 
-    const action = !past ? (
+    const action = inProgress ? (
+      <a
+        href={mailtoEndorse(e)}
+        onClick={(ev) => { ev.stopPropagation(); soundClick(); }}
+        onMouseEnter={soundHover}
+        style={{ textDecoration: "none", flexShrink: 0 }}
+      >
+        <CXPill size="lg" variant="primary" style={{ cursor: "pointer" }}>
+          Endorse <span style={{ marginLeft: 2, display: "inline-block", transform: "scale(1.4)", transformOrigin: "center", position: "relative", top: -2 }}>✦</span>
+        </CXPill>
+      </a>
+    ) : !past ? (
       e.registerUrl
         ? (
           <a

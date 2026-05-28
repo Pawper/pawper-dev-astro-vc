@@ -7,7 +7,7 @@
  * • Everything else → training-row layout with period + organization.
  */
 
-import { EXPERIENCES, PROJECTS, LOGS, canonicalizeSkill } from "../../../data/content";
+import { EXPERIENCES, PROJECTS, LOGS, PROFILE, canonicalizeSkill } from "../../../data/content";
 import type { Endorsement, Experience, ExperienceCategory } from "../../../data/content";
 import type { ModalState } from "../../../types";
 import endorsementsData from "../../../data/endorsements.json";
@@ -16,7 +16,8 @@ import type { PillItem } from "../CollapsiblePills";
 import CXPill from "../CXPill";
 import Tap from "../../shared/Tap";
 import { soundClick, soundHover } from "../../../context/SoundContext";
-import { derivePeriod } from "../../../utils/date";
+import { derivePeriod, isEventPast, isEventInProgress } from "../../../utils/date";
+import { useNow } from "../../../hooks/useNow";
 
 const allEndorsements = endorsementsData as Endorsement[];
 
@@ -63,12 +64,20 @@ export function summaryForDescription(desc: string): string | null {
   return desc;
 }
 
+/** @deprecated Day-level only. Prefer `isEventPast` from utils/date which is
+ *  time-aware and uses the event's `time` field. */
 export function isPastDate(iso: string): boolean {
   const [year, month, day] = iso.split("-").map(Number);
   const d = new Date(year, month - 1, day);
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   return d < today;
+}
+
+function mailtoEndorse(exp: Experience): string {
+  const subject = `Endorsement: ${exp.title}`;
+  const body = `Hi Phillip,\n\nI'd like to leave an endorsement for "${exp.title}"${exp.organization ? ` (${exp.organization})` : ""}.\n\n`;
+  return `mailto:${PROFILE.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 }
 
 export function categoryLabel(category: ExperienceCategory | undefined, past: boolean): string | null {
@@ -103,8 +112,10 @@ interface Props {
 }
 
 export default function ExperienceCardRow({ exp, openModal, onCardClick, onOpenSkill, noDim }: Props) {
+  const now = useNow();
   const isAgenda = !!exp.datetimeStart;
-  const past = isAgenda ? isPastDate(exp.datetimeEnd ?? exp.datetimeStart!) : false;
+  const past = isAgenda ? isEventPast(exp.datetimeStart!, exp.datetimeEnd, exp.time, now) : false;
+  const inProgress = isAgenda ? isEventInProgress(exp.datetimeStart!, exp.datetimeEnd, exp.time, now) : false;
   const upcoming = isAgenda && !past;
   const descSummary = summaryForDescription(exp.description ?? "");
   const roleLabel = categoryLabel(exp.category, past);
@@ -190,7 +201,18 @@ export default function ExperienceCardRow({ exp, openModal, onCardClick, onOpenS
       </a>
     ) : null;
 
-    const action = exp.registerUrl ? (
+    const action = inProgress ? (
+      <a
+        href={mailtoEndorse(exp)}
+        onClick={(e) => { e.stopPropagation(); soundClick(); }}
+        onMouseEnter={soundHover}
+        style={{ textDecoration: "none", flexShrink: 0 }}
+      >
+        <CXPill size="lg" variant="primary" style={{ cursor: "pointer" }}>
+          Endorse <span style={{ marginLeft: 2, display: "inline-block", transform: "scale(1.4)", transformOrigin: "center", position: "relative", top: -2 }}>✦</span>
+        </CXPill>
+      </a>
+    ) : exp.registerUrl ? (
       <a
         href={exp.registerUrl}
         target="_blank"

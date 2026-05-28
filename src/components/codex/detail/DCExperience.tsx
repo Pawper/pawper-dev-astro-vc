@@ -13,6 +13,8 @@ import ExperienceCardRow from "./ExperienceCardRow";
 import { SidebarTagGroups } from "./DCDetailSidebar";
 import EndorsementQuote from "../EndorsementQuote";
 import { soundClick, soundHover } from "../../../context/SoundContext";
+import { isEventPast } from "../../../utils/date";
+import { useNow } from "../../../hooks/useNow";
 
 // ── Description renderer — splits plain text by line, renders bare URLs as
 //    cards (CXLogCard for pawper.dev/l/ links, OG link card for everything else).
@@ -93,14 +95,6 @@ function DescriptionBlock({ text, openModal }: { text: string; openModal: (m: Mo
 function formatAgendaDate(iso: string): string {
   const [year, month, day] = iso.split("-").map(Number);
   return new Date(year, month - 1, day).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
-}
-
-function isPast(iso: string): boolean {
-  const [year, month, day] = iso.split("-").map(Number);
-  const d = new Date(year, month - 1, day);
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  return d < today;
 }
 
 const allEndorsements = endorsementsData as Endorsement[];
@@ -229,12 +223,13 @@ interface SidebarProps {
 }
 
 export function DCExperienceSidebar({ id, onOpen, onNavigateToAgenda, onOpenExperience }: SidebarProps) {
+  const now = useNow();
   const allEvents = [...EXPERIENCES, ...AGENDA_EVENTS];
   const exp = allEvents.find((e) => e.id === id) as Experience | undefined;
   if (!exp) return null;
 
   const upcomingDates = AGENDA_EVENTS
-    .filter((e) => e.title === exp.title && !isPast(e.datetimeEnd ?? e.datetimeStart ?? ""))
+    .filter((e) => e.title === exp.title && !isEventPast(e.datetimeStart ?? "", e.datetimeEnd, e.time, now))
     .sort((a, b) => (a.datetimeStart ?? "").localeCompare(b.datetimeStart ?? ""));
 
   // Collect unique parent events — from this event and any same-title instances
