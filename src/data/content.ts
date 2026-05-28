@@ -436,6 +436,7 @@ export const CX_INDEX: CXCategory[] = [
     accent: "#f5c130",
     accentDeep: "#a07e15",
     accentRgb: "245, 193, 48",
+    accentDeepLight: "#6b5410",
     rootIsCombo: true,
     entries: [{ id: "all", label: "Open channel" }],
   },

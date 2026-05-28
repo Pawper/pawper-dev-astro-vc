@@ -2,6 +2,8 @@ import React, { type ReactNode } from "react";
 import type { CXCategory } from "../../types";
 import CXScrollable from "../shared/CXScrollable";
 import Tap from "../shared/Tap";
+import { useTheme } from "../../hooks/useTheme";
+import { clampEyebrowColor } from "../../utils/color";
 
 interface CXSectionFrameProps {
   cat?: CXCategory;
@@ -18,6 +20,14 @@ const FADE_ZONE = 24;
 const CONTENT_TOP = HEADER_H + FADE_ZONE;
 
 export default function CXSectionFrame({ cat, crumb, children, footer, headerRight, onOverview }: CXSectionFrameProps) {
+  const theme = useTheme();
+  const isDark = theme === "dark";
+  const eyebrowColor = clampEyebrowColor(
+    isDark
+      ? (cat?.accentDeep ?? "#ffffff")
+      : (cat?.accentDeepLight ?? cat?.accentDeep ?? "#000000"),
+    isDark,
+  );
   return (
     <div
       key={(cat?.id ?? "") + (crumb ?? "")}
@@ -46,11 +56,11 @@ export default function CXSectionFrame({ cat, crumb, children, footer, headerRig
       }}>
         <div>
           {onOverview ? (
-            <Tap onClick={onOverview} className="pw-eyebrow cx-section-eyebrow-link" style={{ color: "var(--section-deep)", pointerEvents: "auto" }}>
+            <Tap onClick={onOverview} className="pw-eyebrow cx-section-eyebrow-link" style={{ color: eyebrowColor, pointerEvents: "auto" }}>
               {cat?.code} · {cat?.label}
             </Tap>
           ) : (
-            <div className="pw-eyebrow" style={{ color: "var(--section-deep)" }}>{cat?.code} · {cat?.label}</div>
+            <div className="pw-eyebrow" style={{ color: eyebrowColor }}>{cat?.code} · {cat?.label}</div>
           )}
           <h1 className="cx-section-title" style={{
             fontSize: 32, fontWeight: 500, margin: "8px 0 0", letterSpacing: -0.5, lineHeight: 1.1,
