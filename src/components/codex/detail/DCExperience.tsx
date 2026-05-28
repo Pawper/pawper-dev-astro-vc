@@ -122,7 +122,10 @@ export default function DCExperience({ id, openModal }: Props) {
   const exp = [...EXPERIENCES, ...AGENDA_EVENTS].find((e) => e.id === id) as Experience | undefined;
   if (!exp) return null;
 
-  const endorsements = allEndorsements.filter((e) => exp.endorsementIds?.includes(e.slug));
+  const endorsements = allEndorsements.filter((e) =>
+    exp.endorsementIds?.includes(e.slug) ||
+    (e.experienceName != null && e.experienceName === exp.title)
+  );
   const matchingEvents = AGENDA_EVENTS.filter((e) => e.title === exp.title && e.datetimeStart);
   const period = derivePeriod(exp.title, exp.period ?? "");
   const periodLabel = matchingEvents.length > 1 && period ? `Repeating · ${period}` : period;

@@ -17,6 +17,7 @@ export interface Endorsement {
   featured?: boolean;
   panels?: boolean;
   pullQuote?: string;
+  experienceName?: string;
 }
 
 export interface ServiceEntry {

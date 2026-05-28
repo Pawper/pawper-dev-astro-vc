@@ -17,6 +17,7 @@
  *   Featured    (checkbox — sorted first within service panel)
  *   Hide from Panels  (checkbox — check to hide from services panels without un-approving)
  *   Pull Quote  (AI field — auto-generated highlight sentence for long quotes; blank for short ones)
+ *   Experience  (link to Calendar record — optional; ties the endorsement to a specific event)
  *
  * Env vars:
  *   AIRTABLE_API_KEY  – personal access token from airtable.com → Account → Developer hub (starts with "pat…")
@@ -91,11 +92,27 @@ async function main() {
 
   console.log(`Fetched ${records.length} approved endorsement(s) from Airtable.`);
 
+  // Build a map of Calendar record id → Title so we can resolve the linked
+  // Experience to a name. Matching endorsements to experiences by name lets a
+  // single endorsement attach to every event sharing that title (e.g. recurring
+  // ClawCamp sessions), instead of being pinned to one specific record id.
+  const calendarRecords = await base("Calendar").select({ fields: ["Title"] }).all();
+  const calendarTitleById = new Map(
+    calendarRecords.map((r) => [r.id, String(r.fields.Title || "")])
+  );
+
   const endorsements = await Promise.all(
     records.map(async (r) => {
       const f = r.fields;
       const photoAttachment = Array.isArray(f.Photo) ? f.Photo[0] : null;
       const photo = await uploadPhoto(photoAttachment?.url, r.id);
+
+      const experienceRecordId = Array.isArray(f.Experience)
+        ? (f.Experience[0] ? String(f.Experience[0]) : undefined)
+        : (f.Experience ? String(f.Experience) : undefined);
+      const experienceName = experienceRecordId
+        ? (calendarTitleById.get(experienceRecordId) || undefined)
+        : undefined;
 
       return {
         id:       r.id,
@@ -114,6 +131,7 @@ async function main() {
         featured:  Boolean(f.Featured),
         panels:    !Boolean(f["Hide from Panels"]),
         pullQuote: String(f["Pull Quote"]?.value ?? f["Pull Quote"] ?? "") || undefined,
+        experienceName,
       };
     })
   );
