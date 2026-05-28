@@ -6,6 +6,8 @@ import { getProgress } from "../../utils/logProgress";
 import type { LogProgressEntry } from "../../utils/logProgress";
 import { ArticleProgressRing } from "./detail/DCDetailSidebar";
 import { getLogHeadingIds } from "../../utils/headingCache";
+import { useTheme } from "../../hooks/useTheme";
+import { clampEyebrowColor } from "../../utils/color";
 
 interface CXLogCardProps {
   log: Log;
@@ -14,6 +16,8 @@ interface CXLogCardProps {
 }
 
 export default function CXLogCard({ log, onClick, seriesTotal }: CXLogCardProps) {
+  const theme = useTheme();
+  const eyebrowColor = clampEyebrowColor(LOG_CAT.accent, theme === "dark");
   const [progress, setProgress] = useState<LogProgressEntry>(() => getProgress(log.id));
 
   useEffect(() => {
@@ -65,6 +69,7 @@ export default function CXLogCard({ log, onClick, seriesTotal }: CXLogCardProps)
         badgeSub={badgeSub}
         badgeColor={LOG_CAT.accent}
         eyebrow={log.kicker}
+        eyebrowColor={eyebrowColor}
         date={log.updated ?? log.date}
         title={log.title}
         titleSize={16}
