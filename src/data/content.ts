@@ -2,6 +2,7 @@ import type { Project, Log, CXCategory } from "../types";
 import projectsData from "./projects.json";
 import agendaData from "./agenda.json";
 import experiencesData from "./experiences.json";
+import calendarData from "./calendar.json";
 
 export interface Endorsement {
   id: string;
@@ -57,6 +58,21 @@ export interface Experience {
 }
 
 export const AGENDA_EVENTS: Experience[] = agendaData as Experience[];
+
+export interface CalendarEvent {
+  id: string;
+  title: string;
+  date: string;        // YYYY-MM-DD
+  endDate?: string;    // YYYY-MM-DD
+  time?: string;       // "5 PM", "2:30 PM" etc.
+  type: string;        // "available" | "speaking" | "workshop" | "attending" | "bootcamp" | etc.
+  note?: string;
+  location?: string;
+  registerUrl?: string;
+  parentId?: string;
+}
+
+export const CALENDAR_EVENTS: CalendarEvent[] = calendarData as CalendarEvent[];
 
 export const PROFILE = {
   name: "Phillip Wessels",
