@@ -9,12 +9,14 @@ import endorsementsData from "../../../data/endorsements.json";
 import ogLinkCacheRaw from "../../../data/og-link-cache.json";
 import CXCard from "../CXCard";
 import CXLogCard from "../CXLogCard";
-import ExperienceCardRow from "./ExperienceCardRow";
+import ExperienceCardRow, { isServiceCategory } from "./ExperienceCardRow";
 import { SidebarTagGroups } from "./DCDetailSidebar";
 import EndorsementQuote from "../EndorsementQuote";
 import { soundClick, soundHover } from "../../../context/SoundContext";
 import { isEventPast } from "../../../utils/date";
 import { useNow } from "../../../hooks/useNow";
+import { useTheme } from "../../../hooks/useTheme";
+import { clampEyebrowColor } from "../../../utils/color";
 
 // ── Description renderer — splits plain text by line, renders bare URLs as
 //    cards (CXLogCard for pawper.dev/l/ links, OG link card for everything else).
@@ -227,9 +229,15 @@ interface SidebarProps {
 
 export function DCExperienceSidebar({ id, onOpen, onNavigateToAgenda, onOpenExperience }: SidebarProps) {
   const now = useNow();
+  const theme = useTheme();
+  const isDark = theme === "dark";
   const allEvents = [...EXPERIENCES, ...AGENDA_EVENTS];
   const exp = allEvents.find((e) => e.id === id) as Experience | undefined;
   if (!exp) return null;
+
+  const upcomingDateColor = isServiceCategory(exp.category)
+    ? clampEyebrowColor(isDark ? "#c49ef8" : "#9055e8", isDark)
+    : clampEyebrowColor("#f55a28", isDark);
 
   const upcomingDates = AGENDA_EVENTS
     .filter((e) => e.title === exp.title && !isEventPast(e.datetimeStart ?? "", e.datetimeEnd, e.time, now))
@@ -294,7 +302,7 @@ export function DCExperienceSidebar({ id, onOpen, onNavigateToAgenda, onOpenExpe
                 onMouseEnter={soundHover}
                 style={{ padding: "4px 6px", marginLeft: -6, borderRadius: 6, cursor: "pointer" }}
               >
-                <div className="pw-mono" style={{ fontSize: 11, color: "var(--section-accent)", fontWeight: 600 }}>
+                <div className="pw-mono" style={{ fontSize: 11, color: upcomingDateColor, fontWeight: 600 }}>
                   {dateStr}
                 </div>
                 {e.time && (
