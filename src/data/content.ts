@@ -427,6 +427,9 @@ export const CX_INDEX: CXCategory[] = [
     accent: "#3fbf7a",
     accentDeep: "#1f8a5b",
     accentRgb: "63, 191, 122",
+    accentLight: "#1a7a4d",
+    accentDeepLight: "#0d5236",
+    accentRgbLight: "26, 122, 77",
     entries: LOG_CATEGORIES,
   },
   {

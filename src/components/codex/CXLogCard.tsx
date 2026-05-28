@@ -17,7 +17,11 @@ interface CXLogCardProps {
 
 export default function CXLogCard({ log, onClick, seriesTotal }: CXLogCardProps) {
   const theme = useTheme();
-  const eyebrowColor = clampEyebrowColor(LOG_CAT.accent, theme === "dark");
+  const isDark = theme === "dark";
+  const eyebrowColor = clampEyebrowColor(
+    isDark ? LOG_CAT.accent : (LOG_CAT.accentLight ?? LOG_CAT.accent),
+    isDark,
+  );
   const [progress, setProgress] = useState<LogProgressEntry>(() => getProgress(log.id));
 
   useEffect(() => {
