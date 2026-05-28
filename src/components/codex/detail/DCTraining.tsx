@@ -30,7 +30,7 @@ function ExperienceSkills({ skills, openModal }: { skills: string[]; openModal: 
   const pill = skills.filter((s) => matchSkill(s) !== null);
   const plain = skills.filter((s) => matchSkill(s) === null);
   return (
-    <div onClick={(e) => e.stopPropagation()} style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 5, marginTop: 8 }}>
+    <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 5, marginTop: 8 }}>
       {pill.map((skill) => {
         const match = matchSkill(skill)!;
         return (

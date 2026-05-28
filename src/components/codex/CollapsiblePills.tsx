@@ -38,7 +38,6 @@ export default function CollapsiblePills({ pills, plain = [], size = "sm" }: Pro
   return (
     <div
       ref={ref}
-      onClick={(e) => e.stopPropagation()}
       style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 5 }}
     >
       {shown.map((p) => (
@@ -57,7 +56,7 @@ export default function CollapsiblePills({ pills, plain = [], size = "sm" }: Pro
       {hiddenCount > 0 && !expanded && (
         <span
           className="pw-mono"
-          onClick={() => setExpanded(true)}
+          onClick={(e) => { e.stopPropagation(); setExpanded(true); }}
           style={{ fontSize: 10, color: "var(--section-deep)", cursor: "pointer", letterSpacing: "0.04em", userSelect: "none" }}
         >
           +{hiddenCount} MORE
@@ -68,7 +67,7 @@ export default function CollapsiblePills({ pills, plain = [], size = "sm" }: Pro
           <span style={{ color: "var(--ink-mute)", fontSize: 11, lineHeight: 1 }}>•</span>
           <span
             className="pw-mono"
-            onClick={() => setExpanded(false)}
+            onClick={(e) => { e.stopPropagation(); setExpanded(false); }}
             style={{ fontSize: 10, color: "var(--section-deep)", cursor: "pointer", letterSpacing: "0.04em", userSelect: "none", textTransform: "uppercase" }}
           >
             less

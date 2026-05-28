@@ -157,7 +157,7 @@ export default function ExperienceCardRow({ exp, openModal, onCardClick, onOpenS
           : [];
         const plain = hasPills ? exp.skills!.filter((s) => matchSkill(s) === null) : [];
         return (
-          <div onClick={(e) => e.stopPropagation()} style={{ marginTop: 8, display: "flex", alignItems: "flex-start", flexWrap: "wrap", gap: 6 }}>
+          <div style={{ marginTop: 8, display: "flex", alignItems: "flex-start", flexWrap: "wrap", gap: 6 }}>
             {roleLabel && (
               <span style={{ fontSize: 11, color: "var(--section-deep)", fontWeight: 700, letterSpacing: "0.02em", whiteSpace: "nowrap" }}>
                 {roleLabel}

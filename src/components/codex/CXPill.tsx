@@ -135,7 +135,7 @@ export default function CXPill({
         ref={ref as React.Ref<HTMLButtonElement>}
         className={cls}
         style={pillStyle}
-        onClick={() => { soundClick(); onClick(); }}
+        onClick={(e) => { e.stopPropagation(); soundClick(); onClick(); }}
         onMouseEnter={soundHover}
       >
         {content}

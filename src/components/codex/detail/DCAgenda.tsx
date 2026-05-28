@@ -367,7 +367,7 @@ export default function DCAgenda({ scrollToId, onScrolled, openModal }: Props) {
                 : [];
               const plain = hasPills ? e.skills!.filter((s) => matchSkill(s) === null) : [];
               return (
-                <div onClick={(ev) => ev.stopPropagation()} style={{ marginTop: 8, display: "flex", alignItems: "center", flexWrap: "wrap", gap: 6 }}>
+                <div style={{ marginTop: 8, display: "flex", alignItems: "center", flexWrap: "wrap", gap: 6 }}>
                   {roleLabel && (
                     <span style={{ fontSize: 11, color: "var(--section-deep)", fontWeight: 700, letterSpacing: "0.02em", whiteSpace: "nowrap" }}>
                       {roleLabel}
