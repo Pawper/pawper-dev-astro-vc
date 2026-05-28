@@ -13,7 +13,7 @@
  *
  * Env vars:
  *   AIRTABLE_API_KEY  – personal access token from airtable.com → Account → Developer hub
- *   AIRTABLE_BASE_ID  – base ID from the Airtable URL (app5WObcR6LNZ9bQv)
+ *   AIRTABLE_BASE_ID  – base ID from the Airtable URL (starts with "app…")
  */
 
 const path = require("path");

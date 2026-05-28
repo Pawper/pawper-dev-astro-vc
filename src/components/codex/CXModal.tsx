@@ -329,7 +329,7 @@ function expJoinDateLabel(exp: Experience): string {
  *   prefill_Experience → experience id (hidden)
  */
 function endorseUrl(exp: Experience): string {
-  const base = "https://airtable.com/app5WObcR6LNZ9bQv/pagfzcuqMVAgL0FKk/form";
+  const base = import.meta.env.PUBLIC_ENDORSE_FORM_URL ?? "";
   const parts: string[] = [];
   if (exp.category) parts.push(`prefill_Service=${encodeURIComponent(exp.category)}`);
   if (exp.skills?.length) parts.push(`prefill_Skills%20List=${encodeURIComponent(exp.skills.join(", "))}`);
@@ -553,7 +553,7 @@ function ContentModalLayout({ body, sidebar }: { body: React.ReactNode; sidebar:
     let scrollCleanup: (() => void) | null = null;
 
     function findScroller(): Element | null {
-      let node: Element | null = el.parentElement;
+      let node: Element | null = el!.parentElement;
       while (node && !node.hasAttribute("data-overlayscrollbars-viewport")) {
         node = node.parentElement;
       }
@@ -562,7 +562,7 @@ function ContentModalLayout({ body, sidebar }: { body: React.ReactNode; sidebar:
 
     function updateBase() {
       const containerH = scrollerEl ? scrollerEl.clientHeight : window.innerHeight;
-      const newBase = -Math.max(0, el.scrollHeight - containerH + 14);
+      const newBase = -Math.max(0, el!.scrollHeight - containerH + 14);
       baseTopRef.current = newBase;
       currentTopRef.current = Math.max(newBase, Math.min(0, currentTopRef.current));
       applyTop(currentTopRef.current);

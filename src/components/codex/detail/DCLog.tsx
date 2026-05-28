@@ -74,7 +74,7 @@ interface DCLogProps {
   onOpenProject?: (id: string) => void;
   onOpenSeries?: (slug: string) => void;
   onOpenService?: (service: string) => void;
-  onOpenMedia?: (src: string, alt: string) => void;
+  onOpenMedia?: (src: string, alt: string, siblings?: Array<{ kind: "media"; id: string; label?: string }>) => void;
 }
 
 export function extractHeadings(html: string): Array<{ text: string; anchorId: string }> {
