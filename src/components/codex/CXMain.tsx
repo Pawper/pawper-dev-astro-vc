@@ -56,6 +56,7 @@ export function StatusBar() {
 export default function CXMain({ view, selectEntry, selectCategory, setView, setHeaderExpanded, openModal, agendaScrollTarget, onAgendaScrolled, navigateToAgenda, theme }: CXMainProps) {
   const cat = CX_INDEX.find((c) => c.id === view.cat);
   const [contactSent, setContactSent] = useState(false);
+  const [contactHasMessage, setContactHasMessage] = useState(false);
   const overviewCat = view.cat !== "contact" ? view.cat : undefined;
   const goToOverview = overviewCat ? () => selectEntry(overviewCat, "overview") : undefined;
 
@@ -186,11 +187,11 @@ export default function CXMain({ view, selectEntry, selectCategory, setView, set
             : view.cat === "contact"
             ? (
               <div className="cx-btn-row" style={{ display: "flex", gap: 8, alignItems: "flex-end" }}>
-                <CXContactFooter sent={contactSent} />
+                <CXContactFooter sent={contactSent} hasMessage={contactHasMessage} />
                 <SharePopover
                   shareUrl="https://pawper.dev/contact"
                   title="Contact · pawper.dev"
-                  num="02" primaryHex={primaryHex} secondaryHex={secondaryHex} isDark={isDark} hasPrimary={true}
+                  num={contactHasMessage || contactSent ? "02" : "01"} primaryHex={primaryHex} secondaryHex={secondaryHex} isDark={isDark} hasPrimary={contactHasMessage || contactSent}
                 />
               </div>
             )
@@ -225,7 +226,7 @@ export default function CXMain({ view, selectEntry, selectCategory, setView, set
         {view.cat === "services"  && view.entry === "coaching"    && <DCServiceEntry id="coaching"    selectEntry={selectEntry} openModal={openModal} />}
         {view.cat === "services"  && view.entry === "speaking"    && <DCServiceEntry id="speaking"    selectEntry={selectEntry} openModal={openModal} />}
         {view.cat === "services"  && view.entry === "mentoring"   && <DCServiceEntry id="mentoring"   selectEntry={selectEntry} openModal={openModal} />}
-        {view.cat === "contact"                                && <CXContactCombo onSent={() => setContactSent(true)} onService={(entryId) => selectEntry("services", entryId)} />}
+        {view.cat === "contact"                                && <CXContactCombo onSent={() => setContactSent(true)} onService={(entryId) => selectEntry("services", entryId)} onMessageChange={setContactHasMessage} />}
         {view.cat === "calendar"                               && <DCAgenda scrollToId={agendaScrollTarget} onScrolled={onAgendaScrolled} openModal={openModal} />}
       </CXSectionFrame>
     );
