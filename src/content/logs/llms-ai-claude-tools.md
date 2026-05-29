@@ -3,7 +3,7 @@ title: "All About AI & Using Claude"
 devto: "https://dev.to/pawper/all-about-ai-using-claude-385e"
 date: "2026.05.26"
 kicker: "Tutorial"
-tags: ["Claude", "Bash", "Terminal"]
+tags: ["Claude", "Bash", "Terminal", "ngrok", "OpenClaw"]
 image: "https://res.cloudinary.com/dr1sonbsi/image/upload/v1779833029/pawper.dev/logs/ChatGPT_Image_May_26_2026_03_03_32_PM_keam2k.png"
 hook: "Large language models are reshaping what's possible in software development. Learn what they are, how they work, the tools available to you, and how to use them effectively. This is where agency meets capability."
 series:
@@ -55,7 +55,7 @@ LLMs work with "tokens"—small pieces of text (usually a few characters). When 
 | 2023 | Claude 1 (Anthropic), GPT-4, Gemini, and others compete |
 | 2024–2026 | Frontier models become faster, cheaper, more capable |
 
-The arc: models got bigger (more parameters, more training data) and better at following instructions. AI went from research novelty to practical tool.
+The arc: models got bigger (more parameters, more training data) and better at following instructions.
 
 ## Frontier Models
 "Frontier models" just means the newest, most capable ones — the cutting edge.
@@ -238,38 +238,32 @@ Ask Claude Code to create a file:
 claude "Create a file called hello.txt with the text 'Hello, Claude!'"
 ```
 
-Claude will:
-1. Understand your request
-2. Suggest an approach
-3. Execute it
-4. Show you the result
-
-Congratulations—you've just used an AI agent from the command line. From here you can use Claude to build, explain, and troubleshoot.
+Claude will understand your request, suggest an approach, execute it, and show you the result. Congratulations—you've just used an AI agent from the command line. From here you can use Claude to build, explain, and troubleshoot.
 
 ---
 
 ## Bringing Claude Code into VS Code
 
-The terminal is powerful, but if you spend most of your day in a code editor, there's a more comfortable path: the **Claude Code VS Code extension**. It's the same Claude Code agent — same capabilities, same subscription — just surfaced inside your editor so you never have to leave it.
+The terminal is powerful, but if you spend most of your day in a code editor, there's a more comfortable path: the **Claude Code VS Code extension**. It's the same Claude Code but surfaced inside your editor with some extra affordances.
 
 ### Install
 
 1. Open VS Code and press `Ctrl+Shift+X` (Windows/Linux) or `Cmd+Shift+X` (Mac) to open the Extensions panel.
 2. Search **Claude Code** and look for the one published by **Anthropic**.
 3. Click **Install**.
-4. Once installed, a Claude icon appears in the Activity Bar on the left.
+4. Once installed, a Claude icon appears in top right of the editor.
 
-> On first launch you'll be prompted to sign in. Use the same Claude.ai account (or API key) you set up for the CLI — no separate subscription needed.
+> On first launch you'll be prompted to sign in.
 
 ### What You're Working With
 
-Click the Claude icon in the top right to open the chat panel. You'll see the same conversational interface as the CLI, but now it lives alongside your editor. A few things are immediately different:
+Click the Claude icon in the top right to open the chat panel. A few things are immediately different:
 
 - **File and symbol references** — Type `@` to reference any file or function in your workspace directly in the chat. Claude reads it without you having to paste code.
 - **Inline diffs** — When Claude suggests a code change, it shows a diff view right in the editor. You can accept, reject, or edit the suggestion before it touches your files.
 - **Slash commands** — Type `/` in the chat to see available commands: `/clear` to reset context, `/review` to kick off a code review, `/help` for a full list.
-
-> **Tip:** If you installed Claude Code via `npm install -g` already, the extension picks up your existing authentication automatically — you won't be asked to sign in again.
+- **Easily monitor compression & usage**
+- **Drop in files with your mouse**
 
 ---
 
@@ -279,14 +273,9 @@ Claude Code is for developers at their desk. *Cowork extends that to everything 
 
 ### What Cowork Is
 
-Cowork is Claude's agentic mode inside Claude Desktop (the Mac/Windows app). You describe a task in plain English, and Cowork works through it step by step, reading and writing files on your actual computer.
+Cowork is Claude's agentic mode inside Claude Desktop (the Mac/Windows app). You describe a task in plain English, and Cowork works through it step by step, reading and writing files on your actual computer. Cowork can open Claude Code directly and run full coding tasks on your behalf, including installing packages, editing files, and running terminal commands.
 
-**What it can do:**
-- Reorganize and rename files across folders
-- Chain together multi-step tasks ("take these CSVs, merge them, summarize by category, write the results to a new file")
-- Spin up Claude Code sub-agent sessions — Cowork can open Claude Code directly and run full coding tasks on your behalf, including installing packages, editing files, and running terminal commands
-
-That last point is worth pausing on. Cowork isn't just a layer above file management — it's an abstraction over Claude Code itself. When a task involves writing or running code, Cowork delegates to a Claude Code sub-agent to handle it. You give the high-level instruction; it figures out what to invoke underneath.
+Cowork isn't just a layer above file management — it's an abstraction over Claude Code itself. When a task involves writing or running code, Cowork delegates to a Claude Code sub-agent to handle it. You give the high-level instruction; it figures out what to invoke underneath.
 
 **What it can't do:** browse the web or interact with other apps unless you've connected tools via MCP (more on that in a later article).
 
@@ -322,21 +311,19 @@ Claude handles it. You get a notification when it's done.
 
 ### Testing Web Projects Remotely with Tunnels
 
-Here's where it gets genuinely powerful for developers: when Cowork spins up a Claude Code session and runs your dev server, your local project is running on `localhost` — which your phone can't see. **Tunnels** solve this.
+Here's where it gets genuinely powerful for developers: when Cowork spins up a Claude Code session and runs your dev server, your local project is running on `localhost` — which your phone can't see. Tunnels solve this. A tunnel creates a temporary public URL that forwards traffic to your local machine. Two common options:
 
-A tunnel creates a temporary public URL that forwards traffic to your local machine. Two common options:
+1. **Cloudflare Tunnel (cloudflared)**
+  Cloudflare gives you a public `https://xxxxx.trycloudflare.com` URL instantly. No account required for temporary tunnels. You'd tell Claude:
+  ```wrap
+  Start the dev server, then run cloudflared to create an ad-hoc tunnel. If this is a Vite-based project, add the tunnel URL to the allowedHosts array in your Vite config and restart the dev server. Give me the final URL.
+  ```
 
-**Cloudflare Tunnel (cloudflared)**
-Cloudflare gives you a public `https://xxxxx.trycloudflare.com` URL instantly. No account required for temporary tunnels.
-
-**ngrok**
-ngrok gives you a `https://xxxx.ngrok-free.app` URL. Free tier requires signing up; paid tiers give you stable subdomains.
-
-**The workflow:**
-1. Dispatch a task — "Start the dev server for my portfolio project."
-2. Cowork spins up Claude Code, navigates to your project, and runs `npm run dev`.
-3. You (or Cowork) open a tunnel to expose the local port.
-4. You get a public URL — open it on your phone to review your running project, share it with someone for feedback, or let Claude test it against a real URL.
+2. **ngrok**
+  ngrok gives you a `https://xxxx.ngrok-free.app` URL. Free tier requires signing up; paid tiers give you stable subdomains. You'd tell Claude:
+  ```wrap
+  Start the dev server, then run ngrok pointed at the same port. If this is a Vite-based project, add the tunnel URL to the allowedHosts array in your Vite config and restart the dev server. Give me the final URL.
+  ```
 
 This is useful when you want to check in on a project mid-day from your phone, share a work-in-progress with a collaborator without deploying, or let an external service (a webhook, an OAuth callback, an API test) hit your local server.
 
@@ -350,24 +337,18 @@ The combination of Cowork + Dispatch + tunnels means your computer can be an act
 
 ## Using Claude with Agents like OpenClaw
 
-Everything so far has been Claude responding to you — you prompt, it answers, you prompt again. Agents like OpenClaw are the next step: software that runs continuously, calls an LLM when it needs to think, and keeps working without you in the loop.
+Operator agents like OpenClaw are the next step beyond Claude Code and Cowork: they run continuously to provide deeper integration. It's not locked to Claude either; swap in GPT, Gemini, or an open model.
 
-The difference matters. With Claude Code or Cowork, you're still present for most steps. With an agent like OpenClaw, you configure it once — what it can do, which model to use, what tasks to run — and then it operates on its own, responding to events, chaining together long workflows, and calling Claude only when reasoning is actually needed. OpenClaw works with any API-compatible model — Claude, GPT, Gemini, local models, whatever suits the task. The model is just a tool the agent reaches for.
-
-This is also where the idea of a controlled environment becomes important. Running an autonomous agent on your main computer means every permission it has is one it could misuse — accidentally or not. A better approach is to run the agent inside Docker: an isolated container with only the access you explicitly give it, completely separate from your main system. No permissions to micromanage across your real environment. If something goes wrong, you reset the container. Nothing bleeds out.
-
-The next article in this series walks through exactly that setup — connecting Claude with OpenClaw in a Docker container. For now, here's what you need to know about authenticating Claude for third-party agents like OpenClaw:
+The right way to run an autonomous operator agent is inside **Docker**: an isolated container with only the access you explicitly give it, separate from your main system. No permissions to micromanage, and if something goes wrong you just reset the container. The next article walks through that setup.
 
 > Starting June 15, 2026 Claude subscribers will get a separate monthly "Agent SDK credit" for third-party tools like OpenClaw. The official page is here: https://support.claude.com/en/articles/15036540-use-the-claude-agent-sdk-with-your-claude-plan
-> 
-> For a beginner on a Pro plan who just wants to try OpenClaw with Claude right now:
 > 
 > **If you're before June 15, 2026** — the Agent SDK credit hasn't kicked in yet. Your options today are to set up a pay-as-you-go API key at [console.anthropic.com](https://console.anthropic.com). You load a small amount of credit (even $5 is enough to experiment), generate an API key, and plug that into OpenClaw's settings. You only pay for what you use — no commitment, no second subscription.
 > 
 > **Once June 15 hits** — you can opt in to the $20/month Agent SDK credit from your Claude account, and OpenClaw will be able to authenticate through your subscription again. That $20 covers light use. If you burn through it mid-month, OpenClaw stops working until your next billing cycle (unless you enable overage billing, which charges API rates).
 
 **Practical advice for beginners:**
-If you're brand new and just want to see what you can do with Claude, the first step is to try Claude Code — it's already included with your Pro plan, no extra setup. Then Dispatch gives you a feel for remotely-connected agentic Claude. Claude Code will be great for a lot of uses cases, such as building websites -- especially with Dispatch. The diffrence with OpenClaw is that it can be customized in powerful ways to serve you and and your goals.
+If you're brand new and just want to see what you can do with Claude, the first step is to try Claude Code. Then Dispatch gives you a feel for remotely-connected agentic Claude. Claude Code will be great for a lot of uses cases, such as building websites -- especially with Dispatch. The difference with OpenClaw is that it can be customized in powerful ways to serve you and and your goals in ways beyond just building.
 
 ---
 
