@@ -23,28 +23,11 @@ This isn't about becoming an AI expert. It's about understanding the landscape, 
 
 ## What is Machine Learning?
 
-Machine Learning (ML) is the field where computers learn patterns from data instead of being explicitly programmed.
-
-Traditional programming: You write rules. The computer follows them.
-```
-if temperature > 80:
-    turn on AC
-```
-
-Machine Learning: You show the computer examples. It learns the pattern.
-**Input:** temperature readings + AC on/off history
-**Output:** Model learns to predict when AC should be on
-
-The computer doesn't have explicit rules; it's learned patterns from data. This is powerful because patterns are everywhere, and humans can't always articulate them. Machine Learning finds them automatically.
+Machine Learning is the field where computers learn patterns from data instead of being explicitly programmed. Traditional programming means you write the rules; ML means you show the computer examples and it figures out the rules itself. Feed it enough temperature readings paired with AC on/off history and it learns when to predict the AC should run — no explicit `if temperature > 80` required. This matters because many useful patterns are too complex or too numerous for humans to write out by hand.
 
 ## What are Large Language Models?
-A **Large Language Model (LLM)** is a type of AI trained on vast amounts of text data to predict and generate language.
 
-Here's the core idea: LLMs learned by reading billions of examples of human language. They've internalized patterns about how language works—not consciously, but as mathematical patterns. When you ask them a question, they predict what text should come next, word by word, based on those patterns.
-
-**Key insight:** LLMs don't "understand" in the way humans do. They're incredibly good at pattern recognition and prediction. But that pattern recognition is so sophisticated that it produces surprisingly intelligent output.
-
-Think of it like this: If you've read thousands of novels, you can predict what comes next in a story. You've internalized patterns. LLMs have done this with vastly more data and mathematical precision.
+A **Large Language Model (LLM)** is an AI trained on billions of words of text to predict and generate language. When you ask it a question, it doesn't look up an answer — it predicts, word by word, what text should come next based on patterns learned from everything it read. LLMs don't "understand" the way humans do, but the pattern recognition is sophisticated enough that the output often looks like they do.
 
 ## How Do LLMs Actually Work?
 You don't need to understand the mathematics. But here's the conceptual flow:
@@ -91,32 +74,22 @@ The arc: models got bigger (more parameters, more training data) and better at f
 > This field moves *fast* — new models launch almost every week, and today's leader can be overtaken in a month. Don't stress about always having the "best" one. Pick something that works for you, and know that they're all improving constantly.
 
 ## Open vs. closed
-"Closed" models (like GPT-5.5) live on the company's servers — you rent access. "Open-weight" models can be downloaded and run on your own computer or servers, which appeals to businesses and tinkerers.
+"Closed" models (like GPT-5.5) live on the company's servers — you rent access. "Open-weight" models can be downloaded and run on your own computer or servers.
 
 ## Business Models & Pricing
-These companies mostly earn money two ways: **monthly subscriptions** for everyday people, and **pay-as-you-go API access** for businesses building their own apps. As a beginner, you only care about the first one.
-
-The good news: nearly everyone has settled on the same simple ladder.
+The frontier companies mostly earn money two ways: **monthly subscriptions** for everyday people, and **pay-as-you-go API access** for businesses building their own apps.
 
 | Tier | Price | What you get |
 |---|---|---|
 | **Free** | $0 | Real access to a capable model, with daily/weekly limits. Fine for trying things out. |
-| **Standard (Plus/Pro)** | ~$20/month | The sweet spot. ChatGPT Plus, Claude Pro, and Google AI Pro all land at roughly $20 and unlock the flagship models plus higher limits. |
-| **Premium / Max** | $100–$250/month | For heavy daily users and professionals — much higher usage and extra perks like video generation. Most people don't need this. |
-
-A few helpful notes:
-- **The big three all cost about the same** at the $20 tier, so price isn't really the deciding factor — pick based on which one you like using.
-- **Free tiers are genuinely good now.** Start there before paying for anything.
-- **Subscriptions stack up fast.** Paying for ChatGPT *and* Claude *and* Gemini runs ~$60/month. Most beginners are happiest picking just one.
-- **"API pricing"** (those "$15 per million tokens" numbers) is for developers building software.
-
-> **Tip:** Try the free tiers of two or three for a week, then pay for the single one that earned its place. If you find yourself needing extra usage, consider upgrading your plan.
+| **Standard (Plus/Pro)** | ~$20/month | ChatGPT Plus, Claude Pro, and Google AI Pro all land at roughly $20 and unlock the flagship models plus higher limits. |
+| **Premium / Max** | $100–$250/month | For heavy daily users and professionals — much higher usage and extra perks like video generation. |
 
 ## Cheaper/Free Alternatives
 
-The $20/month flagship plans aren't your only option. If cost matters, here are three ways to spend less — roughly from easiest to most technical.
-1. **Smaller models from the same companies.** Every big provider makes "mini" versions of their flagship — faster, cheaper, and still very capable for everyday tasks. Think Claude Haiku, GPT mini-tier, and Gemini Flash. They handle routine writing, summarizing, and Q&A at a tiny fraction of the flagship cost, and you'll often find them in the free tiers of the chat apps. For most casual use, these are plenty.
-2. **Third-party "model hosting" providers.** Companies like Nebius, Together.ai, Groq, DeepInfra, and OpenRouter don't build their own models — they run open-source ones (Llama, Qwen, DeepSeek, and others) for you, usually much cheaper per use than the big labs. Note: these are mainly aimed at developers building apps, not casual chatbot users.
+The $20/month flagship plans aren't your only option.
+1. **Smaller models from the same companies.** Every big provider makes "mini" versions of their flagship — faster, cheaper, and still very capable for everyday tasks. Think Claude Haiku, GPT mini-tier, and Gemini Flash. They handle routine tasks at a tiny fraction of the flagship cost. For most casual use, these are plenty.
+2. **Third-party "model hosting" providers.** These companies don't build their own models — they run open-source ones (Llama, Qwen, DeepSeek, and others) for you, usually much cheaper per use than the big labs.
   
   | Provider | Specialty | Best for |
   |---|---|---|
@@ -128,11 +101,20 @@ The $20/month flagship plans aren't your only option. If cost matters, here are 
   
 3. **Local models — run AI on your own computer.** Free tools like Ollama and LM Studio let you download an open model (Llama, Gemma, Qwen, and similar) and run it entirely on your own machine. The upsides: it's free after setup, works offline, and nothing you type leaves your computer — great for privacy. The catches: you need a reasonably powerful computer, and these smaller local models aren't as sharp as the cloud-based frontier ones.
 
-> **Rule of thumb:** Use a cheap "mini" model for everyday stuff, and only reach for an expensive flagship when a task is genuinely hard (tricky coding, deep reasoning, long documents). This "use the cheap one by default" approach is exactly how cost-conscious businesses keep their bills down.
+> **Rule of thumb:** Use a cheap "mini" model for everyday stuff, and only reach for an expensive flagship when a task is genuinely hard (tricky coding, deep reasoning, long documents).
 
-## What Are AI Agents?
+## Coding Agents
 
-An **AI Agent** is an AI system that can autonomously perform tasks by:
+| Coding Agent | Creator | Description |
+|-------|---------|-------------|
+| **Claude Code** | Anthropic | A developer favorite for real software work. |
+| **Codex CLI** | OpenAI | OpenAI's command-line coding agent. |
+| **GitHub Copilot** | GitHub/OpenAI | AI pair programmer integrated into VS Code. |
+| **Cursor** | Anysphere | An AI-powered code editor (built on VS Code). |
+
+## What Are Operator Agents?
+
+An **Operator Agent** is an AI system that can autonomously perform tasks by:
 1. Understanding a goal
 2. Breaking it into steps
 3. Taking actions (reading files, running code, making API calls)
@@ -141,88 +123,18 @@ An **AI Agent** is an AI system that can autonomously perform tasks by:
 
 | Agent | Creator | Description |
 |-------|---------|-------------|
-| **OpenClaw** | Open-source | "Operator" agent for personal productivity and automation. Grew from a weekend prototype to GitHub's most-starred repository, with a big marketplace of community-made skills. |
+| **OpenClaw** | Open-source | Operator agent for personal productivity and automation. Grew from a weekend prototype to GitHub's most-starred repository, with a big marketplace of community-made skills. |
 | **Hermes Agent** | Nous Research | Learns your workflows over time. Markets itself as "the agent that grows with you" and recently surpassed OpenClaw as the most-used open-source agent by daily usage. |
-| **Claude Code** | Anthropic | Coding agent; a developer favorite for real software work. |
-| **Codex CLI** | OpenAI | OpenAI's command-line coding agent, in the same category as Claude Code. |
-| **GitHub Copilot** | GitHub/OpenAI | AI pair programmer integrated into VS Code and other editors for coding assistance. |
-| **Cursor** | Anysphere | An AI-powered code editor (built on VS Code) with AI woven into every keystroke. |
-
-*Snapshot as of May 2026.*
-
-> This field moves *fast* — new agents launch almost every week, and today's leader can be overtaken in a month. Don't stress about always having the "best" one. Pick something that works for you, and know that they're all improving constantly.
 
 ---
 
 ## Basic Prompt Engineering
 
-You don't need to be an expert, but understanding a few patterns helps you get better results from models.
-
-### Pattern 1: Be Clear About Your Goal
-
-**Bad:**
-```
-Write something about Python
-```
-
-**Good:**
-```
-Write a beginner-friendly explanation of what Python lists are, with 2 code examples.
-```
-
-Specificity matters. The model can't read your mind.
-
-### Pattern 2: Provide Context
-
-**Bad:**
-```
-Fix this code
-```
-
-**Good:**
-```
-I'm trying to read a CSV file and count rows. Here's my code:
-[code]
-It's giving an error: [error message]
-What's wrong?
-```
-
-Context helps the model understand your actual problem.
-
-### Pattern 3: Ask for Structure
-
-**Bad:**
-```
-Tell me about Docker
-```
-
-**Good:**
-```
-Explain Docker in these sections:
-1. What problem does it solve?
-2. How does it work conceptually?
-3. What are the main concepts (images, containers, registries)?
-4. Why is it useful for development?
-```
-
-Structure forces clarity on both sides.
-
-### Pattern 4: Use Examples
-
-**Bad:**
-```
-Make this function better
-```
-
-**Good:**
-```
-I want this function to be more readable. Here's an example of the style I like:
-[example of clean code in your preferred style]
-Now improve this function using that style:
-[your function]
-```
-
-Examples communicate your preferences better than words.
+You don't need to be an expert. Four patterns cover most situations:
+- **Be specific** — "Write a beginner-friendly explanation of Python lists with 2 code examples" beats "write something about Python." The model can't read your mind.
+- **Provide context** — "I'm trying to read a CSV and count rows. Here's my code and the error I'm getting" gives the model something real to work with.
+- **Ask for structure** — Tell it the sections or format you want. Structure forces clarity on both sides.
+- **Use examples** — Paste in a sample of the style or output you're after. Examples communicate preferences better than descriptions of them.
 
 ## Risks and Guardrails
 
@@ -238,7 +150,7 @@ A model's training data has a cutoff date. It doesn't know current events or rec
 
 ### Biases
 
-LLMs learn from human-generated text, which contains biases. Models are generally trained to be helpful and harmless, but biases can still appear. **Be aware of this, especially for sensitive decisions.**
+LLMs learn from human-generated text, which contains biases. Models are generally trained to be helpful and harmless, but biases can still appear. Be aware of this, especially for sensitive decisions.
 
 ### Security & Privacy
 
@@ -254,21 +166,21 @@ An LLM is a tool, not a replacement for human judgment. For important decisions,
 
 ## The Claude Ecosystem
 
-**Claude** (the model) is made by **Anthropic**, a company focused on building safe, reliable AI. When you use Claude, you're accessing their LLMs through various interfaces. I choose to start folks off with Claude because it's great for development -- and agency is about building your own tools.
+Claude (the model) is made by Anthropic, a company focused on building safe, reliable AI. When you use Claude, you're accessing their LLMs through various interfaces. I choose to start folks off with Claude because it's great for development -- and agency is about building your own tools.
 
 ### Claude's Interfaces
 
 Claude is available through different tools, and you'll choose based on your use case:
 
-| Tool | What It Is | Best For | Cost |
+| Tool | What It Is | Best For | Plan |
 |---|---|---|---|
-| **Claude.ai** (Web) | Chat interface in the browser — the classic way to use Claude | Writing, research, analysis, brainstorming, everyday Q&A | Free (with limits) / $20/mo Pro / $100–$200/mo Max |
-| **Claude Desktop** (Mac/Windows) | Standalone app — same chat as web, plus houses Cowork mode | Same as web chat, but stays in your dock. Required for Cowork. Supports Dispatch (control from phone). | Same subscription — Free, Pro, or Max |
-| **Claude Cowork** | Agentic mode inside Desktop — reads, writes, and organizes files on your computer | Non-technical "get stuff done" work: organizing folders, building spreadsheets/decks/reports, multi-step file tasks. No terminal needed. | Included with Pro ($20/mo), but heavy use burns tokens ~50–100× faster than chat — Max ($100/mo+) realistic for daily use |
-| **Claude Code** (Terminal CLI) | Command-line coding agent in your terminal | Software engineering: writing, refactoring, debugging across multi-file codebases | Pro ($20/mo) minimum. Max ($100–$200/mo) for heavy use. Or pay-per-token via API. |
-| **Claude Code VS Code / JetBrains Extension** | Native IDE extension — Claude Code inside your editor | Same coding tasks as CLI, but in a visual editor instead of raw terminal | Bundled with your Claude subscription or API key |
-| **Claude Design** | AI-powered visual canvas inside claude.ai — describe what you want, get interactive prototypes | Prototypes, pitch decks, slides, one-pagers, UI mockups. Codebase-aware design systems. Hands off directly to Claude Code. | No separate cost — shares existing Pro/Max/Team/Enterprise usage (research preview) |
-| **Claude in Chrome** (Beta) | Browser extension — Claude can see, click, navigate, and fill forms in Chrome | Automating repetitive browser tasks: data extraction, form filling, multi-site research. Pairs with Cowork. | Included with paid plans. Pro gets Haiku only; Max/Team/Enterprise can pick Sonnet or Opus. |
+| **Claude.ai** (Web) | Chat interface in the browser — the classic way to use Claude | Writing, research, analysis, brainstorming, everyday Q&A | Free (with limits) |
+| **Claude Desktop** (Mac/Windows) | Standalone app — same chat as web, plus houses Cowork mode | Same as web chat, but on your computer. Required for Cowork. | Free (with limits) |
+| **Claude Cowork** | Agentic mode inside Desktop — reads, writes, and organizes files on your computer | Mixed work, not necessarily coding, but it can start coding sessions. Supports Dispatch (control from phone). | Pro (with limits), Max recommended for daily use |
+| **Claude Code** (Terminal CLI) | Command-line coding agent in your terminal | Software engineering: writing, refactoring, debugging across multi-file codebases | Pro (with limits), Max recommended for daily use |
+| **Claude Code VS Code** | Native IDE extension — Claude Code inside your editor | Same coding tasks as CLI, but in a visual editor instead of raw terminal | Pro (with limits), Max recommended for daily use |
+| **Claude Design** | AI-powered visual canvas inside claude.ai — describe what you want, get interactive prototypes | Prototypes, pitch decks, slides, one-pagers, UI mockups. Codebase-aware design systems. Hands off directly to Claude Code. | Pro (with limits) |
+| **Claude in Chrome** (Beta) | Browser extension — Claude can see, click, navigate, and fill forms in Chrome | Automating repetitive browser tasks: data extraction, form filling, multi-site research. Pairs with Cowork. | Pro (Haiku only); Max (all models) |
 | **Anthropic API** | Pay-per-token developer API — build Claude into your own apps | Developers embedding Claude in products, automating pipelines, running batch jobs. Full control, no UI. | Haiku ~$0.80/$4 per 1M tokens, Sonnet $3/$15, Opus $15/$75. No monthly minimum. |
 
 ---
@@ -276,18 +188,6 @@ Claude is available through different tools, and you'll choose based on your use
 ## Understanding Claude Code (CLI)
 
 **Claude Code** is a command-line interface that lets you use Claude directly from your terminal. It's designed for developers—Claude can read your code, suggest improvements, and even write and run code for you.
-
-Why is this relevant?
-- You'll use Claude Code in your workflow
-- It's a practical example of how Claude integrates into development
-- It shows how agents work (Claude understands your goal, suggests code, runs it)
-- It bridges the gap between "Claude the AI" and "Claude the development tool"
-
-### Why Claude Code Matters for What's Next
-
-When you learn **Docker** (next), you'll use it to containerize applications. When you learn **OpenClaw**, you'll use it to build autonomous agents. Both of these will interact with LLMs—potentially Claude.
-
-Claude Code is your first hands-on experience with that integration: an AI that can read code, understand your intent, and take action.
 
 ---
 
@@ -375,18 +275,16 @@ Click the Claude icon in the top right to open the chat panel. You'll see the sa
 
 ## Cowork + Dispatch: Claude Working on Your Machine Remotely
 
-Claude Code is for developers at their desk. **Cowork** extends that to everything else on your computer — and **Dispatch** lets you trigger any of it from your phone.
+Claude Code is for developers at their desk. *Cowork extends that to everything else on your computer — and Dispatch lets you trigger any of it from your phone.
 
 ### What Cowork Is
 
-Cowork is Claude's agentic mode inside **Claude Desktop** (the Mac/Windows app). You describe a task in plain English, and Cowork works through it step by step, reading and writing files on your actual computer.
+Cowork is Claude's agentic mode inside Claude Desktop (the Mac/Windows app). You describe a task in plain English, and Cowork works through it step by step, reading and writing files on your actual computer.
 
 **What it can do:**
 - Reorganize and rename files across folders
-- Draft, format, or summarize documents
-- Build spreadsheets from raw data
 - Chain together multi-step tasks ("take these CSVs, merge them, summarize by category, write the results to a new file")
-- Spin up **Claude Code sub-agent sessions** — Cowork can open Claude Code directly and run full coding tasks on your behalf, including installing packages, editing files, and running terminal commands
+- Spin up Claude Code sub-agent sessions — Cowork can open Claude Code directly and run full coding tasks on your behalf, including installing packages, editing files, and running terminal commands
 
 That last point is worth pausing on. Cowork isn't just a layer above file management — it's an abstraction over Claude Code itself. When a task involves writing or running code, Cowork delegates to a Claude Code sub-agent to handle it. You give the high-level instruction; it figures out what to invoke underneath.
 
@@ -394,35 +292,31 @@ That last point is worth pausing on. Cowork isn't just a layer above file manage
 
 ### Enabling Cowork
 
-1. Download and install **Claude Desktop** from [claude.ai/download](https://claude.ai/download) if you haven't already.
-2. Open Claude Desktop and look for the **Cowork** tab or agent mode toggle in the top bar.
+1. Download and install Claude Desktop from [claude.ai/download](https://claude.ai/download) if you haven't already.
+2. Open Claude Desktop and look for the Cowork tab or agent mode toggle in the top bar.
 3. Grant Claude access to the folders you want it to work in — it will prompt for file system permissions the first time.
 
-> Cowork is included with **Pro** ($20/mo), but long autonomous tasks — especially ones that spin up Claude Code sessions underneath — burn tokens 50–100× faster than chat. **Max** ($100/mo+) becomes realistic for daily use.
+> Cowork is included with Pro ($20/mo), but long autonomous tasks — especially ones that spin up Claude Code sessions underneath — burn tokens 50–100× faster than chat. Max ($100/mo+) becomes realistic for daily use.
 
 ### What Dispatch Is
 
-**Dispatch** is how you send tasks to Cowork when you're not at your computer.
+Dispatch is how you send tasks to Cowork when you're not at your computer.
 
-It works through the **Claude mobile app** (iOS and Android). Once your Desktop is running Cowork in the background, Dispatch lets you fire off instructions from your phone — and Claude works through them on your machine while you're away.
+It works through the Claude mobile app (iOS and Android). Once your Desktop is running Cowork in the background, Dispatch lets you fire off instructions from your phone — and Claude works through them on your machine while you're away.
 
 The practical use: you're out, you think of something, you send it. When you sit back down, it's done.
 
 ### Setting Up Dispatch
 
 1. Make sure Claude Desktop is installed and signed in.
-2. Install the **Claude app** on your phone from the App Store or Google Play.
+2. Install the Claude app on your phone from the App Store or Google Play.
 3. Sign in with the same account.
-4. In Claude Desktop settings, enable **Dispatch** (under the Cowork section).
+4. In Claude Desktop settings, enable Dispatch (under the Cowork section).
 5. Your Desktop appears as a connected device in the mobile app.
 
-Once connected, open the mobile app, select your desktop from the Dispatch panel, and send a task. For file work:
+Once connected, open the mobile app, select your desktop from the Dispatch panel, and send a task. 
 
-> *"Go into my Downloads folder, find all the PDFs from this month, and move them into Documents/Receipts."*
-
-Or for coding work, since Cowork can invoke Claude Code directly:
-
-> *"Build out the landing page hero section we talked about. Run the dev server when you're done."*
+> *"Build out the web page we talked about. Run the dev server when you're done."*
 
 Claude handles it. You get a notification when it's done.
 
@@ -433,15 +327,9 @@ Here's where it gets genuinely powerful for developers: when Cowork spins up a C
 A tunnel creates a temporary public URL that forwards traffic to your local machine. Two common options:
 
 **Cloudflare Tunnel (cloudflared)**
-```bash
-npx cloudflared tunnel --url http://localhost:3000
-```
 Cloudflare gives you a public `https://xxxxx.trycloudflare.com` URL instantly. No account required for temporary tunnels.
 
 **ngrok**
-```bash
-ngrok http 3000
-```
 ngrok gives you a `https://xxxx.ngrok-free.app` URL. Free tier requires signing up; paid tiers give you stable subdomains.
 
 **The workflow:**
@@ -466,9 +354,9 @@ Everything so far has been Claude responding to you — you prompt, it answers, 
 
 The difference matters. With Claude Code or Cowork, you're still present for most steps. With an agent like OpenClaw, you configure it once — what it can do, which model to use, what tasks to run — and then it operates on its own, responding to events, chaining together long workflows, and calling Claude only when reasoning is actually needed. OpenClaw works with any API-compatible model — Claude, GPT, Gemini, local models, whatever suits the task. The model is just a tool the agent reaches for.
 
-This is also where the idea of a controlled environment becomes important. Running an autonomous agent on your main computer means every permission it has is one it could misuse — accidentally or not. A better approach is to run the agent inside **Docker**: an isolated container with only the access you explicitly give it, completely separate from your main system. No permissions to micromanage across your real environment. If something goes wrong, you reset the container. Nothing bleeds out.
+This is also where the idea of a controlled environment becomes important. Running an autonomous agent on your main computer means every permission it has is one it could misuse — accidentally or not. A better approach is to run the agent inside Docker: an isolated container with only the access you explicitly give it, completely separate from your main system. No permissions to micromanage across your real environment. If something goes wrong, you reset the container. Nothing bleeds out.
 
-The next article in this series walks through exactly that setup — connecting Claude with OpenClaw in a Docker container. For now, here's what you need to know about authenticating Claude for third-party agents:
+The next article in this series walks through exactly that setup — connecting Claude with OpenClaw in a Docker container. For now, here's what you need to know about authenticating Claude for third-party agents like OpenClaw:
 
 > Starting June 15, 2026 Claude subscribers will get a separate monthly "Agent SDK credit" for third-party tools like OpenClaw. The official page is here: https://support.claude.com/en/articles/15036540-use-the-claude-agent-sdk-with-your-claude-plan
 > 
