@@ -1,6 +1,5 @@
 import React from "react";
 import { PROFILE, SERVICES } from "../../../data/content";
-import Crest from "../../shared/Crest";
 import Readout from "../../shared/Readout";
 import CXBtn from "../CXBtn";
 import CXPill from "../CXPill";
@@ -44,7 +43,18 @@ export default function DCBio({ onService }: { onService: (entryId: string) => v
           padding: 18, borderRadius: 14,
           display: "flex", flexDirection: "column", gap: 12, alignItems: "flex-start",
         }}>
-          <Crest size={64} accent="var(--section-accent)" />
+          <img
+            src={PROFILE.photo}
+            alt={PROFILE.name}
+            style={{
+              width: "100%",
+              aspectRatio: "1 / 1",
+              objectFit: "cover",
+              objectPosition: "center 35%",
+              borderRadius: "40px 8px 40px 8px",
+              display: "block",
+            }}
+          />
           <div style={{ fontSize: 18, fontWeight: 600 }}>{PROFILE.name}</div>
           <div style={{ height: 1, background: "rgba(255,255,255,0.4)", width: "100%" }} />
           <Readout label="Based" value={PROFILE.location} accent="var(--section-deep)" />
