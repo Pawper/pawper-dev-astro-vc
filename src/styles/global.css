@@ -760,6 +760,13 @@ html, body {
 .pw-artboard[data-theme="dark"] .pw-article-body pre {
   background: rgba(0, 0, 0, 0.35);
 }
+.pw-article-body pre[data-language="wrap"] {
+  white-space: pre-wrap;
+  overflow-x: hidden;
+}
+.pw-article-body pre[data-language="wrap"] code {
+  white-space: pre-wrap;
+}
 .pw-article-body pre code {
   background: none;
   padding: 0;

@@ -1065,10 +1065,16 @@ export function enhanceProse(el: HTMLElement, opts: ProseOptions = {}): () => vo
   // Code blocks — copy button
   el.querySelectorAll<HTMLPreElement>("pre").forEach((pre) => {
     if (pre.querySelector(".pw-copy-btn")) return; // already enhanced
-    pre.style.position = "relative";
 
     const ICON_COPY = `<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="8" height="8" rx="1.5"/><path d="M2 10V2h8"/></svg>`;
     const ICON_CHECK = `<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="2.5 7.5 5.5 10.5 11.5 4"/></svg>`;
+
+    // Wrap pre in a positioned div so the button sits outside the scrolling
+    // container and doesn't move when the code block scrolls horizontally.
+    const wrapper = document.createElement("div");
+    wrapper.style.cssText = "position: relative;";
+    pre.parentNode?.insertBefore(wrapper, pre);
+    wrapper.appendChild(pre);
 
     const btn = document.createElement("button");
     btn.className = "pw-copy-btn";
@@ -1086,6 +1092,7 @@ export function enhanceProse(el: HTMLElement, opts: ProseOptions = {}): () => vo
 
     btn.addEventListener("mouseenter", () => {
       if (btn.dataset.copied) return;
+      soundHover();
       btn.style.background = "rgba(255,255,255,0.13)";
       btn.style.color = "rgba(255,255,255,0.7)";
     });
@@ -1097,6 +1104,7 @@ export function enhanceProse(el: HTMLElement, opts: ProseOptions = {}): () => vo
 
     btn.addEventListener("click", (e) => {
       e.stopPropagation();
+      soundClick();
       const code = pre.querySelector("code");
       if (!code) return;
       navigator.clipboard.writeText(code.textContent ?? "").then(() => {
@@ -1115,7 +1123,7 @@ export function enhanceProse(el: HTMLElement, opts: ProseOptions = {}): () => vo
       });
     });
 
-    pre.appendChild(btn);
+    wrapper.appendChild(btn);
   });
 
   // Hover sound — only when entering from outside the target

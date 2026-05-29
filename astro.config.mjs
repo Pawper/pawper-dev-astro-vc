@@ -10,6 +10,7 @@ export default defineConfig({
       langs: [
         { name: "bash-prompt",     scopeName: "source.bash-prompt",     patterns: [], repository: {} },
         { name: "bash-prompt-key", scopeName: "source.bash-prompt-key", patterns: [], repository: {} },
+        { name: "wrap",            scopeName: "source.wrap",            patterns: [], repository: {} },
       ],
     },
   },
