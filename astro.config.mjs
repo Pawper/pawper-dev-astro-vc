@@ -18,6 +18,7 @@ export default defineConfig({
       allowedHosts: [
         "potatoes-holidays-wrap-improving.trycloudflare.com",
         "carried-spatial-antiques-relevant.trycloudflare.com",
+        "efficient-presented-promotion-lock.trycloudflare.com",
       ],
     },
   },

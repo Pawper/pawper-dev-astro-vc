@@ -55,6 +55,11 @@ export default function CXLanding({ onCategory, onEntry }: CXLandingProps) {
               desc="Open an encrypted channel."
               onClick={() => onCategory("contact")}
             />
+            <CXQuickLink
+              code="006" title="Agenda" icon="▦" accent="#f55a28"
+              desc="Schedule, events & speaking."
+              onClick={() => onCategory("calendar")}
+            />
           </div>
         </div>
       </CXScrollable>
