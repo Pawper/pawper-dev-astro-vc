@@ -5,9 +5,10 @@ interface FormFieldProps {
   placeholder: string;
   name: string;
   multiline?: boolean;
+  defaultValue?: string;
 }
 
-export default function FormField({ label, placeholder, name, multiline }: FormFieldProps) {
+export default function FormField({ label, placeholder, name, multiline, defaultValue }: FormFieldProps) {
   const baseStyle: React.CSSProperties = {
     fontFamily: "var(--font-sans)",
     fontSize: 14,
@@ -24,9 +25,9 @@ export default function FormField({ label, placeholder, name, multiline }: FormF
     <label style={{ display: "flex", flexDirection: "column", gap: 6 }}>
       <span className="pw-eyebrow">{label}</span>
       {multiline ? (
-        <textarea name={name} placeholder={placeholder} rows={4} style={{ ...baseStyle, resize: "none" }} />
+        <textarea name={name} placeholder={placeholder} rows={4} defaultValue={defaultValue} style={{ ...baseStyle, resize: "none" }} />
       ) : (
-        <input name={name} placeholder={placeholder} style={baseStyle} />
+        <input name={name} placeholder={placeholder} defaultValue={defaultValue} style={baseStyle} />
       )}
     </label>
   );

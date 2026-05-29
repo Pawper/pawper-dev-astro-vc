@@ -582,7 +582,14 @@ function AppInner({ logsHtml }: Pick<AppProps, "logsHtml">) {
       {modal && <CXModal modal={modal} previousModal={modalStack.length > 1 ? modalStack[modalStack.length - 2] : undefined} onClose={closeModal} onBack={modalStack.length > 1 ? backModal : undefined} onNavigate={navigateModal} onSiblingNav={replaceModal} onPatchModal={patchModal} logsHtml={logsHtml} theme={theme} onNavigateToCategory={(catId) => { closeModal(); selectEntry("projects", catId); }}
         onNavigateToLogCategory={(catId) => { closeModal(); selectEntry("logs", catId); }}
         onNavigateToService={(serviceId) => { closeModal(); selectEntry("services", serviceId); }}
-        onNavigateToAgenda={navigateToAgenda} />}
+        onNavigateToAgenda={navigateToAgenda}
+        onNavigateToContact={(subject) => {
+          const url = new URL(window.location.href);
+          url.searchParams.set("subject", subject);
+          window.history.replaceState({}, "", url.toString());
+          closeModal();
+          selectEntry("contact", "all");
+        }} />}
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { SERVICES } from "../../data/content";
 import FormField from "../shared/FormField";
 import Readout from "../shared/Readout";
@@ -48,6 +48,17 @@ export default function CXContactCombo({ onSent, onService }: CXContactComboProp
   const formRef = useRef<HTMLFormElement>(null);
   const [error, setError] = useState(false);
   const [sent, setSent] = useState(false);
+  const [prefill, setPrefill] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    const p = new URLSearchParams(window.location.search);
+    const vals: Record<string, string> = {};
+    for (const key of ["name", "email", "subject", "message"]) {
+      const v = p.get(key);
+      if (v) vals[key] = v;
+    }
+    if (Object.keys(vals).length) setPrefill(vals);
+  }, []);
   const theme = useTheme();
   const eyebrowColor = clampEyebrowColor(theme === "dark" ? "#a07e15" : "#6b5410", theme === "dark");
 
@@ -83,10 +94,10 @@ export default function CXContactCombo({ onSent, onService }: CXContactComboProp
           replied to within 72. I can take on one freelance client at a time,
           and currently have one slot open.
         </p>
-        <FormField name="name"    label="Identifier"    placeholder="Your name" />
-        <FormField name="email"   label="Return address" placeholder="you@somewhere.dev" />
-        <FormField name="subject" label="Subject"        placeholder="What's on your mind?" />
-        <FormField name="message" label="Transmission"   placeholder="A few sentences is plenty…" multiline />
+        <FormField name="name"    label="Identifier"    placeholder="Your name"              defaultValue={prefill.name} />
+        <FormField name="email"   label="Return address" placeholder="you@somewhere.dev"      defaultValue={prefill.email} />
+        <FormField name="subject" label="Subject"        placeholder="What's on your mind?"   defaultValue={prefill.subject} />
+        <FormField name="message" label="Transmission"   placeholder="A few sentences is plenty…" multiline defaultValue={prefill.message} />
         {sent && <span className="pw-mono" style={{ fontSize: 11, color: "#4caf82", letterSpacing: "0.1em" }}>MESSAGE TRANSMITTED · THANK YOU</span>}
         {error && <span className="pw-mono" style={{ fontSize: 11, color: "var(--color-error, #e05c5c)", letterSpacing: "0.1em" }}>TRANSMISSION FAILED · TRY AGAIN</span>}
         <span className="pw-mono" style={{ fontSize: 11, color: "var(--ink-mute)", letterSpacing: "0.16em", marginTop: 4 }}>

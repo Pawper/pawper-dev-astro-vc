@@ -366,11 +366,12 @@ function makeExpIcs(exp: Experience): string {
   return `data:text/calendar;charset=utf-8,${encodeURIComponent(lines.join("\r\n"))}`;
 }
 
-function ModalFooterButtons({ modal, proj, primaryHex, secondaryHex, isDark, onNavigateToService, onNavigate }: {
+function ModalFooterButtons({ modal, proj, primaryHex, secondaryHex, isDark, onNavigateToService, onNavigate, onNavigateToContact }: {
   modal: ModalState; proj?: ReturnType<typeof PROJECTS.find>;
   primaryHex: string; secondaryHex: string; isDark: boolean;
   onNavigateToService?: (serviceId: string) => void;
   onNavigate?: (m: ModalState) => void;
+  onNavigateToContact?: (subject: string) => void;
 }) {
   const now = useNow();
   const [, setTick] = useState(0);
@@ -402,6 +403,8 @@ function ModalFooterButtons({ modal, proj, primaryHex, secondaryHex, isDark, onN
           hasPrimary={false}
         />
         {log?.devto && <CXBtn num="02" label="Read on Dev.to" href={log.devto} bgHex={secondaryHex} isDark={isDark} />}
+        <CXBtn num={log?.devto ? "03" : "02"} label="Feedback" bgHex={secondaryHex} isDark={isDark} icon={null}
+          onClick={() => onNavigateToContact?.(`Feedback on "${log?.title}"`)} />
       </div>
     );
   }
@@ -535,6 +538,8 @@ function ModalFooterButtons({ modal, proj, primaryHex, secondaryHex, isDark, onN
             ? <CXBtn num="01" label="Open project" href={proj.webURL} primary bgHex={primaryHex} isDark={isDark} />
             : <CXBtn num="01" label="View source"  href={proj.githubURL} primary bgHex={primaryHex} isDark={isDark} />}
           {proj.webURL && <CXBtn num="02" label="View source" href={proj.githubURL} bgHex={secondaryHex} isDark={isDark} />}
+          <CXBtn num={proj.webURL ? "03" : "02"} label="Feedback" bgHex={secondaryHex} isDark={isDark} icon={null}
+            onClick={() => onNavigateToContact?.(`Feedback on "${proj.title}"`)} />
         </>
       )}
       {modal.kind === "series" && continueLog && (
@@ -659,9 +664,10 @@ interface CXModalProps {
   onNavigateToLogCategory?: (catId: string) => void;
   onNavigateToService?: (serviceId: string) => void;
   onNavigateToAgenda?: (eventId: string) => void;
+  onNavigateToContact?: (subject: string) => void;
 }
 
-export default function CXModal({ modal, previousModal, onClose, onBack, onNavigate, onSiblingNav, onPatchModal, logsHtml, theme, onNavigateToCategory, onNavigateToLogCategory, onNavigateToService, onNavigateToAgenda }: CXModalProps) {
+export default function CXModal({ modal, previousModal, onClose, onBack, onNavigate, onSiblingNav, onPatchModal, logsHtml, theme, onNavigateToCategory, onNavigateToLogCategory, onNavigateToService, onNavigateToAgenda, onNavigateToContact }: CXModalProps) {
   const now = useNow();
   function handleBackdropClick() { soundClick(); onBack ? onBack() : onClose(); }
 
@@ -857,7 +863,7 @@ export default function CXModal({ modal, previousModal, onClose, onBack, onNavig
         </div>
         {/* Spacer pushes content below both LCARS arcs (soft arc bottom = top:29 + border:10 = 39px) */}
         <div style={{ height: 40, flexShrink: 0 }} />
-        <ModalFooterButtons modal={modal} proj={_proj} primaryHex={primaryColor} secondaryHex={secondaryColor} isDark={theme === "dark"} onNavigateToService={onNavigateToService} onNavigate={onNavigate} />
+        <ModalFooterButtons modal={modal} proj={_proj} primaryHex={primaryColor} secondaryHex={secondaryColor} isDark={theme === "dark"} onNavigateToService={onNavigateToService} onNavigate={onNavigate} onNavigateToContact={onNavigateToContact} />
         <div style={{ flex: 1, minHeight: 0, position: "relative", display: "flex", flexDirection: "column" }}>
           {modal.kind === "media" && <DCMedia src={modal.id} alt={modal.label} />}
           {modal.kind === "search" && (

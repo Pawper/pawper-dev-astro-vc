@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import type { View, ModalState, Theme } from "../../types";
-import { CX_INDEX, PROJECT_CATEGORIES, LOG_CATEGORIES, DEFAULT_PROJECT_CAT } from "../../data/content";
+import { CX_INDEX, PROJECT_CATEGORIES, LOG_CATEGORIES, DEFAULT_PROJECT_CAT, SERVICES } from "../../data/content";
 import { SharePopover } from "./CXModal";
 import resumeAssets from "../../data/resume-assets.json";
 import CXBtn, { RssIcon } from "./CXBtn";
@@ -168,7 +168,13 @@ export default function CXMain({ view, selectEntry, selectCategory, setView, set
             : view.cat === "services"
             ? (
               <div className="cx-btn-row" style={{ display: "flex", gap: 8 }}>
-                <CXBtn num="01" label="Contact" onClick={() => selectEntry("contact", "all")} primary icon={null} />
+                <CXBtn num="01" label="Contact" onClick={() => {
+                  const svc = SERVICES.find((s) => s.id === view.entry);
+                  const url = new URL(window.location.href);
+                  url.searchParams.set("subject", svc ? `${svc.label} inquiry` : "Services inquiry");
+                  window.history.replaceState({}, "", url.toString());
+                  selectEntry("contact", "all");
+                }} primary icon={null} />
                 <CXBtn num="02" label="Resume" onClick={() => selectEntry("personnel", "resume")} icon={null} />
                 <SharePopover
                   shareUrl={`https://pawper.dev/services${view.entry && view.entry !== "overview" ? `/${view.entry}` : ""}`}
@@ -190,11 +196,19 @@ export default function CXMain({ view, selectEntry, selectCategory, setView, set
             )
             : view.cat === "calendar"
             ? (
-              <SharePopover
-                shareUrl="https://pawper.dev/agenda"
-                title="Agenda · pawper.dev"
-                num="01" primaryHex={primaryHex} secondaryHex={secondaryHex} isDark={isDark} hasPrimary={false}
-              />
+              <div className="cx-btn-row" style={{ display: "flex", gap: 8 }}>
+                <CXBtn num="01" label="Inquire" primary icon={null} onClick={() => {
+                  const url = new URL(window.location.href);
+                  url.searchParams.set("subject", "Speaking & events inquiry");
+                  window.history.replaceState({}, "", url.toString());
+                  selectEntry("contact", "all");
+                }} />
+                <SharePopover
+                  shareUrl="https://pawper.dev/agenda"
+                  title="Agenda · pawper.dev"
+                  num="02" primaryHex={primaryHex} secondaryHex={secondaryHex} isDark={isDark} hasPrimary={true}
+                />
+              </div>
             )
             : undefined
         }
