@@ -6,7 +6,7 @@ import CXPill from "../CXPill";
 import CXCard from "../CXCard";
 import { enhanceProse } from "./proseEnhance";
 import { SidebarTagGroups, SidebarTOC, ProgressDot, ArticleProgressRing } from "./DCDetailSidebar";
-import { soundClick } from "../../../context/SoundContext";
+import { soundClick, soundHover } from "../../../context/SoundContext";
 import { getProgress, checkSection, uncheckSection } from "../../../utils/logProgress";
 import { useTheme } from "../../../hooks/useTheme";
 import { clampEyebrowColor } from "../../../utils/color";
@@ -48,6 +48,8 @@ function MentorLink({
         {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
         className="cx-section-eyebrow-link"
         style={style}
+        onMouseEnter={() => soundHover()}
+        onClick={() => soundClick()}
       >
         {children}
       </a>
@@ -56,7 +58,8 @@ function MentorLink({
   return (
     <button
       type="button"
-      onClick={onClick}
+      onMouseEnter={() => soundHover()}
+      onClick={() => { soundClick(); onClick?.(); }}
       className="cx-section-eyebrow-link"
       style={style}
     >
@@ -345,12 +348,15 @@ export default function DCLog({ id, html, anchor, onOpenLog, onOpenProject, onOp
                   src={PROFILE.photo}
                   alt={PROFILE.name}
                   className="cx-endorsement-photo"
-                  style={{ width: 144, height: 144, objectFit: "cover", objectPosition: "center 35%", borderRadius: "40px 8px 40px 8px", marginTop: "16px", flexShrink: 0 }}
+                  style={{ width: 144, height: 144, objectFit: "cover", objectPosition: "center 35%", borderRadius: "40px 8px 40px 8px", marginTop: "16px", marginBottom: "16px", flexShrink: 0 }}
                 />
               )}
               <div className="cx-endorsement-content" style={{ padding: "16px 20px 16px 0", display: "flex", flexDirection: "column", flex: 1 }}>
                 <div className="pw-eyebrow" style={{ color: "var(--section-deep)", marginBottom: 10 }}>
                   About your mentor
+                </div>
+                <div style={{ fontSize: 16, fontWeight: 500, letterSpacing: -0.3, lineHeight: 1.2, marginBottom: 10 }}>
+                  {PROFILE.name}
                 </div>
                 <p style={{ fontSize: 13, lineHeight: 1.65, color: "var(--ink-soft)", margin: "0 0 12px" }}>
                   {PROFILE.intro}
@@ -360,14 +366,18 @@ export default function DCLog({ id, html, anchor, onOpenLog, onOpenProject, onOp
                   display: "flex", alignItems: "center", justifyContent: "space-between",
                   gap: 12, flexWrap: "wrap",
                 }}>
-                  <div style={{
-                    display: "inline-flex", alignItems: "center", gap: 4,
-                    fontSize: 10, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase",
-                    color: "var(--section-deep)",
-                  }}>
+                  <Tap
+                    className="cx-section-eyebrow-link"
+                    onClick={() => onOpenService?.("mentoring")}
+                    style={{
+                      display: "inline-flex", alignItems: "center", gap: 4,
+                      fontSize: 10, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase",
+                      color: "var(--section-deep)",
+                    }}
+                  >
                     <span style={{ fontSize: 12, fontWeight: 300 }}>◈</span>
                     <span>Mentoring · Open</span>
-                  </div>
+                  </Tap>
                   <div style={{ display: "flex", gap: 14, alignItems: "center", flexWrap: "wrap" }}>
                     <MentorLink href="/contact/">Ask about mentoring</MentorLink>
                     <span style={{ color: "var(--ink-mute)", fontSize: 12 }}>·</span>
