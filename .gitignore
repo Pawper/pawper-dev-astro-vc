@@ -24,6 +24,5 @@ src/data/agenda.json
 src/data/log-updated-dates.json
 src/data/og-images.json
 src/data/og-link-cache.json
-src/data/resume-assets.json
 public/resume.pdf
 public/resume-preview.png
