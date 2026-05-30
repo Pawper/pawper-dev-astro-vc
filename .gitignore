@@ -15,6 +15,7 @@ node_modules/
 # Content drafts / scratch
 src/content/logs-test/
 src/content/logs-drafts/
+src/content/logs/drafts/
 
 # Build-generated data (regenerated from Airtable/GitHub/Cloudinary on each build)
 src/data/projects.json

@@ -64,6 +64,24 @@ export default function CXLogCard({ log, onClick, seriesTotal }: CXLogCardProps)
 
   return (
     <div style={{ position: "relative", height: "100%" }}>
+      {log.draft && (
+        <span
+          className="pw-mono"
+          title="Draft — visible in dev only"
+          style={{
+            position: "absolute", top: 8, right: 8, zIndex: 3,
+            fontSize: 9, fontWeight: 700, letterSpacing: "0.16em",
+            padding: "2px 6px", borderRadius: 4,
+            color: "#ffb84d",
+            background: "rgba(255, 138, 61, 0.16)",
+            border: "1px solid rgba(255, 184, 77, 0.55)",
+            textShadow: "0 1px 2px rgba(0,0,0,0.6)",
+            pointerEvents: "none",
+          }}
+        >
+          DRAFT
+        </span>
+      )}
       <CXCard
         onClick={onClick}
         accentColor={LOG_CAT.accent}

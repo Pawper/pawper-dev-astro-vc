@@ -87,8 +87,102 @@ export default function CXContactCombo({ onSent, onService, onMessageChange }: C
     s.setAttribute("data-recaptcha", "true");
     document.head.appendChild(s);
   }, []);
+
+  // Hide the reCAPTCHA badge when modals, popovers, menu, or expanded header are open.
+  // On desktop, position it under the contact form.
+  useEffect(() => {
+    const checkAndHideBadge = () => {
+      const badge = document.querySelector(".grecaptcha-badge") as any;
+      if (!badge) return;
+
+      // Check for main modal backdrop
+      const hasModalBackdrop = !!document.querySelector(".cx-modal-backdrop");
+
+      // Check for share popover (QR code image appears when share popover is open on any screen size)
+      const hasSharePopover = !!document.querySelector("img[alt='QR code']");
+
+      // Check for mobile menu: look for fixed-position overlay (z-index 199) that's a direct child of .pw-artboard
+      let hasMobileMenu = false;
+      const artboard = document.querySelector(".pw-artboard");
+      if (artboard) {
+        const fixedChildren = Array.from(artboard.children).filter(el => {
+          const style = window.getComputedStyle(el as Element);
+          return style.position === "fixed" && parseInt(style.zIndex || "0") === 199;
+        });
+        hasMobileMenu = fixedChildren.length > 0;
+      }
+
+      // Check for expanded header (adds cx-layout-brief-open class to main grid)
+      const hasExpandedHeader = !!document.querySelector(".cx-layout-brief-open");
+
+      if (hasModalBackdrop || hasSharePopover || hasMobileMenu || hasExpandedHeader) {
+        badge.style.visibility = "hidden";
+      } else {
+        badge.style.visibility = "visible";
+      }
+
+      // On desktop, position badge under the contact form
+      if (window.innerWidth >= 1200) {
+        const form = document.querySelector("#contact-form") as HTMLElement;
+        if (form) {
+          const formRect = form.getBoundingClientRect();
+          const formBottom = formRect.bottom + window.scrollY;
+
+          // Find the first input/textarea field to align with its left edge
+          const firstInput = form.querySelector("input[type='text'], textarea") as HTMLElement;
+          let fieldLeft = formRect.left + window.scrollX;
+          if (firstInput) {
+            const inputRect = firstInput.getBoundingClientRect();
+            fieldLeft = inputRect.left + window.scrollX - 63;
+          }
+
+          badge.style.position = "absolute";
+          badge.style.top = formBottom - 41 + "px";
+          badge.style.left = fieldLeft + "px";
+          badge.style.right = "auto";
+          badge.style.bottom = "auto";
+        }
+      } else {
+        // Reset to fixed positioning on mobile
+        badge.style.position = "fixed";
+        badge.style.top = "auto";
+        badge.style.left = "40px";
+        badge.style.right = "auto";
+        badge.style.bottom = "47px";
+      }
+    };
+
+    // Check every 100ms
+    const interval = setInterval(checkAndHideBadge, 100);
+
+    return () => clearInterval(interval);
+  }, []);
   const theme = useTheme();
   const eyebrowColor = clampEyebrowColor(theme === "dark" ? "#a07e15" : "#6b5410", theme === "dark");
+
+  // Reflect the site's current theme onto the reCAPTCHA badge so it blends with
+  // light/dark. Re-runs whenever `theme` changes (useTheme is reactive), and waits
+  // for Google's script to inject the badge before tagging it. The actual recolor
+  // lives in global.css keyed off this attribute (`.grecaptcha-badge[data-theme]`)
+  // so there's a single source of truth — no inline-vs-`!important` conflict.
+  useEffect(() => {
+    if (!RECAPTCHA_SITE_KEY) return;
+
+    const applyTheme = () => {
+      const badge = document.querySelector<HTMLElement>(".grecaptcha-badge");
+      if (!badge) return false;
+      badge.setAttribute("data-theme", theme);
+      return true;
+    };
+
+    if (applyTheme()) return;
+    // Badge is injected asynchronously — watch the body until it appears.
+    const obs = new MutationObserver(() => {
+      if (applyTheme()) obs.disconnect();
+    });
+    obs.observe(document.body, { childList: true, subtree: true });
+    return () => obs.disconnect();
+  }, [theme]);
 
   async function getRecaptchaToken(): Promise<string | undefined> {
     if (!RECAPTCHA_SITE_KEY || !window.grecaptcha) return undefined;

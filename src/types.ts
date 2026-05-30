@@ -32,6 +32,7 @@ export interface Log {
   series?: { name: string; part: number; total: number };
   noThumb?: string[];
   mentor?: boolean;
+  draft?: boolean; // true for entries sourced from src/content/logs/drafts/ (dev only)
 }
 
 export type ViewKind = "home" | "entry" | "grid";
