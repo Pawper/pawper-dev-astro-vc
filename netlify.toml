@@ -6,6 +6,10 @@
   NODE_VERSION = "22"
   PUPPETEER_CACHE_DIR = "/opt/build/cache/puppeteer"
 
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
+
 [[redirects]]
   from = "/l/faq-editors-ides-vs-code-3fp0"
   to   = "/l/editors-ides-installing-vs-code"

@@ -9,6 +9,17 @@ import { useTheme } from "../../hooks/useTheme";
 import { soundClick, soundHover } from "../../context/SoundContext";
 import { clampEyebrowColor } from "../../utils/color";
 
+const RECAPTCHA_SITE_KEY = import.meta.env.PUBLIC_RECAPTCHA_SITE_KEY as string | undefined;
+
+declare global {
+  interface Window {
+    grecaptcha?: {
+      ready: (cb: () => void) => void;
+      execute: (siteKey: string, opts: { action: string }) => Promise<string>;
+    };
+  }
+}
+
 const directory = [
   { l: "Email",    v: "hello@pawper.dev",          href: "mailto:hello@pawper.dev" },
   { l: "GitHub",   v: "github.com/Pawper",          href: "https://github.com/Pawper" },
@@ -64,22 +75,46 @@ export default function CXContactCombo({ onSent, onService, onMessageChange }: C
     }
     if (Object.keys(vals).length) setPrefill(vals);
   }, []);
+
+  // Load the reCAPTCHA v3 script once (no-op without a configured site key).
+  useEffect(() => {
+    if (!RECAPTCHA_SITE_KEY) return;
+    if (document.querySelector("script[data-recaptcha]")) return;
+    const s = document.createElement("script");
+    s.src = `https://www.google.com/recaptcha/api.js?render=${RECAPTCHA_SITE_KEY}`;
+    s.async = true;
+    s.defer = true;
+    s.setAttribute("data-recaptcha", "true");
+    document.head.appendChild(s);
+  }, []);
   const theme = useTheme();
   const eyebrowColor = clampEyebrowColor(theme === "dark" ? "#a07e15" : "#6b5410", theme === "dark");
+
+  async function getRecaptchaToken(): Promise<string | undefined> {
+    if (!RECAPTCHA_SITE_KEY || !window.grecaptcha) return undefined;
+    const grecaptcha = window.grecaptcha;
+    await new Promise<void>((resolve) => grecaptcha.ready(() => resolve()));
+    return grecaptcha.execute(RECAPTCHA_SITE_KEY, { action: "contact" });
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(false);
     const data = new FormData(formRef.current!);
-    const body = new URLSearchParams({
-      "form-name": "contact",
-      name:    data.get("name")    as string,
-      email:   data.get("email")   as string,
-      subject: data.get("subject") as string,
-      message: data.get("message") as string,
-    });
     try {
-      const res = await fetch("/", { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: body.toString() });
+      const token = await getRecaptchaToken();
+      const res = await fetch("/.netlify/functions/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name:    data.get("name")    as string,
+          email:   data.get("email")   as string,
+          subject: data.get("subject") as string,
+          message: data.get("message") as string,
+          "bot-field": (data.get("bot-field") as string) ?? "",
+          token,
+        }),
+      });
       if (res.ok) { formRef.current?.reset(); setSent(true); onSent(); } else { setError(true); }
     } catch { setError(true); }
   }
@@ -94,6 +129,13 @@ export default function CXContactCombo({ onSent, onService, onMessageChange }: C
         style={{ display: "flex", flexDirection: "column", gap: 12 }}
       >
         <input type="hidden" name="form-name" value="contact" />
+        {/* Honeypot: hidden from real users, tempting to bots. Filled = spam. */}
+        <p style={{ display: "none" }} aria-hidden="true">
+          <label>
+            Leave this field empty
+            <input name="bot-field" tabIndex={-1} autoComplete="off" />
+          </label>
+        </p>
         <FormField name="name"    label="Identifier"    placeholder="Your name"              defaultValue={prefill.name} />
         <FormField name="email"   label="Return address" placeholder="you@somewhere.dev"      defaultValue={prefill.email} />
         <FormField name="subject" label="Subject"        placeholder="What's on your mind?"   defaultValue={prefill.subject} />
