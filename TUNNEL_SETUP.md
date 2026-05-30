@@ -16,28 +16,24 @@ cloudflared tunnel --url http://localhost:4321
 ```
 This generates a public HTTPS URL like: `https://[random-words].trycloudflare.com`
 
-## Important: allowedHosts Config
+## allowedHosts Config
 
-When you get a new tunnel URL, you must add it to `astro.config.mjs`:
+**No action needed** — the config uses a wildcard:
 
 ```javascript
 vite: {
   server: {
-    allowedHosts: [
-      "your-new-tunnel-url.trycloudflare.com",
-      // ... other URLs
-    ],
+    allowedHosts: [".trycloudflare.com"]
   },
 },
 ```
 
-Then **restart the dev server** so Astro picks up the new config.
+The leading dot allows all subdomains of `.trycloudflare.com`, so new tunnel URLs work automatically. No restart needed.
 
-## Why This is Needed
+## Why allowedHosts Exists
 
 - Vite (Astro's bundler) blocks requests from unknown hosts for security
-- Ad-hoc tunnels generate a new random URL each time they start
-- Each new URL must be whitelisted in `allowedHosts`
+- Without allowedHosts, a fresh tunnel URL would return a 403 (Blocked request)
 
 ## Note on Ad-hoc vs Named Tunnels
 

@@ -1,0 +1,53 @@
+---
+// Dev-only draft editor. In production this page redirects home; the API it talks
+// to (/api/edit) is likewise dev-guarded, and drafts are stripped from the build.
+import EditApp from '../components/codex/EditApp';
+import '../styles/global.css';
+
+if (!import.meta.env.DEV) {
+  return Astro.redirect('/');
+}
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Draft Console · DEV</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <style>
+    html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; background: #0a1320; }
+
+    /* Preview pane prose — mirrors the site's reading surface in miniature. */
+    .edit-preview h1, .edit-preview h2, .edit-preview h3 { line-height: 1.2; margin: 1.2em 0 0.5em; }
+    .edit-preview h1 { font-size: 1.7em; }
+    .edit-preview h2 { font-size: 1.35em; }
+    .edit-preview h3 { font-size: 1.12em; }
+    .edit-preview p { margin: 0.7em 0; }
+    .edit-preview a { color: #5cd6a8; }
+    .edit-preview code {
+      font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 0.86em;
+      background: rgba(255,255,255,0.08); padding: 0.12em 0.36em; border-radius: 4px;
+    }
+    .edit-preview pre {
+      background: rgba(0,0,0,0.45); padding: 14px 16px; border-radius: 8px;
+      overflow-x: auto; border: 1px solid rgba(255,255,255,0.08);
+    }
+    .edit-preview pre code { background: none; padding: 0; }
+    .edit-preview blockquote {
+      margin: 0.9em 0; padding: 0.2em 1em; border-left: 3px solid #3fbf7a;
+      color: rgba(236,242,250,0.7);
+    }
+    .edit-preview img { max-width: 100%; border-radius: 8px; }
+    .edit-preview ul, .edit-preview ol { padding-left: 1.4em; }
+    .edit-preview li { margin: 0.3em 0; }
+    .edit-preview table { border-collapse: collapse; width: 100%; margin: 1em 0; }
+    .edit-preview th, .edit-preview td { border: 1px solid rgba(255,255,255,0.15); padding: 6px 10px; text-align: left; }
+    .edit-preview hr { border: none; border-top: 1px solid rgba(255,255,255,0.15); margin: 1.5em 0; }
+  </style>
+</head>
+<body>
+  <EditApp client:only="react" />
+</body>
+</html>
