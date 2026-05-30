@@ -67,7 +67,7 @@ export default function CXLanding({ onCategory, onEntry }: CXLandingProps) {
       <div className="cx-btn-row" style={{ position: "absolute", bottom: 48, right: 7, display: "flex", gap: 8 }}>
         <CXBtn num="01" label="Resume" onClick={() => onEntry("personnel", "resume")} primary icon={null} />
         <CXBtn num="02" label="Contact" onClick={() => onEntry("contact", "all")} icon={null} />
-        <CXBtn num="03" label="RSS feed" href="/feed/activity.xml" icon={<RssIcon />} />
+        <CXBtn num="03" label="RSS feed" href="/feed.xml" icon={<RssIcon />} />
       </div>
     </div>
   );

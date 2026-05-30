@@ -165,7 +165,7 @@ export default function CXMain({ view, selectEntry, selectCategory, setView, set
               </div>
             )
             : view.cat === "personnel" && view.entry === "activity"
-            ? <CXBtn num="01" label="RSS feed" href="/feed/activity.xml" primary icon={<RssIcon />} />
+            ? <CXBtn num="01" label="RSS feed" href="/feed.xml" primary icon={<RssIcon />} />
             : view.cat === "services"
             ? (
               <div className="cx-btn-row" style={{ display: "flex", gap: 8 }}>

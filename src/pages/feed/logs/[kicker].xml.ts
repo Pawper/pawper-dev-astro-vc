@@ -22,12 +22,16 @@ export async function GET(ctx: APIContext) {
 
   const items = await Promise.all(filtered.map(async (entry) => {
     const id = entry.id.replace(/\.md$/, '');
+    const heroImg = entry.data.image
+      ? `<img src="${entry.data.image}" alt="${entry.data.title}" style="max-width:100%;height:auto;display:block;margin-bottom:1.5em" />`
+      : '';
     return {
       title: entry.data.title,
       pubDate: new Date(entry.data.date.replace(/\./g, '-')),
-      description: entry.data.kicker,
-      content: await renderMarkdown(entry.body),
-      link: `/?modal=log&id=${id}`,
+      description: entry.data.hook ?? entry.data.kicker,
+      content: `${heroImg}${await renderMarkdown(entry.body ?? '')}`,
+      link: `/l/${id}`,
+      customData: entry.data.image ? `<media:content url="${entry.data.image}" medium="image" />` : '',
     };
   }));
 
@@ -35,6 +39,7 @@ export async function GET(ctx: APIContext) {
     title: `Phillip Wessels — ${kicker}`,
     description: `Logs filed under "${kicker}".`,
     site: ctx.site!,
+    xmlns: { media: 'http://search.yahoo.com/mrss/' },
     items,
   });
 }
