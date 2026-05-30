@@ -6,9 +6,30 @@ import type { Log } from '../types';
 import logUpdatedDates from '../data/log-updated-dates.json';
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
+import { createMarkdownProcessor } from '@astrojs/markdown-remark';
 
 const rawLogs = await getCollection('logs');
 const logsHtml: Record<string, string> = {};
+
+// Render draft markdown with the SAME engine Astro uses for published logs
+// (@astrojs/markdown-remark), mirroring the shikiConfig from astro.config.mjs so
+// headings, lists, code blocks, emphasis, links, etc. come out identical to the
+// collection-rendered entries. Created once and reused across all draft files.
+let draftMarkdownProcessor: Awaited<ReturnType<typeof createMarkdownProcessor>> | null = null;
+async function getDraftMarkdownProcessor() {
+  if (!draftMarkdownProcessor) {
+    draftMarkdownProcessor = await createMarkdownProcessor({
+      shikiConfig: {
+        langs: [
+          { name: 'bash-prompt',     scopeName: 'source.bash-prompt',     patterns: [], repository: {} },
+          { name: 'bash-prompt-key', scopeName: 'source.bash-prompt-key', patterns: [], repository: {} },
+          { name: 'wrap',            scopeName: 'source.wrap',            patterns: [], repository: {} },
+        ],
+      },
+    });
+  }
+  return draftMarkdownProcessor;
+}
 
 // Helper: parse YAML frontmatter (simple regex-based parser)
 function parseFrontmatter(content: string) {
@@ -53,12 +74,10 @@ async function loadDraftsFolder() {
       mdFiles.map(async (filename) => {
         const content = await fs.readFile(path.join(draftsDir, filename), 'utf-8');
         const { data, body } = parseFrontmatter(content);
-        // Simple HTML conversion: convert markdown paragraphs to HTML
-        // This is a minimal conversion just for hook extraction and word counting
-        const html = body
-          .split('\n\n')
-          .map(p => p.trim() ? `<p>${p.replace(/\n/g, '<br>')}</p>` : '')
-          .join('\n');
+        // Render full markdown (headings, lists, code blocks, emphasis, links, …)
+        // through Astro's own processor so drafts match published logs exactly.
+        const processor = await getDraftMarkdownProcessor();
+        const html = (await processor.render(body)).code;
 
         return {
           id: `logs-drafts/${filename.replace(/\.md$/, '')}`,
