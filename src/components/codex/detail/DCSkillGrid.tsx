@@ -4,7 +4,7 @@ import CXCard from "../CXCard";
 import { PROJECTS, LOGS, EXPERIENCES, AGENDA_EVENTS, canonicalizeSkill } from "../../../data/content";
 import CollapsiblePills from "../CollapsiblePills";
 import type { PillItem } from "../CollapsiblePills";
-import type { Endorsement } from "../../../data/content";
+import type { Endorsement, Experience } from "../../../data/content";
 import endorsementsData from "../../../data/endorsements.json";
 
 const allEndorsements = endorsementsData as Endorsement[];
@@ -22,6 +22,18 @@ const CELL = 9;
 const GAP = 2;
 const DAY_LABELS = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
 const SHOW_DAY = new Set([1, 3, 5]);
+
+/** Year span an experience was active, from its dated start or its free-form
+ *  `period` (e.g. "2019–2022" → [2019, 2022], "Feb 2026" → [2026, 2026]). */
+function expYearRange(e: Experience): [number, number] | null {
+  if (e.datetimeStart) {
+    const y = parseInt(e.datetimeStart.slice(0, 4));
+    return [y, y];
+  }
+  const yrs = (e.period ?? "").match(/\d{4}/g)?.map(Number);
+  if (!yrs?.length) return null;
+  return [Math.min(...yrs), Math.max(...yrs)];
+}
 
 function cellBg(count: number, isFuture: boolean, maxCount: number): string {
   if (isFuture) return "rgba(255,255,255,0.025)";
@@ -83,7 +95,7 @@ export default function DCSkillGrid({ tag, filterType = "topic", onOpen, onOpenE
     });
   const endorsements = allEndorsements.filter((e) => e.skills?.some((s) => canonicalizeSkill(s).toLowerCase() === lower));
 
-  // Derive years from actual skill-relevant commit/log dates, not pushedAt
+  // Derive years from actual skill-relevant commit/log/dated-experience dates, not pushedAt
   const allYears = new Set<number>();
   for (const a of logs) allYears.add(parseInt(a.date.slice(0, 4)));
   for (const p of projects) {
@@ -92,12 +104,13 @@ export default function DCSkillGrid({ tag, filterType = "topic", onOpen, onOpenE
       : p.allCommitDates;
     for (const iso of dates) allYears.add(parseInt(iso.slice(0, 4)));
   }
+  for (const e of experiences) if (e.datetimeStart) allYears.add(parseInt(e.datetimeStart.slice(0, 4)));
   const years = [...allYears].sort((a, b) => b - a);
 
   const [selectedYear, setSelectedYear] = useState<number | null>(null);
   const [yearHovered, setYearHovered] = useState(false);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
-  const [cellTooltip, setCellTooltip] = useState<{ x: number; y: number; iso: string; projCount: number; logCount: number; color: string } | null>(null);
+  const [cellTooltip, setCellTooltip] = useState<{ x: number; y: number; iso: string; projCount: number; logCount: number; expCount: number; color: string } | null>(null);
   const [expExpanded, setExpExpanded] = useState(false);
   useEffect(() => { setSelectedYear(null); setYearHovered(false); setSelectedDate(null); setCellTooltip(null); setExpExpanded(false); }, [tag]);
   useEffect(() => { setSelectedDate(null); setCellTooltip(null); }, [selectedYear]);
@@ -137,6 +150,17 @@ export default function DCSkillGrid({ tag, filterType = "topic", onOpen, onOpenE
     .filter((a) => !selectedYear || a.date.slice(0, 4) === String(selectedYear))
     .filter((a) => !selectedDate || a.date.replace(/\./g, "-") === selectedDate);
 
+  // Clicking a heatmap date/year narrows the experiences list too. Dated
+  // experiences match an exact day; free-form-period experiences match by year.
+  const filteredExperiences = experiences.filter((e) => {
+    if (selectedDate) return e.datetimeStart === selectedDate;
+    if (selectedYear) {
+      const r = expYearRange(e);
+      return r ? selectedYear >= r[0] && selectedYear <= r[1] : false;
+    }
+    return true;
+  });
+
   const totalCommits = filteredProjects.reduce((sum, p) => {
     const dates = filterType === "language"
       ? (Object.entries(p.commitsByLanguage).find(([l]) => l.toLowerCase() === lower)?.[1] ?? [])
@@ -159,8 +183,22 @@ export default function DCSkillGrid({ tag, filterType = "topic", onOpen, onOpenE
     if (selectedYear) return iso.startsWith(String(selectedYear));
     return true;
   });
-  const plDenom = allActiveProjects.length + allActiveLogs.length;
-  const plPct = plDenom > 0 ? ((filteredProjects.length + filteredLogs.length) / plDenom * 100) : 0;
+  const allActiveExperiences = [...EXPERIENCES, ...AGENDA_EVENTS].filter((e) => {
+    if (selectedDate) return e.datetimeStart === selectedDate;
+    if (selectedYear) {
+      const r = expYearRange(e);
+      return r ? selectedYear >= r[0] && selectedYear <= r[1] : false;
+    }
+    return true;
+  });
+
+  // "All entries" spans projects + logs + experiences — the navigable items.
+  const entriesNum = filteredProjects.length + filteredLogs.length + filteredExperiences.length;
+  const entriesDenom = allActiveProjects.length + allActiveLogs.length + allActiveExperiences.length;
+  const entriesPct = entriesDenom > 0 ? (entriesNum / entriesDenom * 100) : 0;
+
+  const totalAllExperiences = allActiveExperiences.length;
+  const expPct = totalAllExperiences > 0 ? (filteredExperiences.length / totalAllExperiences * 100) : 0;
 
   const totalAllCommits = PROJECTS.reduce((s, p) => {
     const dates = p.allCommitDates.filter((iso) => {
@@ -209,17 +247,26 @@ export default function DCSkillGrid({ tag, filterType = "topic", onOpen, onOpenE
       projDateCount.set(iso, (projDateCount.get(iso) ?? 0) + 1);
     }
   }
+  // Skill-relevant experiences with an explicit dated start contribute on that
+  // day. Free-form-period experiences ("2019–2022", "ongoing") have no concrete
+  // day to plot, so they're excluded here.
+  const expDateCount = new Map<string, number>();
+  for (const e of experiences) {
+    if (!e.datetimeStart) continue;
+    expDateCount.set(e.datetimeStart, (expDateCount.get(e.datetimeStart) ?? 0) + 1);
+  }
 
-  const grid: Array<Array<{ iso: string; count: number; logCount: number; projCount: number; isFuture: boolean }>> = [];
+  const grid: Array<Array<{ iso: string; count: number; logCount: number; projCount: number; expCount: number; isFuture: boolean }>> = [];
   for (let w = 0; w < WEEKS; w++) {
-    const week: Array<{ iso: string; count: number; logCount: number; projCount: number; isFuture: boolean }> = [];
+    const week: Array<{ iso: string; count: number; logCount: number; projCount: number; expCount: number; isFuture: boolean }> = [];
     for (let d = 0; d < 7; d++) {
       const date = new Date(firstWeekSun);
       date.setDate(firstWeekSun.getDate() + w * 7 + d);
       const iso = toIso(date);
       const logCount = logDateCount.get(iso) ?? 0;
       const projCount = projDateCount.get(iso) ?? 0;
-      week.push({ iso, count: logCount + projCount, logCount, projCount, isFuture: iso > todayIso });
+      const expCount = expDateCount.get(iso) ?? 0;
+      week.push({ iso, count: logCount + projCount + expCount, logCount, projCount, expCount, isFuture: iso > todayIso });
     }
     grid.push(week);
   }
@@ -242,6 +289,13 @@ export default function DCSkillGrid({ tag, filterType = "topic", onOpen, onOpenE
   const maxCount = Math.max(1, ...grid.flat().map((c) => c.count));
   const showYearTabs = years.length > 0;
 
+  const statsText = [
+    filteredProjects.length     ? `${filteredProjects.length} project${filteredProjects.length !== 1 ? "s" : ""}` : "",
+    filteredLogs.length         ? `${filteredLogs.length} log${filteredLogs.length !== 1 ? "s" : ""}` : "",
+    filteredExperiences.length  ? `${filteredExperiences.length} experience${filteredExperiences.length !== 1 ? "s" : ""}` : "",
+    totalCommits                ? `${totalCommits} commit${totalCommits !== 1 ? "s" : ""}` : "",
+  ].filter(Boolean).join(" · ");
+
   return (
     <>
     <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
@@ -249,16 +303,7 @@ export default function DCSkillGrid({ tag, filterType = "topic", onOpen, onOpenE
       {/* Stats + heatmap */}
       {total > 0 && <CXCard style={{ padding: 20, borderRadius: 14, display: "flex", flexDirection: "column", gap: 14 }}>
         <div style={{ display: "flex", alignItems: "flex-start", gap: 8 }}>
-          <div className="cx-skill-activity-meta" style={{ display: "flex", alignItems: "baseline", gap: 10, flexShrink: 1, minWidth: 0 }}>
-            <div style={{ fontSize: 17, fontWeight: 600, flexShrink: 0 }}>{tag} activity</div>
-            <span className="pw-mono" style={{ fontSize: 10, color: "var(--ink-mute)", letterSpacing: "0.1em", textTransform: "uppercase" }}>
-              {[
-                filteredProjects.length ? `${filteredProjects.length} project${filteredProjects.length !== 1 ? "s" : ""}` : "",
-                filteredLogs.length     ? `${filteredLogs.length} log${filteredLogs.length !== 1 ? "s" : ""}` : "",
-                totalCommits            ? `${totalCommits} commit${totalCommits !== 1 ? "s" : ""}` : "",
-              ].filter(Boolean).join(" · ")}
-            </span>
-          </div>
+          <div style={{ fontSize: 17, fontWeight: 600, flexShrink: 1, minWidth: 0 }}>{tag} activity</div>
 
           <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 8 }}>
             {selectedDate && (
@@ -373,9 +418,10 @@ export default function DCSkillGrid({ tag, filterType = "topic", onOpen, onOpenE
           {/* Distribution bars */}
           <div style={{ display: "flex", flexDirection: "column", gap: 8, flex: 1 }}>
             {[
-              { label: "ALL PROJECTS + LOGS", n: filteredProjects.length + filteredLogs.length, t: plDenom,         pct: plPct,    show: true },
-              { label: "COMMITS",             n: totalCommits,                                  t: totalAllCommits, pct: commitPct, show: totalCommits > 0 },
-              { label: "LOGS",                n: filteredLogs.length,                           t: totalAllLogs,    pct: logPct,    show: filteredLogs.length > 0 },
+              { label: "ALL ENTRIES", n: entriesNum,            t: entriesDenom,        pct: entriesPct, show: true },
+              { label: "COMMITS",     n: totalCommits,          t: totalAllCommits,     pct: commitPct,  show: totalCommits > 0 },
+              { label: "LOGS",        n: filteredLogs.length,   t: totalAllLogs,        pct: logPct,     show: filteredLogs.length > 0 },
+              { label: "EXPERIENCES", n: filteredExperiences.length, t: totalAllExperiences, pct: expPct, show: filteredExperiences.length > 0 },
             ].filter(r => r.show).map(({ label, n, t, pct }) => (
               <div key={label} style={{ display: "flex", flexDirection: "column", gap: 4 }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
@@ -422,7 +468,7 @@ export default function DCSkillGrid({ tag, filterType = "topic", onOpen, onOpenE
                     <div
                       key={`${w}-${d}`}
                       onClick={cell.count ? () => { soundClick(); setSelectedDate(cell.iso === selectedDate ? null : cell.iso); } : undefined}
-                      onMouseEnter={cell.count ? (e) => { soundHover(); const color = getComputedStyle(e.currentTarget).getPropertyValue("--section-accent").trim() || "#c8d4e4"; setCellTooltip({ x: e.clientX, y: e.clientY, iso: cell.iso, projCount: cell.projCount, logCount: cell.logCount, color }); } : undefined}
+                      onMouseEnter={cell.count ? (e) => { soundHover(); const color = getComputedStyle(e.currentTarget).getPropertyValue("--section-accent").trim() || "#c8d4e4"; setCellTooltip({ x: e.clientX, y: e.clientY, iso: cell.iso, projCount: cell.projCount, logCount: cell.logCount, expCount: cell.expCount, color }); } : undefined}
                       onMouseMove={cell.count ? (e) => setCellTooltip((prev) => prev ? { ...prev, x: e.clientX, y: e.clientY } : prev) : undefined}
                       onMouseLeave={cell.count ? () => setCellTooltip(null) : undefined}
                       style={{
@@ -442,6 +488,16 @@ export default function DCSkillGrid({ tag, filterType = "topic", onOpen, onOpenE
           </div>
         </div>
         </div>
+
+        {/* Stats — centered below the heatmap */}
+        {statsText && (
+          <div className="pw-mono" style={{
+            fontSize: 10, color: "var(--ink-mute)", letterSpacing: "0.1em",
+            textTransform: "uppercase", textAlign: "center",
+          }}>
+            {statsText}
+          </div>
+        )}
       </CXCard>}
 
       {/* Endorsements */}
@@ -486,15 +542,15 @@ export default function DCSkillGrid({ tag, filterType = "topic", onOpen, onOpenE
       )}
 
       {/* Experiences */}
-      {experiences.length > 0 && (
+      {filteredExperiences.length > 0 && (
         <div style={{ display: "flex", flexDirection: "column", gap: 10, marginTop: 12 }}>
           <span className="pw-mono" style={{ fontSize: 11, color: "var(--section-deep)", letterSpacing: "0.16em" }}>
-            {`${experiences.length} ${experiences.length === 1 ? "EXPERIENCE" : "EXPERIENCES"}`}
+            {`${filteredExperiences.length} ${filteredExperiences.length === 1 ? "EXPERIENCE" : "EXPERIENCES"}`}
           </span>
           <div
             style={{
               display: "flex", flexDirection: "column", gap: 10,
-              ...(experiences.length > 2 ? {
+              ...(filteredExperiences.length > 2 ? {
                 maxHeight: expExpanded ? 9999 : 180,
                 overflow: "hidden",
                 transition: "max-height 0.6s cubic-bezier(.2,.7,.3,1)",
@@ -503,7 +559,7 @@ export default function DCSkillGrid({ tag, filterType = "topic", onOpen, onOpenE
               } : {}),
             }}
           >
-            {experiences.map((exp) => (
+            {filteredExperiences.map((exp) => (
               <ExperienceCardRow
                 key={exp.id}
                 exp={exp}
@@ -516,10 +572,10 @@ export default function DCSkillGrid({ tag, filterType = "topic", onOpen, onOpenE
               />
             ))}
           </div>
-          {experiences.length > 2 && (
+          {filteredExperiences.length > 2 && (
             <div style={{ display: "flex", justifyContent: "center", marginTop: expExpanded ? 0 : -14, ...(expExpanded ? { position: "sticky", bottom: 60 } : {}) }}>
               <CXPill size="md" onClick={() => { soundClick(); setExpExpanded(e => !e); }}>
-                {expExpanded ? "Show less" : `Show all ${experiences.length}`}
+                {expExpanded ? "Show less" : `Show all ${filteredExperiences.length}`}
               </CXPill>
             </div>
           )}
@@ -560,6 +616,7 @@ export default function DCSkillGrid({ tag, filterType = "topic", onOpen, onOpenE
           {[
             cellTooltip.projCount ? `${cellTooltip.projCount} COMMIT${cellTooltip.projCount !== 1 ? "S" : ""}` : "",
             cellTooltip.logCount  ? `${cellTooltip.logCount} LOG${cellTooltip.logCount !== 1 ? "S" : ""}` : "",
+            cellTooltip.expCount  ? `${cellTooltip.expCount} EXPERIENCE${cellTooltip.expCount !== 1 ? "S" : ""}` : "",
           ].filter(Boolean).join(" · ")}
         </span>
       </div>,

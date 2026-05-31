@@ -75,11 +75,20 @@ export default function DCActivity({ openModal }: DCActivityProps) {
     const iso = a.date.replace(/\./g, "-");
     logDateCount.set(iso, (logDateCount.get(iso) ?? 0) + 1);
   }
+  // Experiences with an explicit dated start contribute to the heatmap on that
+  // day. Free-form-period experiences ("2019–2022", "ongoing") have no concrete
+  // day to plot, so they're excluded here.
+  const expDateCount = new Map<string, number>();
+  for (const e of ALL_EXPERIENCES) {
+    if (!e.datetimeStart) continue;
+    expDateCount.set(e.datetimeStart, (expDateCount.get(e.datetimeStart) ?? 0) + 1);
+  }
 
-  // Years from actual commit + log dates
+  // Years from actual commit + log + dated-experience dates
   const allYears = new Set<number>();
   for (const iso of projDateCount.keys()) allYears.add(parseInt(iso.slice(0, 4)));
   for (const iso of logDateCount.keys()) allYears.add(parseInt(iso.slice(0, 4)));
+  for (const iso of expDateCount.keys()) allYears.add(parseInt(iso.slice(0, 4)));
   const years = [...allYears].sort((a, b) => b - a);
 
   const [selectedYear, setSelectedYear] = useState<number | null>(null);
@@ -87,7 +96,7 @@ export default function DCActivity({ openModal }: DCActivityProps) {
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [expExpanded, setExpExpanded] = useState(false);
   const [cellTooltip, setCellTooltip] = useState<{
-    x: number; y: number; iso: string; projCount: number; logCount: number; color: string;
+    x: number; y: number; iso: string; projCount: number; logCount: number; expCount: number; color: string;
   } | null>(null);
 
   useEffect(() => { setSelectedDate(null); setCellTooltip(null); setExpExpanded(false); }, [selectedYear]);
@@ -138,6 +147,13 @@ export default function DCActivity({ openModal }: DCActivityProps) {
     return sum + count;
   }, 0);
 
+  const statsText = [
+    filteredProjectItems.length ? `${filteredProjectItems.length} PROJECT${filteredProjectItems.length !== 1 ? "S" : ""}` : "",
+    filteredLogItems.length     ? `${filteredLogItems.length} LOG${filteredLogItems.length !== 1 ? "S" : ""}` : "",
+    filteredExperiences.length  ? `${filteredExperiences.length} EXPERIENCE${filteredExperiences.length !== 1 ? "S" : ""}` : "",
+    filteredCommits             ? `${filteredCommits} COMMIT${filteredCommits !== 1 ? "S" : ""}` : "",
+  ].filter(Boolean).join(" · ");
+
   // Heatmap anchor
   let firstWeekSun: Date;
   if (selectedYear) {
@@ -151,16 +167,17 @@ export default function DCActivity({ openModal }: DCActivityProps) {
     firstWeekSun.setDate(currentWeekSun.getDate() - 51 * 7);
   }
 
-  const grid: Array<Array<{ iso: string; count: number; logCount: number; projCount: number; isFuture: boolean }>> = [];
+  const grid: Array<Array<{ iso: string; count: number; logCount: number; projCount: number; expCount: number; isFuture: boolean }>> = [];
   for (let w = 0; w < WEEKS; w++) {
-    const week: Array<{ iso: string; count: number; logCount: number; projCount: number; isFuture: boolean }> = [];
+    const week: Array<{ iso: string; count: number; logCount: number; projCount: number; expCount: number; isFuture: boolean }> = [];
     for (let d = 0; d < 7; d++) {
       const date = new Date(firstWeekSun);
       date.setDate(firstWeekSun.getDate() + w * 7 + d);
       const iso = toIso(date);
       const logCount = logDateCount.get(iso) ?? 0;
       const projCount = projDateCount.get(iso) ?? 0;
-      week.push({ iso, count: logCount + projCount, logCount, projCount, isFuture: iso > todayIso });
+      const expCount = expDateCount.get(iso) ?? 0;
+      week.push({ iso, count: logCount + projCount + expCount, logCount, projCount, expCount, isFuture: iso > todayIso });
     }
     grid.push(week);
   }
@@ -194,14 +211,7 @@ export default function DCActivity({ openModal }: DCActivityProps) {
             {/* Row 1: title + stats + year filter */}
             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
               <div style={{ fontSize: 17, fontWeight: 600, flexShrink: 0 }}>Activity</div>
-              <span className="pw-mono cx-skill-activity-meta" style={{ fontSize: 10, color: "var(--ink-mute)", letterSpacing: "0.1em", textTransform: "uppercase", flex: 1, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                {[
-                  filteredProjectItems.length ? `${filteredProjectItems.length} PROJECT${filteredProjectItems.length !== 1 ? "S" : ""}` : "",
-                  filteredLogItems.length     ? `${filteredLogItems.length} LOG${filteredLogItems.length !== 1 ? "S" : ""}` : "",
-                  filteredExperiences.length  ? `${filteredExperiences.length} EXPERIENCE${filteredExperiences.length !== 1 ? "S" : ""}` : "",
-                  filteredCommits             ? `${filteredCommits} COMMIT${filteredCommits !== 1 ? "S" : ""}` : "",
-                ].filter(Boolean).join(" · ")}
-              </span>
+              <div style={{ flex: 1, minWidth: 0 }} />
 
               {showYearTabs && (
                 <div
@@ -318,7 +328,7 @@ export default function DCActivity({ openModal }: DCActivityProps) {
                         onMouseEnter={cell.count ? (e) => {
                           soundHover();
                           const color = getComputedStyle(e.currentTarget).getPropertyValue("--section-accent").trim() || "#e84455";
-                          setCellTooltip({ x: e.clientX, y: e.clientY, iso: cell.iso, projCount: cell.projCount, logCount: cell.logCount, color });
+                          setCellTooltip({ x: e.clientX, y: e.clientY, iso: cell.iso, projCount: cell.projCount, logCount: cell.logCount, expCount: cell.expCount, color });
                         } : undefined}
                         onMouseMove={cell.count ? (e) => setCellTooltip(prev => prev ? { ...prev, x: e.clientX, y: e.clientY } : prev) : undefined}
                         onMouseLeave={cell.count ? () => setCellTooltip(null) : undefined}
@@ -338,6 +348,16 @@ export default function DCActivity({ openModal }: DCActivityProps) {
               ))}
             </div>
           </div>
+
+          {/* Stats — centered below the heatmap */}
+          {statsText && (
+            <div className="pw-mono cx-skill-activity-meta" style={{
+              fontSize: 10, color: "var(--ink-mute)", letterSpacing: "0.1em",
+              textTransform: "uppercase", textAlign: "center",
+            }}>
+              {statsText}
+            </div>
+          )}
         </CXCard>
 
         {filteredExperiences.length > 0 && (
@@ -405,6 +425,7 @@ export default function DCActivity({ openModal }: DCActivityProps) {
             {[
               cellTooltip.projCount ? `${cellTooltip.projCount} COMMIT${cellTooltip.projCount !== 1 ? "S" : ""}` : "",
               cellTooltip.logCount  ? `${cellTooltip.logCount} LOG${cellTooltip.logCount !== 1 ? "S" : ""}` : "",
+              cellTooltip.expCount  ? `${cellTooltip.expCount} EXPERIENCE${cellTooltip.expCount !== 1 ? "S" : ""}` : "",
             ].filter(Boolean).join(" · ")}
           </span>
         </div>,
