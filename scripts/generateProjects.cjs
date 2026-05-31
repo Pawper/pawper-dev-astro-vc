@@ -56,7 +56,7 @@ async function getOldImages() {
   if (!CLOUDINARY_ENABLED) return [];
   return new Promise((resolve, reject) => {
     cloudinary.search
-      .expression("folder:pawper.dev")
+      .expression("folder:pawper.dev/projects/screenshots")
       .execute()
       .then((result) => resolve(result.resources.map(({ public_id }) => public_id)))
       .catch(reject);
@@ -73,7 +73,7 @@ async function deleteImages(ids) {
 async function uploadStream(buffer) {
   return new Promise((resolve, reject) => {
     const writeStream = cloudinary.uploader.upload_stream(
-      { folder: "pawper.dev", width: 500 },
+      { folder: "pawper.dev/projects/screenshots", width: 500 },
       (err, result) => (err ? reject(err) : resolve(result))
     );
     const readStream = new Readable({
