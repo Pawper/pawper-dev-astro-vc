@@ -163,7 +163,14 @@ export default function CXContactCombo({ onSent, onService, onMessageChange }: C
     // Check every 100ms
     const interval = setInterval(checkAndHideBadge, 100);
 
-    return () => clearInterval(interval);
+    // On unmount (e.g. navigating away from the contact page) the interval above
+    // stops running, so the in-loop "form gone → hide" guard never fires. Hide the
+    // badge here too, otherwise it lingers visible over whatever page we land on.
+    return () => {
+      clearInterval(interval);
+      const badge = document.querySelector<HTMLElement>(".grecaptcha-badge");
+      if (badge) badge.style.visibility = "hidden";
+    };
   }, []);
   const theme = useTheme();
   const eyebrowColor = clampEyebrowColor(theme === "dark" ? "#a07e15" : "#6b5410", theme === "dark");
