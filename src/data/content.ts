@@ -84,7 +84,7 @@ export const PROFILE = {
   stack: ["React", "TypeScript", "Node", "Python", "Postgres", "Tailwind"],
   intro:
     "Twenty years on the web — from data engineering and CMS architecture to agentic systems design. I build platforms where technical rigor and human experience meet. Based in San Francisco.",
-  photo: "https://res.cloudinary.com/dr1sonbsi/image/upload/v1780170567/pawper.dev/PXL_20260527_024551482_wz1vfs.jpg",
+  photo: "https://res.cloudinary.com/dr1sonbsi/image/upload/v1780202254/pawper.dev/PXL_20260527_024551482_wz1vfs.jpg",
   email: "hello@pawper.dev",
   resumeUrl: "#resume",
 };
