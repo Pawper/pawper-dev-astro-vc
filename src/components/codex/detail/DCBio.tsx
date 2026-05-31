@@ -1,6 +1,7 @@
 import React from "react";
 import { PROFILE, SERVICES } from "../../../data/content";
 import Readout from "../../shared/Readout";
+import ResponsiveCloudinaryPicture from "../../shared/ResponsiveCloudinaryPicture";
 import CXBtn from "../CXBtn";
 import CXPill from "../CXPill";
 
@@ -43,14 +44,33 @@ export default function DCBio({ onService }: { onService: (entryId: string) => v
           padding: 18, borderRadius: 14,
           display: "flex", flexDirection: "column", gap: 12, alignItems: "flex-start",
         }}>
-          <img
+          {/* Art-directed profile photo:
+              · mobile (≤768px) renders a large full-width square;
+              · desktop renders the fixed 280px square.
+              Pre-cropped in Cloudinary to exact framing; served with f_auto/q_auto
+              for format and quality optimization across viewport sizes. */}
+          <ResponsiveCloudinaryPicture
             src={PROFILE.photo}
             alt={PROFILE.name}
+            loading="eager"
+            transforms={{
+              mobile: {
+                media: "(max-width: 768px)",
+                transform: "f_auto,q_auto,w_{w}",
+                widths: [400, 560, 750, 900],
+                sizes: "calc(100vw - 76px)",
+              },
+              desktop: {
+                transform: "f_auto,q_auto,w_{w}",
+                widths: [280, 420, 560],
+                sizes: "280px",
+              },
+            }}
             style={{
               width: "100%",
               aspectRatio: "1 / 1",
               objectFit: "cover",
-              objectPosition: "center 35%",
+              objectPosition: "center 5%",
               borderRadius: "40px 8px 40px 8px",
               display: "block",
             }}
