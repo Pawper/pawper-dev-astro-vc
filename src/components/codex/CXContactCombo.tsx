@@ -34,7 +34,6 @@ const directory = [
   { l: "Email",    v: "hello@pawper.dev",          href: "mailto:hello@pawper.dev" },
   { l: "GitHub",   v: "github.com/Pawper",          href: "https://github.com/Pawper" },
   { l: "LinkedIn", v: "linkedin.com/in/pawper",     href: "https://linkedin.com/in/pawper" },
-  { l: "dev.to",   v: "dev.to/pawper",              href: "https://dev.to/pawper" },
   { l: "Ko-fi",    v: "ko-fi.com/pawper",           href: "https://ko-fi.com/pawper" },
   { l: "RSS",      v: "pawper.dev/feed.xml",        href: "https://pawper.dev/feed.xml" },
 ];
