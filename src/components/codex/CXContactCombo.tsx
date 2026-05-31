@@ -35,7 +35,6 @@ const directory = [
   { l: "GitHub",   v: "github.com/Pawper",          href: "https://github.com/Pawper" },
   { l: "LinkedIn", v: "linkedin.com/in/pawper",     href: "https://linkedin.com/in/pawper" },
   { l: "Ko-fi",    v: "ko-fi.com/pawper",           href: "https://ko-fi.com/pawper" },
-  { l: "RSS",      v: "pawper.dev/feed.xml",        href: "https://pawper.dev/feed.xml" },
 ];
 
 interface CXContactComboProps {
