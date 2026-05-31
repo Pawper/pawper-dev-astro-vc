@@ -12,6 +12,13 @@ This instruction takes precedence over any default behavior. When in doubt, ask 
 
 ---
 
+## Remote Testing (Phone)
+
+- If you say you're **remote on your phone**, refer to tunnel setup instructions to help expose the local dev server.
+- If you're **remote on your phone AND debugging a desktop issue**, ask for screenshot instructions to capture and view desktop state from mobile context.
+
+---
+
 ## Additional Notes
 
 - All major work should be done in dedicated coding sessions, not in the main Dispatch context.
