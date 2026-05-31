@@ -7,6 +7,7 @@ import endorsementsData from "../../../data/endorsements.json";
 import CXCard from "../CXCard";
 import EndorsementQuote from "../EndorsementQuote";
 import ExperienceCardRow from "./ExperienceCardRow";
+import { cldUrl, cldSrcSet } from "../../../utils/cloudinary";
 
 interface Props {
   id: string;
@@ -120,7 +121,9 @@ export default function DCServiceEntry({ id, openModal }: Props) {
                 {/* Photo — floats left, text wraps */}
                 {e.photo && (
                   <img
-                    src={e.photo}
+                    src={cldUrl(e.photo, "c_fill,g_face,ar_1:1,f_auto,q_auto,w_288")}
+                    srcSet={cldSrcSet(e.photo, "c_fill,g_face,ar_1:1,f_auto,q_auto,w_{w}", [72, 144, 216, 288])}
+                    sizes="(max-width: 768px) 72px, 144px"
                     alt={e.name}
                     className="cx-endorsement-photo"
                     style={{ float: "left", width: 144, height: 144, objectFit: "cover", objectPosition: "center top", borderRadius: "40px 8px 40px 8px", margin: "20px 18px 4px 0" }}
