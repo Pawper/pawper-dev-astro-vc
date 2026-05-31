@@ -13,6 +13,7 @@ import DCExperience, { DCExperienceSidebar } from "./detail/DCExperience";
 import DCMedia from "./detail/DCMedia";
 import { soundClick, soundHover } from "../../context/SoundContext";
 import CXBtn, { RssIcon } from "./CXBtn";
+import { SubscribePopover } from "./SubscribePopover";
 import { PROJECTS, LOGS, EXPERIENCES, AGENDA_EVENTS, SERVICES, slugify, getPrimaryColor } from "../../data/content";
 import type { Experience } from "../../data/content";
 import { isServiceCategory } from "./detail/ExperienceCardRow";
@@ -496,8 +497,8 @@ function ModalFooterButtons({ modal, proj, primaryHex, secondaryHex, isDark, onN
   }
 
   const rssHref = modal.kind === "series"
-    ? `/feed/series/${modal.id}.xml`
-    : `/feed/skills/${modal.id.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "")}.xml`;
+    ? `https://pawper.dev/feed/series/${modal.id}.xml`
+    : `https://pawper.dev/feed/skills/${modal.id.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "")}.xml`;
 
   const ghHref = modal.filterType === "language"
     ? `https://github.com/search?q=user%3APawper++language%3A${encodeURIComponent(modal.id)}&type=code`
@@ -530,8 +531,15 @@ function ModalFooterButtons({ modal, proj, primaryHex, secondaryHex, isDark, onN
     : null;
   const seriesSiblings = seriesLogs.map(a => ({ kind: "log" as const, id: a.id }));
 
+  // Count the buttons this footer will render; only stretch to fill (fluid) when crowded (4+).
+  const buttonCount =
+    (modal.kind === "project" && proj ? (proj.webURL ? 4 : 3) : 0) +
+    (modal.kind === "series" ? (continueLog ? 4 : 3) : 0) +
+    (skillHasContent ? 2 : 0);
+  const useFluid = buttonCount >= 4;
+
   return (
-    <div className={`cx-btn-row${modal.kind === "series" && continueLog ? " cx-btn-row-fluid" : ""}`} style={{ position: "absolute", bottom: 7, left: modal.kind === "series" && continueLog ? 24 : undefined, right: 24, display: "flex", gap: 8, zIndex: 20, alignItems: "flex-end" }}>
+    <div className={`cx-btn-row${useFluid ? " cx-btn-row-fluid" : ""}`} style={{ position: "absolute", bottom: 7, left: useFluid ? 24 : undefined, right: 24, display: "flex", gap: 8, zIndex: 20, alignItems: "flex-end" }}>
       {modal.kind === "project" && proj && (
         <>
           {proj.webURL
@@ -540,32 +548,54 @@ function ModalFooterButtons({ modal, proj, primaryHex, secondaryHex, isDark, onN
           {proj.webURL && <CXBtn num="02" label="View source" href={proj.githubURL} bgHex={secondaryHex} isDark={isDark} />}
           <CXBtn num={proj.webURL ? "03" : "02"} label="Feedback" bgHex={secondaryHex} isDark={isDark} icon={null}
             onClick={() => onNavigateToContact?.(`Feedback on "${proj.title}"`)} />
+          <SharePopover
+            shareUrl={`https://pawper.dev/p/${modal.id}`}
+            title={proj.title}
+            num={proj.webURL ? "04" : "03"}
+            primaryHex={primaryHex}
+            secondaryHex={secondaryHex}
+            isDark={isDark}
+            hasPrimary={true}
+          />
         </>
       )}
       {modal.kind === "series" && continueLog && (
         <CXBtn num="01" label={seriesStarted ? "Continue" : "Start"} primary bgHex={primaryHex} isDark={isDark} icon={<span className="cx-btn-icon">›</span>}
           onClick={() => onNavigate?.({ kind: "log", id: continueLog.id, siblings: seriesSiblings })} />
       )}
-      {(modal.kind === "series" || skillHasContent) && (
-        <CXBtn num={modal.kind === "series" ? (continueLog ? "02" : "01") : "01"} label="RSS feed" href={rssHref}
-          primary={modal.kind !== "series" || !continueLog} bgHex={continueLog ? secondaryHex : primaryHex} isDark={isDark} icon={<RssIcon />} />
+      {skillHasContent && (
+        <CXBtn num="01" label="RSS feed" href={rssHref}
+          primary bgHex={primaryHex} isDark={isDark} icon={<RssIcon />} />
       )}
       {skillHasContent && (
         <CXBtn num="02" label="Full GH activity" href={ghHref} bgHex={secondaryHex} isDark={isDark} />
       )}
-      {modal.kind === "series" && seriesHasDevto && (
-        <CXBtn num={continueLog ? "03" : "02"} label="Series on dev.to" href={seriesDevtoId ? `https://dev.to/pawper/series/${seriesDevtoId}` : `https://dev.to/pawper`} bgHex={secondaryHex} isDark={isDark} />
+      {modal.kind === "series" && (
+        <SubscribePopover
+          rssUrl={rssHref}
+          devtoUrl={seriesDevtoId ? `https://dev.to/pawper/series/${seriesDevtoId}` : `https://dev.to/pawper`}
+          title={seriesName}
+          num={continueLog ? "02" : "01"}
+          primaryHex={primaryHex}
+          secondaryHex={secondaryHex}
+          isDark={isDark}
+          hasPrimary={!!continueLog}
+        />
       )}
       {modal.kind === "series" && (
         <SharePopover
           shareUrl={`https://pawper.dev/ls/${modal.id}`}
           title={seriesName}
-          num={continueLog ? (seriesHasDevto ? "04" : "03") : (seriesHasDevto ? "03" : "02")}
+          num={continueLog ? "03" : "02"}
           primaryHex={primaryHex}
           secondaryHex={secondaryHex}
           isDark={isDark}
           hasPrimary={true}
         />
+      )}
+      {modal.kind === "series" && (
+        <CXBtn num={continueLog ? "04" : "03"} label="Feedback" bgHex={secondaryHex} isDark={isDark} icon={null}
+          onClick={() => onNavigateToContact?.(`Feedback on "${seriesName}"`)} />
       )}
     </div>
   );
@@ -855,7 +885,7 @@ export default function CXModal({ modal, previousModal, onClose, onBack, onNavig
             <span className="cx-modal-kind-label">· </span>{modal.kind === "skill"   ? modal.id
               : modal.kind === "project" ? (PROJECTS.find(p => p.id === modal.id)?.description ?? modal.id)
               : modal.kind === "series"  ? ([...new Set(LOGS.filter(a => a.series).map(a => a.series!.name))].find(n => slugify(n) === modal.id) ?? modal.id)
-              : modal.kind === "search"     ? `${PROJECTS.length + LOGS.length + EXPERIENCES.length} entries indexed`
+              : modal.kind === "search"     ? `${PROJECTS.length + LOGS.length + EXPERIENCES.length + AGENDA_EVENTS.length} entries indexed`
               : modal.kind === "experience" ? (EXPERIENCES.find(e => e.id === modal.id)?.organization ?? modal.id)
               : modal.kind === "media"      ? (modal.label || "image")
               : (LOGS.find(a => a.id === modal.id)?.title ?? modal.id)}
@@ -881,7 +911,7 @@ export default function CXModal({ modal, previousModal, onClose, onBack, onNavig
                   ref={searchInputRef}
                   value={modal.query ?? ""}
                   onChange={(e) => onPatchModal?.({ query: e.target.value })}
-                  placeholder="Search projects and logs…"
+                  placeholder="Search projects, logs & experience…"
                   className="cx-search-input"
                   style={{
                     flex: 1, minWidth: 0, background: "transparent", border: "none", outline: "none",

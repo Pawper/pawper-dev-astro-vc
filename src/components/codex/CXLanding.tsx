@@ -1,7 +1,8 @@
 import React from "react";
 import { PROJECTS, LOGS } from "../../data/content";
 import CXQuickLink from "./CXQuickLink";
-import CXBtn, { RssIcon } from "./CXBtn";
+import { SubscribePopover } from "./SubscribePopover";
+import { SharePopover } from "./CXModal";
 import CXScrollable from "../shared/CXScrollable";
 
 interface CXLandingProps {
@@ -9,7 +10,7 @@ interface CXLandingProps {
   onEntry: (catId: string, entryId: string) => void;
 }
 
-export default function CXLanding({ onCategory, onEntry }: CXLandingProps) {
+export default function CXLanding({ onCategory }: CXLandingProps) {
   return (
     <div className="pw-page" style={{ position: "relative", height: "100%" }}>
       <CXScrollable
@@ -65,9 +66,25 @@ export default function CXLanding({ onCategory, onEntry }: CXLandingProps) {
       </CXScrollable>
 
       <div className="cx-btn-row" style={{ position: "absolute", bottom: 48, right: 7, display: "flex", gap: 8 }}>
-        <CXBtn num="01" label="Resume" onClick={() => onEntry("personnel", "resume")} primary icon={null} />
-        <CXBtn num="02" label="Contact" onClick={() => onEntry("contact", "all")} icon={null} />
-        <CXBtn num="03" label="RSS feed" href="/feed.xml" icon={<RssIcon />} />
+        <SubscribePopover
+          rssUrl="https://pawper.dev/feed.xml"
+          devtoUrl="https://dev.to/pawper"
+          title="pawper.dev"
+          num="01"
+          primaryHex="#c8d4e4"
+          secondaryHex="#c8d4e4"
+          isDark={true}
+          hasPrimary={false}
+        />
+        <SharePopover
+          shareUrl="https://pawper.dev"
+          title="pawper.dev"
+          num="02"
+          primaryHex="#c8d4e4"
+          secondaryHex="#c8d4e4"
+          isDark={true}
+          hasPrimary={true}
+        />
       </div>
     </div>
   );

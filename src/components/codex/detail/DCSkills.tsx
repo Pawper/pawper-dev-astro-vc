@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import CXCard from "../CXCard";
 import CXPill from "../CXPill";
-import { PROJECTS, LOGS, SKILLS, EXPERIENCES } from "../../../data/content";
+import { PROJECTS, LOGS, SKILLS, ALL_EXPERIENCES } from "../../../data/content";
 import type { Endorsement } from "../../../data/content";
 import endorsementsData from "../../../data/endorsements.json";
 
@@ -28,7 +28,7 @@ function matchSkill(name: string): Match {
   }
   if (PROJECTS.some((p) => p.topics.some((t) => t.toLowerCase() === lower))) return { kind: "topic" };
   if (LOGS.some((a) => a.tags?.some((t) => t.toLowerCase() === lower))) return { kind: "topic" };
-  if (EXPERIENCES.some((e) => e.skills?.some((s) => s.toLowerCase() === lower))) return { kind: "topic" };
+  if (ALL_EXPERIENCES.some((e) => e.skills?.some((s) => s.toLowerCase() === lower))) return { kind: "topic" };
   if (allEndorsements.some((e) => e.skills?.some((s) => s.toLowerCase() === lower))) return { kind: "topic" };
   return null;
 }
@@ -86,6 +86,12 @@ function aggregateLanguages(mode: FilterMode) {
       if (entry) entry[1].articleCount += 1;
     }
   }
+  for (const e of ALL_EXPERIENCES) {
+    for (const s of e.skills ?? []) {
+      const entry = Object.entries(totals).find(([l]) => l.toLowerCase() === s.toLowerCase());
+      if (entry) entry[1].articleCount += 1;
+    }
+  }
   const articleBoost = 2;
   const result = Object.entries(totals).map(([lang, { sum, color, articleCount }]) => ({
     lang, color, score: sum / n + articleCount * articleBoost,
@@ -98,7 +104,7 @@ function aggregateLanguages(mode: FilterMode) {
 
 function aggregateTopics(mode: FilterMode) {
   const allSkillItems = new Set(SKILLS.flatMap(g => g.items.map(s => s.toLowerCase())));
-  const counts: Record<string, { label: string; projects: number; articles: number; commits: number }> = {};
+  const counts: Record<string, { label: string; projects: number; articles: number; commits: number; experiences: number }> = {};
 
   for (const p of PROJECTS) {
     for (const t of p.topics) {
@@ -106,7 +112,7 @@ function aggregateTopics(mode: FilterMode) {
       const isLang = Object.keys(p.languages).some(l => l.toLowerCase() === t.toLowerCase());
       if (isLang) continue;
       const key = t.toLowerCase();
-      if (!counts[key]) counts[key] = { label: t, projects: 0, articles: 0, commits: 0 };
+      if (!counts[key]) counts[key] = { label: t, projects: 0, articles: 0, commits: 0, experiences: 0 };
       counts[key].projects++;
       counts[key].commits += (p.allCommitDates ?? []).length;
     }
@@ -118,13 +124,24 @@ function aggregateTopics(mode: FilterMode) {
       if (!allSkillItems.has(key)) continue;
       const isLang = PROJECTS.some(p => Object.keys(p.languages).some(l => l.toLowerCase() === key));
       if (isLang) continue;
-      if (!counts[key]) counts[key] = { label: t, projects: 0, articles: 0, commits: 0 };
+      if (!counts[key]) counts[key] = { label: t, projects: 0, articles: 0, commits: 0, experiences: 0 };
       counts[key].articles++;
     }
   }
 
+  for (const e of ALL_EXPERIENCES) {
+    for (const s of e.skills ?? []) {
+      const key = s.toLowerCase();
+      if (!allSkillItems.has(key)) continue;
+      const isLang = PROJECTS.some(p => Object.keys(p.languages).some(l => l.toLowerCase() === key));
+      if (isLang) continue;
+      if (!counts[key]) counts[key] = { label: s, projects: 0, articles: 0, commits: 0, experiences: 0 };
+      counts[key].experiences++;
+    }
+  }
+
   const getValue = (c: typeof counts[string]) =>
-    mode === "commits" ? c.commits : mode === "logs" ? c.articles : c.projects + c.articles;
+    mode === "commits" ? c.commits : mode === "logs" ? c.articles : c.projects + c.articles + c.experiences;
 
   return Object.values(counts)
     .filter(c => getValue(c) > 0)
@@ -133,7 +150,7 @@ function aggregateTopics(mode: FilterMode) {
 }
 
 const MODE_LABELS: Record<FilterMode, string> = { pl: "ALL", commits: "COMMITS", logs: "LOGS" };
-const MODE_SUBTITLE: Record<FilterMode, string> = { pl: "All projects & logs", commits: "Weighted by commits", logs: "Logs only" };
+const MODE_SUBTITLE: Record<FilterMode, string> = { pl: "All projects, logs & experience", commits: "Weighted by commits", logs: "Logs only" };
 
 function FilterDropdown({ mode, setMode, hovered, setHovered }: {
   mode: FilterMode; setMode: (m: FilterMode) => void;
@@ -252,13 +269,17 @@ export default function DCSkills({ openModal }: DCSkillsProps) {
             <FilterDropdown mode={topicMode} setMode={setTopicMode} hovered={topicHovered} setHovered={setTopicHovered} />
           </div>
           <div className="cx-skills-topic-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: "6px 24px" }}>
-            {topics.map(({ label, projects, articles, commits, value }) => {
+            {topics.map(({ label, projects, articles, commits, experiences, value }) => {
               const pct = value / topicMax * 100;
               const countLabel = topicMode === "commits"
                 ? `${commits}`
                 : topicMode === "logs"
                   ? (articles > 0 ? `${articles}L` : "")
-                  : `${projects > 0 ? `${projects}P` : ""}${projects > 0 && articles > 0 ? " · " : ""}${articles > 0 ? `${articles}L` : ""}`;
+                  : [
+                      projects > 0 ? `${projects}P` : "",
+                      articles > 0 ? `${articles}L` : "",
+                      experiences > 0 ? `${experiences}E` : "",
+                    ].filter(Boolean).join(" · ");
               return (
                 <Tap
                   key={label}

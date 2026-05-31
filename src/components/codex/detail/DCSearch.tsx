@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { PROJECTS, LOGS, SKILLS, SKILL_ALIASES, EXPERIENCES } from "../../../data/content";
+import { PROJECTS, LOGS, SKILLS, SKILL_ALIASES, ALL_EXPERIENCES } from "../../../data/content";
 import type { Endorsement } from "../../../data/content";
 import endorsementsData from "../../../data/endorsements.json";
 
@@ -7,6 +7,9 @@ const allEndorsements = endorsementsData as Endorsement[];
 import type { ModalSibling } from "../../../types";
 import MixedGrid from "../MixedGrid";
 import CXCard from "../CXCard";
+import CXPill from "../CXPill";
+import ExperienceCardRow from "./ExperienceCardRow";
+import { soundClick } from "../../../context/SoundContext";
 
 function stripHtml(html: string): string {
   return html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
@@ -22,7 +25,7 @@ type MatchedSkill = {
 };
 
 interface DCSearchProps {
-  onOpen: (kind: "project" | "log", id: string, siblings: ModalSibling[]) => void;
+  onOpen: (kind: "project" | "log" | "experience", id: string, siblings: ModalSibling[]) => void;
   onOpenSkill: (id: string, filterType: "language" | "topic", color?: string) => void;
   logsHtml: Record<string, string>;
   query: string;
@@ -31,10 +34,12 @@ interface DCSearchProps {
 export default function DCSearch({ onOpen, onOpenSkill, logsHtml, query }: DCSearchProps) {
   const [debouncedQuery, setDebouncedQuery] = useState(query);
   const [resultsHeight, setResultsHeight] = useState(0);
+  const [expExpanded, setExpExpanded] = useState(false);
   const resultsRef = useRef<HTMLDivElement>(null);
   const shouldAnimate = useRef(!query);
 
   useEffect(() => { shouldAnimate.current = true; }, []);
+  useEffect(() => { setExpExpanded(false); }, [debouncedQuery]);
 
   useEffect(() => {
     const t = setTimeout(() => setDebouncedQuery(query), 300);
@@ -73,7 +78,20 @@ export default function DCSearch({ onOpen, onOpenSkill, logsHtml, query }: DCSea
     );
   });
 
-  const total = PROJECTS.length + LOGS.length + EXPERIENCES.length + allEndorsements.length;
+  const matchedExperiences = q.length < 2 ? [] : ALL_EXPERIENCES.filter((e) => {
+    const haystack = [
+      e.title, e.organization, e.description, e.category, e.period,
+      ...(e.longDescription ?? []),
+      ...(e.skills ?? []),
+    ].join(" ").toLowerCase();
+    return haystack.includes(q);
+  }).sort((a, b) => {
+    if (a.featured !== b.featured) return a.featured ? -1 : 1;
+    const key = (e: typeof a) => e.datetimeStart ?? e.period?.match(/(\d{4})[^0-9]*$/)?.[1] ?? "0000";
+    return key(b).localeCompare(key(a));
+  });
+
+  const total = PROJECTS.length + LOGS.length + ALL_EXPERIENCES.length + allEndorsements.length;
 
   const matchedSkills: MatchedSkill[] = q.length < 2 ? [] : SKILLS.flatMap((group) =>
     group.items
@@ -84,7 +102,7 @@ export default function DCSearch({ onOpen, onOpenSkill, logsHtml, query }: DCSea
       .flatMap((item): MatchedSkill[] => {
         const lc = item.toLowerCase();
         const logCount = LOGS.filter((a) => a.tags?.some((t) => t.toLowerCase() === lc)).length;
-        const expCount = EXPERIENCES.filter((e) => e.skills?.some((s) => s.toLowerCase() === lc)).length;
+        const expCount = ALL_EXPERIENCES.filter((e) => e.skills?.some((s) => s.toLowerCase() === lc)).length;
         const endorseCount = allEndorsements.filter((e) => e.skills?.some((s) => s.toLowerCase() === lc)).length;
         const langEntry = PROJECTS.flatMap((p) => Object.entries(p.languages))
           .find(([l]) => l.toLowerCase() === lc);
@@ -103,7 +121,7 @@ export default function DCSearch({ onOpen, onOpenSkill, logsHtml, query }: DCSea
   const projectSiblings: ModalSibling[] = matchedProjects.map((p) => ({ kind: "project", id: p.id }));
   const logSiblings: ModalSibling[] = matchedLogs.map((a) => ({ kind: "log", id: a.id }));
   const contentCount = matchedProjects.length + matchedLogs.length;
-  const hasResults = matchedSkills.length > 0 || contentCount > 0;
+  const hasResults = matchedSkills.length > 0 || matchedExperiences.length > 0 || contentCount > 0;
   const hasQuery = q.length >= 2;
 
   const labelStyle: React.CSSProperties = {
@@ -124,7 +142,10 @@ export default function DCSearch({ onOpen, onOpenSkill, logsHtml, query }: DCSea
       }}>
         <div style={shouldAnimate.current ? {
           height: hasQuery ? resultsHeight : 0,
-          overflow: "hidden",
+          // `clip` (not `hidden`) clips the open/close height animation without
+          // establishing a scroll container, so the sticky "Show less" pill binds
+          // to the modal's scroll container (CXScrollable) like the skill modal.
+          overflow: "clip",
           transition: "height 0.35s cubic-bezier(.2,.7,.3,1)",
         } : {}}>
           <div ref={resultsRef}>
@@ -135,7 +156,7 @@ export default function DCSearch({ onOpen, onOpenSkill, logsHtml, query }: DCSea
                 </p>
                 <div className="cx-search-skills-grid" style={{
                   display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 8,
-                  marginBottom: contentCount > 0 ? 16 : 0,
+                  marginBottom: (matchedExperiences.length > 0 || contentCount > 0) ? 16 : 0,
                 }}>
                   {matchedSkills.map((skill) => {
                     const pct = skill.total > 0 ? (skill.matchCount / skill.total) * 100 : 0;
@@ -170,6 +191,43 @@ export default function DCSearch({ onOpen, onOpenSkill, logsHtml, query }: DCSea
                   })}
                 </div>
               </>
+            )}
+            {matchedExperiences.length > 0 && (
+              <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: contentCount > 0 ? 16 : 0 }}>
+                <p className="pw-mono" style={labelStyle}>
+                  {`${matchedExperiences.length} ${matchedExperiences.length === 1 ? "EXPERIENCE" : "EXPERIENCES"}`}
+                </p>
+                <div style={{
+                  display: "flex", flexDirection: "column", gap: 10,
+                  ...(matchedExperiences.length > 2 ? {
+                    maxHeight: expExpanded ? 9999 : 180,
+                    overflow: "hidden",
+                    transition: "max-height 0.6s cubic-bezier(.2,.7,.3,1)",
+                    WebkitMaskImage: expExpanded ? "none" : "linear-gradient(to bottom, black 40%, transparent 100%)",
+                    maskImage: expExpanded ? "none" : "linear-gradient(to bottom, black 40%, transparent 100%)",
+                  } : {}),
+                }}>
+                  {matchedExperiences.map((exp) => (
+                    <ExperienceCardRow
+                      key={exp.id}
+                      exp={exp}
+                      openModal={(m) => {
+                        if (m.kind === "skill") onOpenSkill(m.id, m.filterType!, m.color);
+                        else if (m.kind === "experience") onOpen("experience", m.id, []);
+                      }}
+                      onCardClick={() => onOpen("experience", exp.id, [])}
+                      onOpenSkill={onOpenSkill}
+                    />
+                  ))}
+                </div>
+                {matchedExperiences.length > 2 && (
+                  <div style={{ display: "flex", justifyContent: "center", marginTop: expExpanded ? 0 : -14, ...(expExpanded ? { position: "sticky", bottom: 60 } : {}) }}>
+                    <CXPill size="md" onClick={() => { soundClick(); setExpExpanded((e) => !e); }}>
+                      {expExpanded ? "Show less" : `Show all ${matchedExperiences.length}`}
+                    </CXPill>
+                  </div>
+                )}
+              </div>
             )}
             {contentCount > 0 && (
               <MixedGrid

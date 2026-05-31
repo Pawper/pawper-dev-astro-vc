@@ -1,7 +1,7 @@
 import rss from '@astrojs/rss';
 import { getCollection } from 'astro:content';
 import type { APIContext } from 'astro';
-import { PROJECTS, getStackLabel } from '../../data/content';
+import { PROJECTS, ALL_EXPERIENCES, getStackLabel } from '../../data/content';
 import { renderMarkdown } from '../../utils/renderMarkdown';
 
 export async function GET(ctx: APIContext) {
@@ -33,13 +33,30 @@ export async function GET(ctx: APIContext) {
     customData: '',
   }));
 
-  const items = [...logItems, ...projectItems]
+  const expItems = ALL_EXPERIENCES.map((e) => {
+    const year = e.datetimeStart?.slice(0, 4) ?? e.period?.match(/(\d{4})[^0-9]*$/)?.[1] ?? '0000';
+    const sortKey = e.datetimeStart ?? `${year}-01-01`;
+    const body = e.longDescription?.length
+      ? e.longDescription.map((p) => `<p>${p}</p>`).join('')
+      : `<p>${e.description ?? ''}</p>`;
+    return {
+      sortKey,
+      title: e.title,
+      pubDate: new Date(`${sortKey}T12:00:00`),
+      description: [e.organization, e.period].filter(Boolean).join(' · '),
+      content: body,
+      link: `/xp/${e.id}`,
+      customData: '',
+    };
+  });
+
+  const items = [...logItems, ...projectItems, ...expItems]
     .sort((a, b) => b.sortKey.localeCompare(a.sortKey))
     .map(({ sortKey: _s, ...item }) => item);
 
   return rss({
     title: 'Phillip Wessels — Activity',
-    description: 'All projects and log entries, sorted by most recent activity.',
+    description: 'All projects, logs, and experience, sorted by most recent activity.',
     site: ctx.site!,
     xmlns: { media: 'http://search.yahoo.com/mrss/' },
     items,

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import type { View, ModalState, Theme } from "../../types";
 import { CX_INDEX, PROJECT_CATEGORIES, LOG_CATEGORIES, DEFAULT_PROJECT_CAT, SERVICES } from "../../data/content";
 import { SharePopover } from "./CXModal";
+import { SubscribePopover } from "./SubscribePopover";
 import resumeAssets from "../../data/resume-assets.json";
 import CXBtn, { RssIcon } from "./CXBtn";
 import CXSectionFrame from "./CXSectionFrame";
@@ -95,7 +96,19 @@ export default function CXMain({ view, selectEntry, selectCategory, setView, set
 
   if (view.kind === "grid" && view.cat === "projects") {
     return (
-      <CXSectionFrame cat={cat} crumb="all projects" onOverview={goToOverview}>
+      <CXSectionFrame cat={cat} crumb="all projects" onOverview={goToOverview} footer={
+        <div className="cx-btn-row" style={{ display: "flex", gap: 8 }}>
+          <SharePopover
+            shareUrl="https://pawper.dev/projects"
+            title="Projects · pawper.dev"
+            num="01"
+            primaryHex={primaryHex}
+            secondaryHex={secondaryHex}
+            isDark={isDark}
+            hasPrimary={true}
+          />
+        </div>
+      }>
         <CXProjectsGrid onOpen={(id) => selectEntry("projects", id)} />
       </CXSectionFrame>
     );
@@ -106,8 +119,25 @@ export default function CXMain({ view, selectEntry, selectCategory, setView, set
     return (
       <CXSectionFrame cat={cat} crumb={projCat?.label ?? view.entry} onOverview={goToOverview} footer={
         <div className="cx-btn-row" style={{ display: "flex", gap: 8 }}>
-          <CXBtn num="01" label="RSS feed" href={`/feed/projects/${view.entry}.xml`} primary icon={<RssIcon />} />
-          <CXBtn num="02" label="GitHub" href="https://github.com/Pawper?tab=repositories&q=topic%3Aportfolio-project" />
+          <SubscribePopover
+            rssUrl={`https://pawper.dev/feed/projects/${view.entry}.xml`}
+            devtoUrl="https://github.com/Pawper?tab=repositories&q=topic%3Aportfolio-project"
+            title={projCat?.label ?? view.entry}
+            num="01"
+            primaryHex={primaryHex}
+            secondaryHex={secondaryHex}
+            isDark={isDark}
+            hasPrimary={true}
+          />
+          <SharePopover
+            shareUrl={`https://pawper.dev/projects/${view.entry}`}
+            title={projCat?.label ?? view.entry}
+            num="02"
+            primaryHex={primaryHex}
+            secondaryHex={secondaryHex}
+            isDark={isDark}
+            hasPrimary={true}
+          />
         </div>
       }>
         <CXProjectsGrid category={view.entry} onOpen={(id) => selectEntry("projects", id)} />
@@ -125,12 +155,20 @@ export default function CXMain({ view, selectEntry, selectCategory, setView, set
 
   if (view.kind === "entry" && view.cat === "logs" && view.entry) {
     const logCat = LOG_CATEGORIES.find((c) => c.id === view.entry);
-    const rssFeedUrl = view.entry === "latest" ? "/feed.xml" : `/feed/logs/${view.entry}.xml`;
+    const rssFeedUrl = view.entry === "latest" ? "https://pawper.dev/feed.xml" : `https://pawper.dev/feed/logs/${view.entry}.xml`;
     return (
       <CXSectionFrame cat={cat} crumb={logCat?.label ?? view.entry} onOverview={goToOverview} footer={
         <div className="cx-btn-row" style={{ display: "flex", gap: 8 }}>
-          <CXBtn num="01" label="RSS feed" href={rssFeedUrl} primary icon={<RssIcon />} />
-          <CXBtn num="02" label="dev.to" href="https://dev.to/pawper" />
+          <SubscribePopover
+            rssUrl={rssFeedUrl}
+            devtoUrl="https://dev.to/pawper"
+            title={logCat?.label ?? view.entry}
+            num="01"
+            primaryHex={primaryHex}
+            secondaryHex={secondaryHex}
+            isDark={isDark}
+            hasPrimary={true}
+          />
         </div>
       }>
         <CXLogsGrid category={view.entry} onOpen={(id) => selectEntry("logs", id)} />
@@ -165,7 +203,20 @@ export default function CXMain({ view, selectEntry, selectCategory, setView, set
               </div>
             )
             : view.cat === "personnel" && view.entry === "activity"
-            ? <CXBtn num="01" label="RSS feed" href="/feed.xml" primary icon={<RssIcon />} />
+            ? (
+              <div className="cx-btn-row" style={{ display: "flex", gap: 8 }}>
+                <SubscribePopover
+                  rssUrl="https://pawper.dev/feed.xml"
+                  devtoUrl="https://dev.to/pawper"
+                  title="Activity"
+                  num="01"
+                  primaryHex={primaryHex}
+                  secondaryHex={secondaryHex}
+                  isDark={isDark}
+                  hasPrimary={true}
+                />
+              </div>
+            )
             : view.cat === "services"
             ? (
               <div className="cx-btn-row" style={{ display: "flex", gap: 8 }}>

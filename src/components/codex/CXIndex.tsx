@@ -1,6 +1,6 @@
 import React from "react";
 import type { View, ModalState } from "../../types";
-import { CX_INDEX, PROJECTS, LOGS, SERVICES } from "../../data/content";
+import { CX_INDEX, PROJECTS, LOGS, ALL_EXPERIENCES, SERVICES } from "../../data/content";
 import Tap from "../shared/Tap";
 import { soundClick, soundHover } from "../../context/SoundContext";
 
@@ -207,7 +207,7 @@ export default function CXIndex({ view, openCats, onCategory, onEntry, onHome, o
           <svg width="11" height="11" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
             <circle cx="7.5" cy="7.5" r="5.5"/><line x1="11.5" y1="11.5" x2="16" y2="16"/>
           </svg>
-          Search {PROJECTS.length + LOGS.length} entries
+          Search {PROJECTS.length + LOGS.length + ALL_EXPERIENCES.length} entries
         </div>
       </Tap>
     </div>

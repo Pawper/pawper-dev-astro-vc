@@ -1,11 +1,44 @@
 import React, { useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import CXCard from "../CXCard";
-import { PROJECTS, LOGS } from "../../../data/content";
+import CXPill from "../CXPill";
+import { PROJECTS, LOGS, ALL_EXPERIENCES } from "../../../data/content";
+import type { Experience } from "../../../data/content";
 import type { ModalState, ModalSibling } from "../../../types";
 import MixedGrid from "../MixedGrid";
+import ExperienceCardRow from "./ExperienceCardRow";
 import Tap from "../../shared/Tap";
 import { soundClick, soundHover } from "../../../context/SoundContext";
+
+/** Year span an experience was active, from its dated start or its free-form
+ *  `period` (e.g. "2019–2022" → [2019, 2022], "Feb 2026" → [2026, 2026]). */
+function expYearRange(e: Experience): [number, number] | null {
+  if (e.datetimeStart) {
+    const y = parseInt(e.datetimeStart.slice(0, 4));
+    return [y, y];
+  }
+  const yrs = (e.period ?? "").match(/\d{4}/g)?.map(Number);
+  if (!yrs?.length) return null;
+  return [Math.min(...yrs), Math.max(...yrs)];
+}
+
+const MONTHS = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"];
+
+/** A YYYY-MM-DD sort key for reverse-chronological ordering, mixing dated agenda
+ *  events with free-form-period experiences. Agenda events use their start date;
+ *  "Mon YYYY" periods resolve to that month; bare year ranges anchor to the end
+ *  of their most recent year (a multi-year role's recency). */
+function expSortKey(e: Experience): string {
+  if (e.datetimeStart) return e.datetimeStart;
+  const period = e.period ?? "";
+  const monthMatch = period.match(/([A-Za-z]{3,})\s+(\d{4})\s*$/);
+  if (monthMatch) {
+    const mi = MONTHS.indexOf(monthMatch[1].slice(0, 3).toLowerCase());
+    if (mi >= 0) return `${monthMatch[2]}-${String(mi + 1).padStart(2, "0")}-15`;
+  }
+  const year = period.match(/(\d{4})[^0-9]*$/)?.[1];
+  return year ? `${year}-12-31` : "0000";
+}
 
 const WEEKS = 52;
 const CELL = 9;
@@ -52,11 +85,12 @@ export default function DCActivity({ openModal }: DCActivityProps) {
   const [selectedYear, setSelectedYear] = useState<number | null>(null);
   const [yearHovered, setYearHovered] = useState(false);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
+  const [expExpanded, setExpExpanded] = useState(false);
   const [cellTooltip, setCellTooltip] = useState<{
     x: number; y: number; iso: string; projCount: number; logCount: number; color: string;
   } | null>(null);
 
-  useEffect(() => { setSelectedDate(null); setCellTooltip(null); }, [selectedYear]);
+  useEffect(() => { setSelectedDate(null); setCellTooltip(null); setExpExpanded(false); }, [selectedYear]);
   const heatmapScrollRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const el = heatmapScrollRef.current;
@@ -82,6 +116,17 @@ export default function DCActivity({ openModal }: DCActivityProps) {
       return true;
     })
     .sort((a, b) => b.date.localeCompare(a.date));
+
+  const filteredExperiences = ALL_EXPERIENCES
+    .filter(e => {
+      if (selectedDate) return e.datetimeStart === selectedDate;
+      if (selectedYear) {
+        const r = expYearRange(e);
+        return r ? selectedYear >= r[0] && selectedYear <= r[1] : false;
+      }
+      return true;
+    })
+    .sort((a, b) => expSortKey(b).localeCompare(expSortKey(a)));
 
   const projectSiblings: ModalSibling[] = filteredProjectItems.map(p => ({ kind: "project", id: p.id }));
   const logSiblings: ModalSibling[] = filteredLogItems.map(a => ({ kind: "log", id: a.id }));
@@ -153,6 +198,7 @@ export default function DCActivity({ openModal }: DCActivityProps) {
                 {[
                   filteredProjectItems.length ? `${filteredProjectItems.length} PROJECT${filteredProjectItems.length !== 1 ? "S" : ""}` : "",
                   filteredLogItems.length     ? `${filteredLogItems.length} LOG${filteredLogItems.length !== 1 ? "S" : ""}` : "",
+                  filteredExperiences.length  ? `${filteredExperiences.length} EXPERIENCE${filteredExperiences.length !== 1 ? "S" : ""}` : "",
                   filteredCommits             ? `${filteredCommits} COMMIT${filteredCommits !== 1 ? "S" : ""}` : "",
                 ].filter(Boolean).join(" · ")}
               </span>
@@ -293,6 +339,38 @@ export default function DCActivity({ openModal }: DCActivityProps) {
             </div>
           </div>
         </CXCard>
+
+        {filteredExperiences.length > 0 && (
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            <span className="pw-mono" style={{ fontSize: 11, color: "var(--section-deep)", letterSpacing: "0.16em" }}>
+              {`${filteredExperiences.length} ${filteredExperiences.length === 1 ? "EXPERIENCE" : "EXPERIENCES"}`}
+            </span>
+            <div style={{
+              display: "flex", flexDirection: "column", gap: 10,
+              ...(filteredExperiences.length > 2 ? {
+                maxHeight: expExpanded ? 9999 : 180,
+                overflow: "hidden",
+                transition: "max-height 0.6s cubic-bezier(.2,.7,.3,1)",
+                WebkitMaskImage: expExpanded ? "none" : "linear-gradient(to bottom, black 40%, transparent 100%)",
+                maskImage: expExpanded ? "none" : "linear-gradient(to bottom, black 40%, transparent 100%)",
+              } : {}),
+            }}>
+              {filteredExperiences.map((exp) => (
+                <ExperienceCardRow key={exp.id} exp={exp} openModal={openModal} />
+              ))}
+            </div>
+            {/* bottom: 110 clears the reading panel's bottom scroll-fade so the
+                pinned pill stays in the visible region — the modal's fade is
+                smaller, hence its 60. */}
+            {filteredExperiences.length > 2 && (
+              <div style={{ display: "flex", justifyContent: "center", marginTop: expExpanded ? 0 : -14, ...(expExpanded ? { position: "sticky", bottom: 110 } : {}) }}>
+                <CXPill size="md" onClick={() => { soundClick(); setExpExpanded(e => !e); }}>
+                  {expExpanded ? "Show less" : `Show all ${filteredExperiences.length}`}
+                </CXPill>
+              </div>
+            )}
+          </div>
+        )}
 
         <MixedGrid
           projects={filteredProjectItems}

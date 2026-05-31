@@ -169,6 +169,12 @@ export const SERVICES: ServiceEntry[] = [
 
 export const EXPERIENCES: Experience[] = experiencesData as Experience[];
 
+/** All experience-type entries: hardcoded historical EXPERIENCES plus the dated,
+ *  Airtable-sourced AGENDA_EVENTS (including nested child sessions). Both open as
+ *  `experience` modals and are independently navigable, so they count as entries
+ *  for search, activity, skills, and feed integrations. */
+export const ALL_EXPERIENCES: Experience[] = [...EXPERIENCES, ...AGENDA_EVENTS];
+
 // ── Project category helpers ─────────────────────────────────────────────────
 
 const _customCatIds = [
