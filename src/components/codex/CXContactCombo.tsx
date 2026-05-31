@@ -89,11 +89,19 @@ export default function CXContactCombo({ onSent, onService, onMessageChange }: C
   }, []);
 
   // Hide the reCAPTCHA badge when modals, popovers, menu, or expanded header are open.
+  // Also hide when leaving the contact page (contact form is not in the DOM).
   // On desktop, position it under the contact form.
   useEffect(() => {
     const checkAndHideBadge = () => {
       const badge = document.querySelector(".grecaptcha-badge") as any;
       if (!badge) return;
+
+      // If the contact form doesn't exist, we've left the contact page — hide the badge
+      const form = document.querySelector("#contact-form") as HTMLElement;
+      if (!form) {
+        badge.style.visibility = "hidden";
+        return;
+      }
 
       // Check for main modal backdrop
       const hasModalBackdrop = !!document.querySelector(".cx-modal-backdrop");
