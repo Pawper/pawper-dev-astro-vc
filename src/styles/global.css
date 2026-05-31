@@ -1267,32 +1267,23 @@ html, body {
     flex-direction: column !important;
     align-items: stretch !important;
   }
-
-  /* Position the reCAPTCHA badge on mobile: left of button, aligned with button row. */
-  .grecaptcha-badge {
-    left: 40px !important;
-    right: auto !important;
-    bottom: 47px !important;
-    transform-origin: bottom left !important;
-  }
 }
 
-/* reCAPTCHA v3 badge — scaled down so it sits quietly in the corner, and
-   theme-aware via the data-theme attribute set in CXContactCombo. Google locks
-   down the badge's box-shadow/background, but CSS `filter` still applies to the
-   whole widget (iframe included), so in dark mode we recolor it rather than just
-   dimming: invert() flips the white chrome to near-black, and hue-rotate(180deg)
-   spins the inverted hues back so the reCAPTCHA logo keeps its blue/green. */
-.grecaptcha-badge {
-  transform: scale(0.75) !important;
-  transform-origin: bottom right;
+/* reCAPTCHA inline badge — rendered as the last element of the contact form
+   (see CXContactCombo). Scaled down a touch and aligned to the form's left edge.
+   It's theme-aware via the artboard's data-theme: Google locks down the badge's
+   box-shadow/background, but CSS `filter` still applies to the whole widget
+   (iframe included), so in dark mode we recolor it. invert() flips the white
+   chrome to near-black; the inverted hues land around gold (~50°), which we keep
+   (no hue-rotate back to blue) so the badge reads in the site's amber accent. */
+.cx-recaptcha .grecaptcha-badge {
+  transform: scale(0.8) !important;
+  transform-origin: top left;
+  box-shadow: none !important;
+  height: 48px !important;
 }
 
-.grecaptcha-badge[data-theme="dark"] {
-  filter: invert(0.92) hue-rotate(180deg) brightness(1.05) !important;
-}
-
-.grecaptcha-badge[data-theme="light"] {
-  filter: none !important;
+.pw-artboard[data-theme="dark"] .cx-recaptcha .grecaptcha-badge {
+  filter: invert(0.92) sepia(1) hue-rotate(10deg) saturate(3) brightness(1.1) !important;
 }
 

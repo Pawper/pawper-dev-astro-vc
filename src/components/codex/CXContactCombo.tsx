@@ -15,7 +15,17 @@ declare global {
   interface Window {
     grecaptcha?: {
       ready: (cb: () => void) => void;
-      execute: (siteKey: string, opts: { action: string }) => Promise<string>;
+      // Explicit-render widgets are executed by their numeric widget id (not the
+      // site key — that only works when the key is loaded via api.js?render=KEY).
+      execute: (widgetId: number, opts: { action: string }) => Promise<string>;
+      render: (
+        container: HTMLElement | string,
+        params: {
+          sitekey: string;
+          size?: "invisible";
+          badge?: "bottomright" | "bottomleft" | "inline";
+        },
+      ) => number;
     };
   }
 }
@@ -62,6 +72,8 @@ export function CXContactFooter({ sent, hasMessage }: { sent: boolean; hasMessag
 
 export default function CXContactCombo({ onSent, onService, onMessageChange }: CXContactComboProps) {
   const formRef = useRef<HTMLFormElement>(null);
+  const badgeRef = useRef<HTMLDivElement>(null);
+  const widgetIdRef = useRef<number | null>(null);
   const [error, setError] = useState(false);
   const [sent, setSent] = useState(false);
   const [prefill, setPrefill] = useState<Record<string, string>>({});
@@ -76,134 +88,59 @@ export default function CXContactCombo({ onSent, onService, onMessageChange }: C
     if (Object.keys(vals).length) setPrefill(vals);
   }, []);
 
-  // Load the reCAPTCHA v3 script once (no-op without a configured site key).
+  // Load the reCAPTCHA script once (no-op without a configured site key). We use
+  // explicit rendering (`render=explicit`) rather than `render=SITE_KEY` so we can
+  // place the badge inline inside the form ourselves, instead of Google injecting a
+  // floating, fixed-position badge into <body> that has to be chased into position.
   useEffect(() => {
     if (!RECAPTCHA_SITE_KEY) return;
     if (document.querySelector("script[data-recaptcha]")) return;
     const s = document.createElement("script");
-    s.src = `https://www.google.com/recaptcha/api.js?render=${RECAPTCHA_SITE_KEY}`;
+    s.src = "https://www.google.com/recaptcha/api.js?render=explicit";
     s.async = true;
     s.defer = true;
     s.setAttribute("data-recaptcha", "true");
     document.head.appendChild(s);
   }, []);
 
-  // Hide the reCAPTCHA badge when modals, popovers, menu, or expanded header are open.
-  // Also hide when leaving the contact page (contact form is not in the DOM).
-  // On desktop, position it under the contact form.
+  // Render the (invisible, score-based v3) badge inline into our own container, so it
+  // flows as the last element of the form instead of floating over the whole app.
+  // Polls until the API is ready, then renders once into badgeRef.
   useEffect(() => {
-    const checkAndHideBadge = () => {
-      const badge = document.querySelector(".grecaptcha-badge") as any;
-      if (!badge) return;
+    if (!RECAPTCHA_SITE_KEY) return;
+    let cancelled = false;
 
-      // If the contact form doesn't exist, we've left the contact page — hide the badge
-      const form = document.querySelector("#contact-form") as HTMLElement;
-      if (!form) {
-        badge.style.visibility = "hidden";
+    const render = () => {
+      if (cancelled) return;
+      const g = window.grecaptcha;
+      const container = badgeRef.current;
+      // Wait for the async script, the API, and the container to all be ready.
+      if (!g || typeof g.render !== "function" || !container) {
+        window.setTimeout(render, 50);
         return;
       }
-
-      // Check for main modal backdrop
-      const hasModalBackdrop = !!document.querySelector(".cx-modal-backdrop");
-
-      // Check for share popover (QR code image appears when share popover is open on any screen size)
-      const hasSharePopover = !!document.querySelector("img[alt='QR code']");
-
-      // Check for mobile menu: look for fixed-position overlay (z-index 199) that's a direct child of .pw-artboard
-      let hasMobileMenu = false;
-      const artboard = document.querySelector(".pw-artboard");
-      if (artboard) {
-        const fixedChildren = Array.from(artboard.children).filter(el => {
-          const style = window.getComputedStyle(el as Element);
-          return style.position === "fixed" && parseInt(style.zIndex || "0") === 199;
-        });
-        hasMobileMenu = fixedChildren.length > 0;
-      }
-
-      // Check for expanded header (adds cx-layout-brief-open class to main grid)
-      const hasExpandedHeader = !!document.querySelector(".cx-layout-brief-open");
-
-      if (hasModalBackdrop || hasSharePopover || hasMobileMenu || hasExpandedHeader) {
-        badge.style.visibility = "hidden";
-      } else {
-        badge.style.visibility = "visible";
-      }
-
-      // On desktop, position badge under the contact form
-      if (window.innerWidth >= 1200) {
-        const form = document.querySelector("#contact-form") as HTMLElement;
-        if (form) {
-          const formRect = form.getBoundingClientRect();
-          const formBottom = formRect.bottom + window.scrollY;
-
-          // Find the first input/textarea field to align with its left edge
-          const firstInput = form.querySelector("input[type='text'], textarea") as HTMLElement;
-          let fieldLeft = formRect.left + window.scrollX;
-          if (firstInput) {
-            const inputRect = firstInput.getBoundingClientRect();
-            fieldLeft = inputRect.left + window.scrollX - 63;
-          }
-
-          badge.style.position = "absolute";
-          badge.style.top = formBottom - 41 + "px";
-          badge.style.left = fieldLeft + "px";
-          badge.style.right = "auto";
-          badge.style.bottom = "auto";
-        }
-      } else {
-        // Reset to fixed positioning on mobile
-        badge.style.position = "fixed";
-        badge.style.top = "auto";
-        badge.style.left = "40px";
-        badge.style.right = "auto";
-        badge.style.bottom = "47px";
-      }
+      // Already rendered into this container (e.g. React Strict Mode double-invoke).
+      if (widgetIdRef.current !== null || container.childElementCount > 0) return;
+      widgetIdRef.current = g.render(container, {
+        sitekey: RECAPTCHA_SITE_KEY,
+        size: "invisible",
+        badge: "inline",
+      });
     };
 
-    // Check every 100ms
-    const interval = setInterval(checkAndHideBadge, 100);
-
-    // On unmount (e.g. navigating away from the contact page) the interval above
-    // stops running, so the in-loop "form gone → hide" guard never fires. Hide the
-    // badge here too, otherwise it lingers visible over whatever page we land on.
-    return () => {
-      clearInterval(interval);
-      const badge = document.querySelector<HTMLElement>(".grecaptcha-badge");
-      if (badge) badge.style.visibility = "hidden";
-    };
+    render();
+    return () => { cancelled = true; };
   }, []);
+
   const theme = useTheme();
   const eyebrowColor = clampEyebrowColor(theme === "dark" ? "#a07e15" : "#6b5410", theme === "dark");
 
-  // Reflect the site's current theme onto the reCAPTCHA badge so it blends with
-  // light/dark. Re-runs whenever `theme` changes (useTheme is reactive), and waits
-  // for Google's script to inject the badge before tagging it. The actual recolor
-  // lives in global.css keyed off this attribute (`.grecaptcha-badge[data-theme]`)
-  // so there's a single source of truth — no inline-vs-`!important` conflict.
-  useEffect(() => {
-    if (!RECAPTCHA_SITE_KEY) return;
-
-    const applyTheme = () => {
-      const badge = document.querySelector<HTMLElement>(".grecaptcha-badge");
-      if (!badge) return false;
-      badge.setAttribute("data-theme", theme);
-      return true;
-    };
-
-    if (applyTheme()) return;
-    // Badge is injected asynchronously — watch the body until it appears.
-    const obs = new MutationObserver(() => {
-      if (applyTheme()) obs.disconnect();
-    });
-    obs.observe(document.body, { childList: true, subtree: true });
-    return () => obs.disconnect();
-  }, [theme]);
-
   async function getRecaptchaToken(): Promise<string | undefined> {
-    if (!RECAPTCHA_SITE_KEY || !window.grecaptcha) return undefined;
     const grecaptcha = window.grecaptcha;
+    const widgetId = widgetIdRef.current;
+    if (!RECAPTCHA_SITE_KEY || !grecaptcha || widgetId === null) return undefined;
     await new Promise<void>((resolve) => grecaptcha.ready(() => resolve()));
-    return grecaptcha.execute(RECAPTCHA_SITE_KEY, { action: "contact" });
+    return grecaptcha.execute(widgetId, { action: "contact" });
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -254,6 +191,17 @@ export default function CXContactCombo({ onSent, onService, onMessageChange }: C
         <span className="pw-mono" style={{ fontSize: 11, color: "var(--ink-mute)", letterSpacing: "0.16em", marginTop: 4 }}>
           SENT SECURELY · HTTPS
         </span>
+        {/* reCAPTCHA renders its inline badge here (see render effect above). */}
+        <div ref={badgeRef} className="cx-recaptcha" />
+        <p className="cx-recaptcha-disclosure" style={{
+          fontSize: 11, lineHeight: 1.5, color: "var(--ink-mute)", margin: 0,
+        }}>
+          This site is protected by reCAPTCHA and the Google{" "}
+          <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer"
+            style={{ color: "inherit", textDecoration: "underline" }}>Privacy Policy</a> and{" "}
+          <a href="https://policies.google.com/terms" target="_blank" rel="noopener noreferrer"
+            style={{ color: "inherit", textDecoration: "underline" }}>Terms of Service</a> apply.
+        </p>
       </form>
 
       <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
