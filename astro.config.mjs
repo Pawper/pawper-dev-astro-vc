@@ -1,6 +1,8 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
 import react from '@astrojs/react';
+import remarkDirective from 'remark-directive';
+import { remarkTabsPlugin } from './src/utils/remarkTabsPlugin.mjs';
 
 /**
  * Dev-only middleware that serves /api/edit with raw access to the query string and
@@ -70,6 +72,7 @@ export default defineConfig({
   site: 'https://pawper.dev',
   integrations: [react(), draftEditApi()],
   markdown: {
+    remarkPlugins: [remarkDirective, remarkTabsPlugin('site')],
     shikiConfig: {
       langs: [
         { name: "bash-prompt",     scopeName: "source.bash-prompt",     patterns: [], repository: {} },
