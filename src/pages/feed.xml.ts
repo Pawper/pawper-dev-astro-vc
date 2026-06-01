@@ -16,7 +16,7 @@ export async function GET(ctx: APIContext) {
       title: entry.data.title,
       pubDate: new Date(entry.data.date.replace(/\./g, '-')),
       description: entry.data.hook ?? `${entry.data.kicker}${entry.data.series ? ` · ${entry.data.series.name} pt. ${entry.data.series.part}` : ''}`,
-      content: `${heroImg}${await renderMarkdown(entry.body ?? '')}`,
+      content: `${heroImg}${await renderMarkdown(entry.body ?? '', 'rss')}`,
       link: `/l/${id}`,
       customData: entry.data.image
         ? `<media:content url="${entry.data.image}" medium="image" />`

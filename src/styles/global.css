@@ -774,6 +774,55 @@ html, body {
   font-size: 13px;
 }
 
+/* ─── Tabs (:::tabs / ::tab[Label] markdown directive) ──────────────────────── */
+
+.pw-tabs {
+  margin: 1.5em 0;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.pw-tabs-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  padding: 4px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 8px 8px 0 0;
+}
+
+.pw-tab-btn {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 6px 14px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  color: var(--ink-soft);
+  background: transparent;
+  transition: background 0.12s, color 0.12s;
+}
+
+.pw-tab-btn:hover { color: var(--ink); background: rgba(255,255,255,0.08); }
+
+.pw-tab-btn.is-active { color: #12141c; background: #f5c130; }
+
+.pw-tab-panel {
+  display: none;
+  padding: 1.25em 1.25em 0.25em;
+  background: rgba(255,255,255,0.03);
+  border-radius: 0 0 8px 8px;
+  border: 1px solid rgba(255,255,255,0.06);
+  border-top: none;
+}
+
+.pw-tab-panel.is-active { display: block; }
+
+.pw-tab-panel > *:last-child { margin-bottom: 0; }
+
 /* ─── Header marquee ────────────────────────────────────────────────────────── */
 
 @keyframes cx-marquee {

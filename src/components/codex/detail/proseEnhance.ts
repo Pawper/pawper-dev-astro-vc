@@ -817,7 +817,59 @@ function attachHeadingProgress(el: HTMLElement, slug: string): () => void {
 
 // ── Main enhancer ────────────────────────────────────────────────────────────
 
+function activateTabs(el: HTMLElement) {
+  el.querySelectorAll<HTMLElement>('.pw-tabs-raw').forEach(raw => {
+    const seps = Array.from(raw.querySelectorAll<HTMLElement>('.pw-tab-sep'));
+    if (seps.length === 0) return;
+
+    const tabs: { label: string; nodes: ChildNode[] }[] = [];
+    let current: { label: string; nodes: ChildNode[] } | null = null;
+
+    Array.from(raw.childNodes).forEach(child => {
+      if (child instanceof HTMLElement && child.classList.contains('pw-tab-sep')) {
+        if (current) tabs.push(current);
+        current = { label: child.dataset.label ?? '', nodes: [] };
+      } else if (current) {
+        current.nodes.push(child);
+      }
+    });
+    if (current) tabs.push(current);
+    if (tabs.length === 0) return;
+
+    const wrapper = document.createElement('div');
+    wrapper.className = 'pw-tabs';
+
+    const nav = document.createElement('div');
+    nav.className = 'pw-tabs-nav';
+    wrapper.appendChild(nav);
+
+    tabs.forEach(({ label, nodes }, i) => {
+      const btn = document.createElement('button');
+      btn.className = 'pw-tab-btn' + (i === 0 ? ' is-active' : '');
+      btn.textContent = label;
+      btn.addEventListener('mouseenter', soundHover);
+      btn.addEventListener('click', () => {
+        soundClick();
+        wrapper.querySelectorAll('.pw-tab-btn').forEach(b => b.classList.remove('is-active'));
+        wrapper.querySelectorAll('.pw-tab-panel').forEach(p => p.classList.remove('is-active'));
+        btn.classList.add('is-active');
+        wrapper.querySelector(`[data-panel="${i}"]`)?.classList.add('is-active');
+      });
+      nav.appendChild(btn);
+
+      const panel = document.createElement('div');
+      panel.className = 'pw-tab-panel' + (i === 0 ? ' is-active' : '');
+      panel.dataset.panel = String(i);
+      nodes.forEach(n => panel.appendChild(n.cloneNode(true)));
+      wrapper.appendChild(panel);
+    });
+
+    raw.replaceWith(wrapper);
+  });
+}
+
 export function enhanceProse(el: HTMLElement, opts: ProseOptions = {}): () => void {
+  activateTabs(el);
   // External links → new tab (pawper.dev /l/ links open the modal instead)
   el.querySelectorAll<HTMLAnchorElement>('a[href^="http"]').forEach((a) => {
     const href = a.getAttribute("href") ?? "";
