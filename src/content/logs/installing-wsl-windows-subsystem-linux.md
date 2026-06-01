@@ -98,19 +98,9 @@ This single command will:
 
 > **Note**: If you see an error about virtualization, you may need to enable it in your BIOS. Restart your computer, enter BIOS (usually by pressing F2, F10, DEL, or ESC during startup — varies by manufacturer), and look for "Virtualization" or "Intel VT-x" / "AMD-V" and enable it.
 
-### Step 3: Restart Your Computer
+### Step 3: Ubuntu setup
 
-WSL requires a system restart. Do this now.
-
-### Step 4: Complete Ubuntu Setup
-
-After restarting, Ubuntu may launch automatically, or you may need to launch it manually:
-
-**If Ubuntu launches automatically:** You'll see a terminal window prompt you to create a username and password. Skip to the next section.
-
-**If Ubuntu doesn't launch automatically:** Open Windows Terminal, click the dropdown arrow in the toolbar, and select "Ubuntu" to launch the setup.
-
-Either way, you'll see a setup prompt:
+You'll see a setup prompt:
 
 ```
 Installing, this may take a few minutes...
@@ -125,23 +115,29 @@ Choose a simple username (e.g., `dev` or your first name). **Remember this passw
 
 https://pawper.dev/?v=entry&cat=logs&entry=latest&modal=log&id=guide-password-management-cybersecurity-beginners
 
+### Step 4: Restart Your Computer
+
+WSL requires a system restart for Ubuntu to show up in your terminal applications. Do this now.
+
 ### Step 5: Verify Installation
 
-In the Ubuntu terminal that's now open, verify everything works:
+Open a PowerShell terminal and verify everything works:
 
-```bash
+```pwsh
 wsl --version
 ```
 
 You should see output showing WSL version 2.x.
 
-Also verify your Linux distribution:
-
-```bash
-lsb_release -a
 ```
-
-You should see Ubuntu information.
+WSL version: 2.7.3.0
+Kernel version: 6.6.114.1-1
+WSLg version: 1.0.73
+MSRDC version: 1.2.6676
+Direct3D version: 1.611.1-81528511
+DXCore version: 10.0.26100.1-240331-1435.ge-release
+Windows version: 10.0.26200.8524
+```
 
 > **Sources / additional material:**
 >
