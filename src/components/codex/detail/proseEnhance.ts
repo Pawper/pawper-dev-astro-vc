@@ -817,8 +817,48 @@ function attachHeadingProgress(el: HTMLElement, slug: string): () => void {
 
 // ── Main enhancer ────────────────────────────────────────────────────────────
 
+const TAB_PREF_KEY = 'pw-tab-pref';
+
+function loadTabPrefs(): string[] {
+  try { return JSON.parse(localStorage.getItem(TAB_PREF_KEY) ?? '[]'); }
+  catch { return []; }
+}
+
+function saveTabPref(label: string): void {
+  try {
+    const prefs = loadTabPrefs().filter(l => l !== label);
+    prefs.unshift(label);
+    localStorage.setItem(TAB_PREF_KEY, JSON.stringify(prefs.slice(0, 20)));
+  } catch {}
+}
+
+function selectTabByLabel(el: HTMLElement, label: string, sourceWrapper?: HTMLElement) {
+  el.querySelectorAll<HTMLElement>('.pw-tabs').forEach(wrapper => {
+    if (wrapper === sourceWrapper) return;
+    const btns = Array.from(wrapper.querySelectorAll<HTMLElement>(':scope > .pw-tabs-nav > .pw-tab-btn'));
+    const idx = btns.findIndex(b => b.textContent?.trim() === label);
+    if (idx === -1) return;
+    btns.forEach(b => b.classList.remove('is-active'));
+    wrapper.querySelectorAll(':scope > .pw-tab-panel').forEach(p => p.classList.remove('is-active'));
+    btns[idx].classList.add('is-active');
+    wrapper.querySelector(`:scope > [data-panel="${idx}"]`)?.classList.add('is-active');
+  });
+}
+
 function activateTabs(el: HTMLElement) {
-  el.querySelectorAll<HTMLElement>('.pw-tabs-raw').forEach(raw => {
+  // Process innermost tabs first so nested raws are activated before their
+  // parent clones them into a panel via cloneNode(true).
+  const allRaw = () => Array.from(el.querySelectorAll<HTMLElement>('.pw-tabs-raw'));
+  let pass = allRaw();
+  while (pass.length > 0) {
+    const innermost = pass.filter(raw => !raw.parentElement?.closest('.pw-tabs-raw'));
+    if (innermost.length === 0) break;
+    innermost.forEach(raw => processRaw(raw, el));
+    pass = allRaw();
+  }
+}
+
+function processRaw(raw: HTMLElement, el: HTMLElement) {
     const seps = Array.from(raw.querySelectorAll<HTMLElement>('.pw-tab-sep'));
     if (seps.length === 0) return;
 
@@ -850,26 +890,67 @@ function activateTabs(el: HTMLElement) {
       btn.addEventListener('mouseenter', soundHover);
       btn.addEventListener('click', () => {
         soundClick();
-        wrapper.querySelectorAll('.pw-tab-btn').forEach(b => b.classList.remove('is-active'));
-        wrapper.querySelectorAll('.pw-tab-panel').forEach(p => p.classList.remove('is-active'));
+        wrapper.querySelectorAll(':scope > .pw-tabs-nav > .pw-tab-btn').forEach(b => b.classList.remove('is-active'));
+        wrapper.querySelectorAll(':scope > .pw-tab-panel').forEach(p => p.classList.remove('is-active'));
         btn.classList.add('is-active');
-        wrapper.querySelector(`[data-panel="${i}"]`)?.classList.add('is-active');
+        wrapper.querySelector(`:scope > [data-panel="${i}"]`)?.classList.add('is-active');
+        saveTabPref(label);
+        selectTabByLabel(el, label, wrapper);
       });
       nav.appendChild(btn);
 
       const panel = document.createElement('div');
       panel.className = 'pw-tab-panel' + (i === 0 ? ' is-active' : '');
       panel.dataset.panel = String(i);
-      nodes.forEach(n => panel.appendChild(n.cloneNode(true)));
+      nodes.forEach(n => panel.appendChild(n));
       wrapper.appendChild(panel);
     });
 
+    // Apply saved preference: activate the tab whose label appears earliest in prefs
+    const prefs = loadTabPrefs();
+    let prefIdx = -1;
+    let bestPriority = Infinity;
+    tabs.forEach(({ label }, i) => {
+      const priority = prefs.indexOf(label);
+      if (priority !== -1 && priority < bestPriority) { bestPriority = priority; prefIdx = i; }
+    });
+    if (prefIdx > 0) {
+      const allBtns = Array.from(nav.querySelectorAll<HTMLElement>(':scope > .pw-tab-btn'));
+      const allPanels = Array.from(wrapper.querySelectorAll<HTMLElement>(':scope > .pw-tab-panel'));
+      allBtns.forEach(b => b.classList.remove('is-active'));
+      allPanels.forEach(p => p.classList.remove('is-active'));
+      allBtns[prefIdx]?.classList.add('is-active');
+      allPanels[prefIdx]?.classList.add('is-active');
+    }
+
     raw.replaceWith(wrapper);
-  });
 }
 
 export function enhanceProse(el: HTMLElement, opts: ProseOptions = {}): () => void {
   activateTabs(el);
+  // Anchor links — scroll the OverlayScrollbars viewport instead of the window
+  el.querySelectorAll<HTMLAnchorElement>('a[href^="#"]').forEach((a) => {
+    a.addEventListener("click", (e) => {
+      const hash = a.getAttribute("href")?.slice(1);
+      if (!hash) return;
+      const target = document.getElementById(hash);
+      if (!target) return;
+      e.preventDefault();
+      soundClick();
+      let scrollRoot: Element | null = el.parentElement;
+      while (scrollRoot && !scrollRoot.hasAttribute("data-overlayscrollbars-viewport")) {
+        scrollRoot = scrollRoot.parentElement;
+      }
+      if (scrollRoot) {
+        const rootRect = scrollRoot.getBoundingClientRect();
+        const targetRect = target.getBoundingClientRect();
+        scrollRoot.scrollTop += targetRect.top - rootRect.top - 80;
+      } else {
+        target.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    });
+  });
+
   // External links → new tab (pawper.dev /l/ links open the modal instead)
   el.querySelectorAll<HTMLAnchorElement>('a[href^="http"]').forEach((a) => {
     const href = a.getAttribute("href") ?? "";

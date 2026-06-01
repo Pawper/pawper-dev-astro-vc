@@ -50,9 +50,28 @@ VS Code is the most popular editor and has many features, including syntax highl
 ---
 
 ## 💻 Set Up VS Code
-1. Download the Visual Studio Code installer. https://code.visualstudio.com/download
-   * The Insiders edition is a nightly build with the latest features, but it is not a stable release and you may encounter issues. That said, you can have both versions installed. https://code.visualstudio.com/insiders/ 
-1. Once it is downloaded, run the installer. This will only take a minute.
+
+:::tabs
+::tab[macOS]
+1. Download the Visual Studio Code installer. https://code.visualstudio.com/download — select the **macOS** `.dmg` package.
+2. Open the downloaded `.dmg`, drag **Visual Studio Code** into your **Applications** folder.
+3. Launch VS Code from Applications (or Spotlight: <kbd>⌘</kbd>+<kbd>Space</kbd>, type "code").
+   * The Insiders edition is a nightly build with the latest features, but it is not a stable release and you may encounter issues. That said, you can have both versions installed. https://code.visualstudio.com/insiders/
+
+::tab[Windows]
+1. Download the Visual Studio Code installer. https://code.visualstudio.com/download — select the **Windows** installer.
+   * The Insiders edition is a nightly build with the latest features, but it is not a stable release and you may encounter issues. That said, you can have both versions installed. https://code.visualstudio.com/insiders/
+2. Once it is downloaded, run the installer. This will only take a minute.
+
+::tab[Linux]
+The quickest way on Ubuntu/Debian is via snap:
+```bash
+sudo snap install code --classic
+```
+Or download the `.deb` or `.rpm` package from https://code.visualstudio.com/download for your distribution. Full setup guide: https://code.visualstudio.com/docs/setup/linux
+
+Launch VS Code from your application menu or run `code` in the terminal.
+:::
 
 > Sources / additional material:
 > https://code.visualstudio.com/docs/setup/setup-overview 
@@ -96,6 +115,17 @@ Here you can see that since this is a React project, I am setting all JavaScript
 
 ## 📜Key Bindings: VS Code
 
+:::tabs
+::tab[macOS]
+| Shortcut | Action |
+|---|---|
+| <kbd>⌘</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd> | Show Command Palette |
+| <kbd>⌘</kbd>+<kbd>P</kbd> | Quick Open, Go to File |
+| <kbd>⌘</kbd>+<kbd>Shift</kbd>+<kbd>X</kbd> | Open Extensions panel |
+| <kbd>Ctrl</kbd>+<kbd>`</kbd> | Show Integrated Terminal |
+| <kbd>Option</kbd>+<kbd>Click</kbd> | Insert additional cursors |
+
+::tab[Windows]
 | Shortcut | Action |
 |---|---|
 | <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd> | Show Command Palette |
@@ -104,8 +134,35 @@ Here you can see that since this is a React project, I am setting all JavaScript
 | <kbd>Ctrl</kbd>+<kbd>`</kbd> | Show Integrated Terminal |
 | <kbd>Alt</kbd>+<kbd>Click</kbd> | Insert additional cursors |
 
+::tab[Linux]
+| Shortcut | Action |
+|---|---|
+| <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd> | Show Command Palette |
+| <kbd>Ctrl</kbd>+<kbd>P</kbd> | Quick Open, Go to File |
+| <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>X</kbd> | Open Extensions panel |
+| <kbd>Ctrl</kbd>+<kbd>`</kbd> | Show Integrated Terminal |
+| <kbd>Alt</kbd>+<kbd>Click</kbd> | Insert additional cursors |
+:::
+
 ## 📜Key Bindings: Navigating & Selecting Text
 
+:::tabs
+::tab[macOS]
+| Shortcut | Action |
+|---|---|
+| <kbd>Option</kbd>+<kbd>→</kbd> | Move the cursor one word to the right |
+| <kbd>Option</kbd>+<kbd>←</kbd> | Move the cursor one word to the left |
+| <kbd>Shift</kbd>+<kbd>→</kbd> | Select text to the right |
+| <kbd>Shift</kbd>+<kbd>←</kbd> | Select text to the left |
+| <kbd>Option</kbd>+<kbd>Shift</kbd>+<kbd>→</kbd> | Select the word to the right |
+| <kbd>Option</kbd>+<kbd>Shift</kbd>+<kbd>←</kbd> | Select the word to the left |
+| <kbd>⌘</kbd>+<kbd>Shift</kbd>+<kbd>←</kbd> | Select to the beginning of the current line |
+| <kbd>⌘</kbd>+<kbd>Shift</kbd>+<kbd>→</kbd> | Select to the end of the current line |
+| <kbd>⌘</kbd>+<kbd>Shift</kbd>+<kbd>↑</kbd> | Select to the beginning of the document |
+| <kbd>⌘</kbd>+<kbd>Shift</kbd>+<kbd>↓</kbd> | Select to the end of the document |
+| <kbd>⌘</kbd>+<kbd>A</kbd> | Select all document content |
+
+::tab[Windows]
 | Shortcut | Action |
 |---|---|
 | <kbd>Ctrl</kbd>+<kbd>→</kbd> | Move the cursor one word to the right |
@@ -120,9 +177,40 @@ Here you can see that since this is a React project, I am setting all JavaScript
 | <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>End</kbd> | Select to the end of the document |
 | <kbd>Ctrl</kbd>+<kbd>A</kbd> | Select all document content |
 
+::tab[Linux]
+| Shortcut | Action |
+|---|---|
+| <kbd>Ctrl</kbd>+<kbd>→</kbd> | Move the cursor one word to the right |
+| <kbd>Ctrl</kbd>+<kbd>←</kbd> | Move the cursor one word to the left |
+| <kbd>Shift</kbd>+<kbd>→</kbd> | Select text to the right |
+| <kbd>Shift</kbd>+<kbd>←</kbd> | Select text to the left |
+| <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>→</kbd> | Select the word to the right |
+| <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>←</kbd> | Select the word to the left |
+| <kbd>Shift</kbd>+<kbd>Home</kbd> | Select to the beginning of the current line |
+| <kbd>Shift</kbd>+<kbd>End</kbd> | Select to the end of the current line |
+| <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Home</kbd> | Select to the beginning of the document |
+| <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>End</kbd> | Select to the end of the document |
+| <kbd>Ctrl</kbd>+<kbd>A</kbd> | Select all document content |
+:::
+
 > Sources / additional material:
 > https://code.visualstudio.com/shortcuts/keyboard-shortcuts-macos.pdf
 > https://code.visualstudio.com/shortcuts/keyboard-shortcuts-windows.pdf
 > https://code.visualstudio.com/docs/configure/keybindings
+
+:::tabs
+::tab[macOS]
+The next couple of guides in the series are for Windows users. You can skip to this one:
+http://pawper.dev/l/using-terminal-in-vs-code
+
+::tab[Windows]
+Please proceed to the next guide:
+http://pawper.dev/l/installing-wsl-windows-subsystem-linux
+
+::tab[Linux]
+You already have a native Unix terminal — no WSL needed. Skip ahead to:
+http://pawper.dev/l/using-terminal-in-vs-code
+
+:::
 
 _This article was revised & expanded with AI for the purpose of providing practical information. I have reviewed it for accuracy and edited it appropriately._

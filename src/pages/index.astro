@@ -104,18 +104,71 @@ async function loadDraftsFolder() {
   }
 }
 
+// Word count: for tab groups, count only the longest tab — a reader only reads one path.
+// Uses a depth-aware parser so nested tab groups are handled correctly at every level.
+function findClosingDiv(html: string, start: number): number {
+  let depth = 1;
+  let i = start;
+  while (i < html.length && depth > 0) {
+    if (html.startsWith('</div>', i)) {
+      depth--;
+      if (depth === 0) return i;
+      i += 6;
+    } else if (html.startsWith('<div', i) && (html[i + 4] === '>' || html[i + 4] === ' ')) {
+      depth++;
+      i += 4;
+    } else {
+      i++;
+    }
+  }
+  return -1;
+}
+
+function longestTabOnly(html: string): string {
+  const OPEN = '<div class="pw-tabs-raw">';
+  const SEP_RE = /<div class="pw-tab-sep"[^>]*><\/div>/g;
+  const textLen = (s: string) => s.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().length;
+  let result = '';
+  let i = 0;
+  while (i < html.length) {
+    const tabStart = html.indexOf(OPEN, i);
+    if (tabStart === -1) { result += html.slice(i); break; }
+    result += html.slice(i, tabStart);
+    const innerStart = tabStart + OPEN.length;
+    const closeIdx = findClosingDiv(html, innerStart);
+    if (closeIdx === -1) { result += html.slice(tabStart); break; }
+    const inner = html.slice(innerStart, closeIdx);
+    // Split inner content on tab separators
+    const parts: string[] = [];
+    let last = 0;
+    SEP_RE.lastIndex = 0;
+    let m: RegExpExecArray | null;
+    while ((m = SEP_RE.exec(inner)) !== null) { parts.push(inner.slice(last, m.index)); last = m.index + m[0].length; }
+    parts.push(inner.slice(last));
+    const tabs = parts.slice(1); // index 0 is pre-first-separator preamble
+    if (tabs.length === 0) {
+      result += html.slice(tabStart, closeIdx + 6);
+    } else {
+      const longest = tabs.reduce((a, b) => textLen(b) > textLen(a) ? b : a, tabs[0]);
+      result += longestTabOnly(longest); // recurse for nested groups in winner
+    }
+    i = closeIdx + 6;
+  }
+  return result;
+}
+
 // Load both published logs and draft logs
 const draftLogs = import.meta.env.DEV ? await loadDraftsFolder() : [];
 const allLogs = [...rawLogs, ...draftLogs];
 const rawEntries = allLogs.map((entry) => {
-  // Drafts arrive with a `logs-drafts/` path prefix (dev only). Strip it so the
-  // slug behaves like any other log, and carry a `draft` flag through for the badge.
+  // Drafts arrive with a `logs-drafts/` or `drafts/` path prefix (dev only). Strip it
+  // so the slug behaves like any other log, and carry a `draft` flag through for the badge.
   const rawId = entry.id.replace(/\.md$/, '');
-  const draft = rawId.startsWith('logs-drafts/');
-  const id = draft ? rawId.replace(/^logs-drafts\//, '') : rawId;
+  const draft = rawId.startsWith('logs-drafts/') || rawId.startsWith('drafts/');
+  const id = rawId.replace(/^(?:logs-drafts|drafts)\//, '');
   const html = entry.rendered?.html ?? '';
   logsHtml[id] = html;
-  const words = html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().split(' ').filter(Boolean).length;
+  const words = longestTabOnly(html).replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().split(' ').filter(Boolean).length;
   const hook = entry.data.hook ?? (html.match(/<p[^>]*>([\s\S]*?)<\/p>/)?.[1].replace(/<[^>]+>/g, "").trim() || undefined);
   return { id, draft, title: entry.data.title, date: entry.data.date, kicker: entry.data.kicker, words, tags: entry.data.tags, image: entry.data.image, hook, devto: entry.data.devto, seriesRaw: entry.data.series, noThumb: entry.data.noThumb, mentor: entry.data.mentor };
 });

@@ -777,7 +777,6 @@ html, body {
 /* ─── Tabs (:::tabs / ::tab[Label] markdown directive) ──────────────────────── */
 
 .pw-tabs {
-  margin: 1.5em 0;
   border-radius: 8px;
   overflow: hidden;
 }
@@ -808,18 +807,21 @@ html, body {
 
 .pw-tab-btn:hover { color: var(--ink); background: rgba(255,255,255,0.08); }
 
-.pw-tab-btn.is-active { color: #12141c; background: #f5c130; }
+.pw-tab-btn.is-active { color: #12141c; background: var(--section-accent, #f5c130); }
 
 .pw-tab-panel {
   display: none;
-  padding: 1.25em 1.25em 0.25em;
+  flex-direction: column;
+  gap: 14px;
+  padding: 1.25em 1.25em 1.25em;
   background: rgba(255,255,255,0.03);
   border-radius: 0 0 8px 8px;
   border: 1px solid rgba(255,255,255,0.06);
   border-top: none;
+  line-height: 1.7;
 }
 
-.pw-tab-panel.is-active { display: block; }
+.pw-tab-panel.is-active { display: flex; }
 
 .pw-tab-panel > *:last-child { margin-bottom: 0; }
 

@@ -41,31 +41,61 @@ VS Code's integrated terminal runs **inside your editor**. You can:
 
 The integrated terminal in VS Code can run any shell installed on your system. Your choice depends on your operating system and setup:
 
-### On Windows
+:::tabs
+::tab[macOS]
+Use **zsh** (default in modern macOS).
+
+::tab[Windows]
 Use **bash** (from Ubuntu through WSL). This gives you a Unix-based development environment that matches your production servers and aligns with most tutorials. If you haven't already, [install WSL](http://pawper.dev/l/installing-wsl-windows-subsystem-linux) and [configure VS Code to use it](http://pawper.dev/l/using-vs-code-with-wsl).
 
 From here on we'll assume you're using Windows & VS Code with the Bash [shell](http://pawper.dev/l/operating-systems-terminals-shells#what-is-a-shell) from WSL in your VS Code integrated terminal.
 
-### On macOS
-Use **zsh** (default in modern macOS).
+::tab[Linux]
+Use whatever shell your distribution defaults to — usually **bash** or **zsh**. VS Code picks it up automatically. No additional setup needed.
+:::
 
 ## Setting Up the Integrated Terminal
 
 ### Step 1: Open the Integrated Terminal
+:::tabs
+::tab[macOS]
+Press <kbd>Ctrl</kbd>+<kbd>`</kbd> (backtick) to open the integrated terminal. Note: VS Code uses <kbd>Ctrl</kbd> — not <kbd>⌘</kbd> — for this shortcut on macOS.
 
-Open VS Code and press <kbd>Ctrl</kbd>+<kbd>`</kbd> (backtick, the key below <kbd>Esc</kbd>) to open the integrated terminal.
+::tab[Windows]
+Press <kbd>Ctrl</kbd>+<kbd>`</kbd> (backtick, the key below <kbd>Esc</kbd>) to open the integrated terminal.
+
+::tab[Linux]
+Press <kbd>Ctrl</kbd>+<kbd>`</kbd> (backtick, the key below <kbd>Esc</kbd>) to open the integrated terminal.
+:::
 
 Alternatively, go to **View → Terminal** or right-click in the editor and select **"Open in Integrated Terminal"**.
 
 The terminal will open at the bottom of your editor.
 
-> **Windows Users: Ensure VS Code is remote connected with WSL**
-> 
-> By default on Windows, VS Code opens terminals in PowerShell. But if you [have VS Code configured for WSL](http://pawper.dev/l/using-vs-code-with-wsl), the terminal should open with the Ubuntu (WSL) or Bash shell. If it opens to PowerShell, [ensure VS Code is remote connected with WSL](http://localhost:4322/l/using-vs-code-with-wsl#opening-a-wsl-project-folder).
+:::tabs
+::tab[macOS]
+The terminal opens with **zsh** by default. No additional setup needed — it works out of the box.
+
+::tab[Windows]
+**Ensure VS Code is remote connected with WSL**
+
+By default on Windows, VS Code opens terminals in PowerShell. But if you [have VS Code configured for WSL](http://pawper.dev/l/using-vs-code-with-wsl), the terminal should open with the Ubuntu (WSL) or Bash shell. If it opens to PowerShell, [ensure VS Code is remote connected with WSL](http://pawper.dev/l/using-vs-code-with-wsl#opening-a-wsl-project-folder).
+
+::tab[Linux]
+The terminal opens with your default shell (bash or zsh). No additional setup needed — it works out of the box.
+:::
 
 ### Step 2: Create a New Terminal
-
+:::tabs
+::tab[macOS]
 Close your current terminal (click the X) and open a new one with <kbd>Ctrl</kbd>+<kbd>`</kbd>.
+
+::tab[Windows]
+Close your current terminal (click the X) and open a new one with <kbd>Ctrl</kbd>+<kbd>`</kbd>.
+
+::tab[Linux]
+Close your current terminal (click the X) and open a new one with <kbd>Ctrl</kbd>+<kbd>`</kbd>.
+:::
 
 Verify by running:
 
@@ -81,18 +111,46 @@ You should see `/bin/bash` (WSL) or `/bin/zsh` (macOS).
 
 Now that your terminal is set up, here's how you'll use it:
 
+:::tabs
+::tab[macOS]
+1. **Open a project folder**: File → Open Folder (or <kbd>⌘</kbd>+<kbd>O</kbd>), then select your project directory
+2. **Open the terminal**: <kbd>Ctrl</kbd>+<kbd>`</kbd>
+3. **Run commands**: Type whatever you need (`npm install`, `git commit`, etc.)
+4. **See output immediately**: Right above your code in the same window
+
+::tab[Windows]
 1. **Open a project folder**: File → Open Folder, then select your project directory
 2. **Open the terminal**: <kbd>Ctrl</kbd>+<kbd>`</kbd>
 3. **Run commands**: Type whatever you need (`npm install`, `git commit`, etc.)
 4. **See output immediately**: Right above your code in the same window
 
+::tab[Linux]
+1. **Open a project folder**: File → Open Folder, then select your project directory
+2. **Open the terminal**: <kbd>Ctrl</kbd>+<kbd>`</kbd>
+3. **Run commands**: Type whatever you need (`npm install`, `git commit`, etc.)
+4. **See output immediately**: Right above your code in the same window
+:::
+
 ### Multiple Terminals
 
 You can open multiple terminal tabs within the integrated terminal:
 
+:::tabs
+::tab[macOS]
+- **New terminal**: Click the **+** button in the terminal panel, or press <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>`</kbd>
+- **Switch between terminals**: Click the terminal name at the top. On MacBooks without dedicated <kbd>PageUp</kbd>/<kbd>PageDown</kbd> keys, use <kbd>Fn</kbd>+<kbd>↑</kbd>/<kbd>↓</kbd> or click the terminal in the panel
+- **Split terminals**: Click the split icon (or right-click and select "Split Terminal") to run two terminals side-by-side
+
+::tab[Windows]
 - **New terminal**: Click the **+** button in the terminal panel, or press <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>`</kbd>
 - **Switch between terminals**: Click the terminal name at the top, or use <kbd>Ctrl</kbd>+<kbd>PageUp</kbd>/<kbd>PageDown</kbd> to cycle through them
 - **Split terminals**: Click the split icon (or right-click and select "Split Terminal") to run two terminals side-by-side
+
+::tab[Linux]
+- **New terminal**: Click the **+** button in the terminal panel, or press <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>`</kbd>
+- **Switch between terminals**: Click the terminal name at the top, or use <kbd>Ctrl</kbd>+<kbd>PageUp</kbd>/<kbd>PageDown</kbd> to cycle through them
+- **Split terminals**: Click the split icon (or right-click and select "Split Terminal") to run two terminals side-by-side
+:::
 
 This is useful for:
 - Running a development server in one terminal (`npm start`)
@@ -103,6 +161,20 @@ This is useful for:
 
 Learn these keyboard shortcuts to work faster:
 
+:::tabs
+::tab[macOS]
+| Shortcut | Action |
+|----------|--------|
+| <kbd>Ctrl</kbd>+<kbd>`</kbd> | Toggle terminal open/close |
+| <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>`</kbd> | Create new terminal |
+| <kbd>Fn</kbd>+<kbd>↑</kbd> | Previous terminal |
+| <kbd>Fn</kbd>+<kbd>↓</kbd> | Next terminal |
+| <kbd>⌘</kbd>+<kbd>C</kbd> | Copy selected text |
+| <kbd>⌘</kbd>+<kbd>V</kbd> | Paste |
+| <kbd>⌘</kbd>+<kbd>W</kbd> | Close terminal |
+| <kbd>⌘</kbd>+<kbd>K</kbd> | Clear terminal (or `clear` command) |
+
+::tab[Windows]
 | Shortcut | Action |
 |----------|--------|
 | <kbd>Ctrl</kbd>+<kbd>`</kbd> | Toggle terminal open/close |
@@ -114,15 +186,44 @@ Learn these keyboard shortcuts to work faster:
 | <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>W</kbd> | Close terminal |
 | <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Home</kbd> | Clear terminal (or `clear` command) |
 
+::tab[Linux]
+| Shortcut | Action |
+|----------|--------|
+| <kbd>Ctrl</kbd>+<kbd>`</kbd> | Toggle terminal open/close |
+| <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>`</kbd> | Create new terminal |
+| <kbd>Ctrl</kbd>+<kbd>PageUp</kbd> | Previous terminal |
+| <kbd>Ctrl</kbd>+<kbd>PageDown</kbd> | Next terminal |
+| <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>C</kbd> | Copy selected text |
+| <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>V</kbd> | Paste |
+| <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>W</kbd> | Close terminal |
+| <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Home</kbd> | Clear terminal (or `clear` command) |
+:::
+
 ## Customizing Your Terminal
 
 ### Change Terminal Font Size
+:::tabs
+::tab[macOS]
+In Settings (<kbd>⌘</kbd>+<kbd>,</kbd>), search "terminal font size":
 
+```json
+"terminal.integrated.fontSize": 14
+```
+
+::tab[Windows]
 In Settings (<kbd>Ctrl</kbd>+<kbd>,</kbd>), search "terminal font size":
 
 ```json
 "terminal.integrated.fontSize": 14
 ```
+
+::tab[Linux]
+In Settings (<kbd>Ctrl</kbd>+<kbd>,</kbd>), search "terminal font size":
+
+```json
+"terminal.integrated.fontSize": 14
+```
+:::
 
 ### Change Terminal Font Family
 
@@ -169,7 +270,17 @@ By default, the integrated terminal opens in your project root (where you opened
 ```
 
 ### Terminal Text is Too Small or Too Large
+:::tabs
+::tab[macOS]
+Adjust in Settings (<kbd>⌘</kbd>+<kbd>,</kbd>):
 
+```json
+"terminal.integrated.fontSize": 14
+```
+
+Try sizes between 12-18 depending on your monitor.
+
+::tab[Windows]
 Adjust in Settings (<kbd>Ctrl</kbd>+<kbd>,</kbd>):
 
 ```json
@@ -178,6 +289,15 @@ Adjust in Settings (<kbd>Ctrl</kbd>+<kbd>,</kbd>):
 
 Try sizes between 12-18 depending on your monitor.
 
+::tab[Linux]
+Adjust in Settings (<kbd>Ctrl</kbd>+<kbd>,</kbd>):
+
+```json
+"terminal.integrated.fontSize": 14
+```
+
+Try sizes between 12-18 depending on your monitor.
+:::
 ---
 
 > **Sources / additional material:**

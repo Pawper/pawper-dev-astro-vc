@@ -7,7 +7,7 @@ const ogImages = ogImagesRaw as Record<string, string>;
 export async function getStaticPaths() {
   const logs = await getCollection('logs');
   return logs.map((entry) => {
-    const slug = entry.id.replace(/\.md$/, '');
+    const slug = entry.id.replace(/\.md$/, '').replace(/^drafts\//, '');
     return {
       params: { slug },
       props: {

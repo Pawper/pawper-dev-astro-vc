@@ -333,14 +333,14 @@ export function getLogsForCategory(catId: string): Log[] {
 }
 
 export const SKILLS: Array<{ label: string; items: string[] }> = [
-  { label: "AI",     items: ["OpenClaw", "Claude"] },
+  { label: "AI",           items: ["OpenClaw", "Hermes", "Claude", "ChatGPT", "Gemini", "Antigravity", "OpenRouter", "Ollama", "ngrok", "Discord", "Telegram"] },
   { label: "Frontend",     items: ["HTML", "CSS", "SCSS", "JavaScript", "TypeScript", "React", "Astro", "Tailwind", "Bootstrap", "EJS"] },
-  { label: "Backend",     items: ["Node", "Python", "SQL", "PHP", "REST APIs", "PowerShell", "Bash"] },
-  { label: "Tooling",     items: ["Git", "Webpack", "Vite", "Netlify", "Puppeteer", "Octokit", "Cloudinary", "Docker"] },
-  { label: "Content/Data", items: ["WordPress", "Toolset", "Elementor", "Postman", "Excel/VBA", "Smartsheet", "Zoho Desk"] },
-  { label: "Practice",    items: ["Accessibility", "Performance", "Testing", "DX", "Type-safety", "Design", "AI-Augmented Dev"] },
-  { label: "Flourishing", items: ["Positive Psychology", "PERMA", "VIA Strengths", "Wellness Coaching"] },
-  { label: "Adjacent",    items: ["Mentoring", "Writing", "Figma"] },
+  { label: "Backend",      items: ["Node", "Python", "SQL", "PHP", "REST APIs", "PowerShell", "Bash"] },
+  { label: "Tooling",      items: ["Git", "Webpack", "Vite", "Netlify", "Puppeteer", "Octokit", "Cloudinary", "Docker", "VS Code", "Terminal", "WSL", "Containers", "Deployment", "Syncthing"] },
+  { label: "Content/Data", items: ["WordPress", "Toolset", "Elementor", "Postman", "Excel/VBA", "Smartsheet", "Zoho Desk", "Obsidian"] },
+  { label: "Practice",     items: ["Accessibility", "Performance", "Testing", "DX", "Type-safety", "Design", "AI-Augmented Dev", "Security"] },
+  { label: "Flourishing",  items: ["Positive Psychology", "PERMA", "VIA Strengths", "Wellness Coaching", "Personal OS", "Second Brain"] },
+  { label: "Adjacent",     items: ["Mentoring", "Writing", "Figma"] },
 ];
 
 export const SKILL_ALIASES: Record<string, string[]> = {
@@ -360,6 +360,7 @@ export const SKILL_ALIASES: Record<string, string[]> = {
   "Design":        ["web design", "ux", "user experience", "user experience (ux)"],
   "Testing":       ["quality assurance", "qa"],
   "VS Code":       ["vscode"],
+  "Discord":       ["discord bots", "discord bot"],
 };
 
 export function canonicalizeSkill(name: string): string {
