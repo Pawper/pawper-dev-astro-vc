@@ -1080,7 +1080,7 @@ export function enhanceProse(el: HTMLElement, opts: ProseOptions = {}): () => vo
   // Images — clickable to open media viewer
   if (opts.onOpenMedia) {
     const imgs = Array.from(el.querySelectorAll<HTMLImageElement>("img"))
-      .filter(img => !img.classList.contains("cx-endorsement-photo"));
+      .filter(img => !img.classList.contains("cx-endorsement-photo") && !img.closest(".pw-url-card"));
     const mediaSiblings: Array<{ kind: "media"; id: string; label?: string }> | undefined =
       imgs.length > 1 ? imgs.map(img => ({ kind: "media" as const, id: img.src, label: img.alt || undefined })) : undefined;
     imgs.forEach((img) => {
