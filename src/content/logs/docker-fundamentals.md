@@ -2640,6 +2640,90 @@ To disable: `systemctl --user disable hermes-gateway`
 
 ---
 
+## Inspecting Your Agent Container via VS Code Remote
+
+Attach VS Code *inside* the running agent container to browse and edit its live state (persona, config, sessions) with a real editor + terminal.
+
+:::tabs
+::tab[OpenClaw]
+The container is **Debian 12 (glibc), user `node` (uid 1000)** — ideal for the VS Code server; it installs and runs cleanly with no Alpine/musl workarounds.
+
+### Prerequisites
+
+- The container must be **running**: `docker compose up -d openclaw-gateway`.
+- VS Code extension **Dev Containers** (`ms-vscode-remote.remote-containers`). The **Container Tools** / Docker extension is an optional sidebar convenience.
+
+### Attach
+
+Either:
+- **Command Palette** (`Ctrl+Shift+P`) → **"Dev Containers: Attach to Running Container…"** → select **`/openclaw-gateway`**, or
+- **Docker/Containers sidebar** → right-click `openclaw-gateway` → **"Attach Visual Studio Code"**.
+
+A new window opens inside the container.
+
+![Container in VS Code](https://res.cloudinary.com/dr1sonbsi/image/upload/v1780480924/pawper.dev/logs/22c54135-c4fc-4547-a311-b2525bd86f2b.png)
+
+### What to Do Once Attached
+
+- **File → Open Folder → `/workspace`** — the live agent state:
+  - `SOUL.md` — the agent's persona.
+  - `.openclaw/openclaw.json` — config (model, gateway, channels).
+  - `.openclaw/agents/main/…` — auth profiles, sessions.
+  - `.openclaw/telegram/…` — Telegram ingress spool.
+- The integrated **terminal** is a shell as `node`. Useful commands:
+  ```bash
+  openclaw status
+  openclaw models list
+  openclaw channels status
+  ```
+- After editing `SOUL.md` or config, restart the gateway to apply (from the host, in `~/projects/openclaw`): `docker compose restart openclaw-gateway`.
+
+### Gotchas
+
+- **Persistence:** only `/workspace` survives restarts and `docker compose down` (it's the named volume `openclaw-workspace`). Anything you change elsewhere in the container (`/home/node`, installed packages, etc.) is **ephemeral** — lost on recreate. Do real work in `/workspace`.
+- **Attach needs a running container.** `docker compose down` (or `stop`) disconnects the attached window.
+- **First attach is slower** — VS Code downloads its server into the container; it's cached in `~/.vscode-server` inside the container, so later attaches are fast (until the container is recreated).
+- This is for **inspecting/editing live state**. The source of truth for *setup* remains `compose.yaml` + the setup commands in `SETUP.md`.
+
+::tab[Hermes]
+The container is Python-based and Debian-derived — the VS Code server installs and runs cleanly.
+
+### Prerequisites
+
+- The container must be **running**: `docker compose up -d hermes-gateway`.
+- VS Code extension **Dev Containers** (`ms-vscode-remote.remote-containers`). The **Container Tools** / Docker extension is an optional sidebar convenience.
+
+### Attach
+
+Either:
+- **Command Palette** (`Ctrl+Shift+P`) → **"Dev Containers: Attach to Running Container…"** → select **`/hermes-gateway`**, or
+- **Docker/Containers sidebar** → right-click `hermes-gateway` → **"Attach Visual Studio Code"**.
+
+A new window opens inside the container.
+
+### What to Do Once Attached
+
+- **File → Open Folder → `/opt/data`** — the live agent state:
+  - `SOUL.md` — the agent's persona.
+  - Config and credential files written during `hermes setup` / `hermes gateway setup`.
+  - Session memory and self-improvement logs.
+- The integrated **terminal** is a shell inside the container. Useful commands:
+  ```bash
+  hermes model
+  hermes gateway setup
+  ```
+- After editing `SOUL.md` or config, restart the gateway to apply (from the host, in `~/projects/hermes`): `docker compose restart hermes-gateway`.
+
+### Gotchas
+
+- **Persistence:** only `/opt/data` survives restarts and `docker compose down` (it's the named volume `hermes-workspace`). Anything you change elsewhere in the container is **ephemeral** — lost on recreate. Do real work in `/opt/data`.
+- **Attach needs a running container.** `docker compose down` (or `stop`) disconnects the attached window.
+- **First attach is slower** — VS Code downloads its server into the container; it's cached in `~/.vscode-server` inside the container, so later attaches are fast (until the container is recreated).
+- This is for **inspecting/editing live state**. The source of truth for *setup* remains `compose.yaml` + the setup commands in `SETUP.md`.
+:::
+
+---
+
 ## Troubleshooting
 
 | Problem | Fix |
