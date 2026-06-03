@@ -1257,6 +1257,64 @@ export function enhanceProse(el: HTMLElement, opts: ProseOptions = {}): () => vo
     });
 
     wrapper.appendChild(btn);
+
+    // Collapse tall code blocks (taller than half the viewport)
+    const halfVH = window.innerHeight / 2;
+    if (pre.scrollHeight > halfVH) {
+      wrapper.style.maxHeight = `${halfVH}px`;
+      wrapper.style.overflow = "hidden";
+
+      const fade = document.createElement("div");
+      fade.style.cssText = `
+        position: absolute; bottom: 0; left: 0; right: 0; height: 90px;
+        pointer-events: none;
+        background: linear-gradient(to bottom, transparent, rgba(0,0,0,0.82));
+        border-radius: 0 0 8px 8px;
+      `;
+      wrapper.appendChild(fade);
+
+      const pillRow = document.createElement("div");
+      pillRow.style.cssText = "display: flex; justify-content: center; margin-top: 8px;";
+
+      const expandBtn = document.createElement("span");
+      expandBtn.className = "pw-mono";
+      expandBtn.textContent = "SEE MORE";
+      expandBtn.style.cssText = `
+        font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+        color: var(--section-deep); cursor: pointer; user-select: none;
+        padding: 4px 12px; border: 1px solid var(--section-deep);
+        border-radius: 999px; opacity: 0.7; transition: opacity 0.15s;
+      `;
+      expandBtn.addEventListener("mouseenter", () => {
+        soundHover();
+        expandBtn.style.opacity = "1";
+      });
+      expandBtn.addEventListener("mouseleave", () => {
+        expandBtn.style.opacity = "0.7";
+      });
+
+      let codeExpanded = false;
+      expandBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        soundClick();
+        codeExpanded = !codeExpanded;
+        if (codeExpanded) {
+          wrapper.style.maxHeight = "";
+          wrapper.style.overflow = "visible";
+          fade.style.display = "none";
+          expandBtn.textContent = "SEE LESS";
+        } else {
+          wrapper.style.maxHeight = `${halfVH}px`;
+          wrapper.style.overflow = "hidden";
+          fade.style.display = "";
+          expandBtn.textContent = "SEE MORE";
+          wrapper.scrollIntoView({ behavior: "smooth", block: "nearest" });
+        }
+      });
+
+      pillRow.appendChild(expandBtn);
+      wrapper.insertAdjacentElement("afterend", pillRow);
+    }
   });
 
   // Hover sound — only when entering from outside the target
