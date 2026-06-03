@@ -13,19 +13,19 @@ series:
 mentor: true
 ---
 
-> **Note: This guide is for Windows only.** If you're on macOS, you are already living in Unix in VS Code, so you can skip this tutorial and move on to the next one in the series.
+> **Note: This guide is for Windows only.** If you're on macOS or Linux, you are already living in Unix in VS Code, so you can skip this tutorial and move on to the next one in the series.
 
-So, you're on Windows. You've installed VS Code, WSL and Windows Terminal per the previous entries in the series -- but here's the problem: your editor VS Code is a Windows application. As discussed in the last entry in the series, the world of modern web development assumes a Unix-based environment. You have WSL (Linux) -- so you're close! -- but if you don't configure VS Code properly, you'll be:
+So, you're on Windows. You've installed VS Code, WSL and Windows Terminal and Linux-native GUI apps per the previous entries in the series -- but here's the problem: your editor VS Code is a Windows application. As discussed in the last entry in the series, the world of modern web development assumes a Unix-based environment. You have WSL (Linux) -- so you're close! -- but if you don't configure VS Code properly, you'll be:
 - Editing files in Windows while tools run in Linux (file sync issues)
 - Running commands in the wrong environment
 - Dealing with path mismatches and permission problems
 - Losing the seamless development experience you're after
 
-The solution is **Remote - WSL**, an extension that connects VS Code directly to your WSL environment. This tutorial shows you how to set it up.
+You don't need to install VS Code again in Linux like the other GUI apps. The solution is the **WSL extension**, an extension that connects VS Code directly to your WSL environment. This guide helps you set it up.
 
-## What's Remote - WSL?
+## What's the WSL extension?
 
-Remote - WSL is a Microsoft extension that lets VS Code run **inside your WSL environment** instead of Windows. Here's what that unlocks:
+The WSL extension is a Microsoft extension that lets VS Code run **inside your WSL environment** instead of Windows. Here's what that unlocks:
 - VS Code connects to WSL and runs there
 - You edit files in your Linux home directory (`~/projects/...`)
 - All commands run in the same Linux environment
@@ -49,31 +49,34 @@ When you configure VS Code to work with WSL, several things happen:
 
 So -- when you are working on a project, in most cases you'll live on the WSL side of the fence through VS Code. Don't be intimidated. You can do it!
 
-## Installing Remote - WSL
+## Installing the WSL Extension
 
 ### Step 1: Install the Extension
 
-Open VS Code and install **Remote - WSL** (by Microsoft):
+Open VS Code and install **WSL** (by Microsoft):
 
 1. Press **Ctrl+Shift+X** to open Extensions
-2. Search for "Remote - WSL"
+2. Search for "remote dev"
 3. Click the first result (official Microsoft extension)
+  ![Search for "remote dev"](https://res.cloudinary.com/dr1sonbsi/image/upload/v1780447620/pawper.dev/logs/b8c5c582-b45e-4885-87c9-6e9a17e16019.png)
 4. Click **Install**
 
 That's it. The extension will install in seconds.
 
+> We're installing the full Remote Development extension pack which includes the WSL extension because it will also come in useful later to have the ability to open Docker containers in VS Code.
+
 ### Step 2: Verify Installation
 
-Look at the bottom-left corner of VS Code. You should see a green button or icon indicating the remote connection status. If you see "WSL" or a green icon, the extension is active.
+In the Ubuntu terminal, open VS Code:
+```bash
+code
+```
+Look at the bottom-left corner of VS Code. You should see an icon indicating the remote connection status. If you see the blue "WSL: Ubuntu" indicator, the extension is active.
+![Remote Connection WSL](https://res.cloudinary.com/dr1sonbsi/image/upload/v1780448132/pawper.dev/logs/fb00bc25-506b-4f93-9ba9-a8cca4cb8179.png)
 
 ## Opening a WSL Project Folder
 
-### Method 1: Open Folder from WSL
-
-This is the most reliable way:
-
-1. Open Windows Terminal and launch bash (which opens WSL)
-2. Navigate to your project folder:
+1. In the Ubuntu terminal, navigate to/create your project folder:
    ```bash
    cd ~/projects/my-project
    ```
@@ -88,25 +91,6 @@ This is the most reliable way:
    code .
    ```
 
-VS Code will launch and automatically detect WSL. You'll see "WSL" in the bottom-left corner, confirming you're connected.
-
-### Method 2: Open Folder via VS Code UI
-
-1. Open VS Code
-2. Click **File → Open Folder**
-3. Navigate to `\\wsl$\Ubuntu\home\your-username\` (your WSL home)
-4. Select your project folder
-5. Click **Select Folder**
-
-VS Code will connect to WSL automatically.
-
-### Method 3: Use the Remote Connection Button
-
-1. Open VS Code
-2. Click the green icon or button in the bottom-left corner
-3. Select **"Open Folder in WSL"** or **"Connect to WSL"**
-4. Select your project folder when prompted
-
 ## Working Inside WSL
 
 Once VS Code is connected to WSL, everything works in the Linux environment:
@@ -118,20 +102,17 @@ Your file explorer shows your WSL filesystem, not Windows:
 - Paths use `/` not `\`
 
 ### Terminal
-When you open a terminal in VS Code (Ctrl+`), it opens **bash in WSL**, not PowerShell in Windows. This is perfect because all your tools (npm, git, node) are already here.
-
-### File Permissions
-Files are created with proper Linux permissions. No more permission issues when switching between editors.
+When you open a terminal in VS Code (<kbd>Ctrl</kbd>+<kbd>`</kbd>), it opens **bash in WSL**, not PowerShell in Windows. This is perfect because you'll be completely ready to stay on the Linux side of the fence.
 
 ## Verifying Your Environment
 
-Open the terminal in VS Code (Ctrl+`) and verify you're in WSL:
+Open the terminal in VS Code (<kbd>Ctrl</kbd>+<kbd>`</kbd>) and verify you're in WSL:
 
 ```bash
 echo $SHELL
 ```
 
-Should show `/bin/bash` or `/bin/zsh`.
+Should show `/bin/bash`.
 
 Check your location:
 
@@ -146,28 +127,12 @@ Should show `/home/username/...`, not `C:\Users\...`.
 ### VS Code Doesn't Show WSL Option
 
 Make sure:
-1. You've installed the **Remote - WSL** extension
-2. You have WSL installed (run `wsl --version` in Windows Terminal)
+1. You've installed the **WSL** extension
+2. You have WSL installed (run `wsl --version` in PowerShell)
 3. You have a Linux distribution installed (like Ubuntu)
-4. You've restarted VS Code after installing the extension
 
-### Can't Find Your Project Folder
-
-Use `\\wsl$\Ubuntu\` in the File → Open Folder dialog:
-1. Click **File → Open Folder**
-2. Type `\\wsl$\Ubuntu\` in the address bar
-3. Press Enter
-4. Navigate to `/home/your-username/`
-5. Select your project
-
-### Terminal Shows PowerShell Instead of Bash
-
-Your VS Code terminal might still default to PowerShell. Change it:
-
-1. Press **Ctrl+,** to open Settings
-2. Search "terminal default profile"
-3. Find **Terminal › Integrated: Default Profile: Windows**
-4. Change to **bash** or **Ubuntu (WSL)**
+If you haven't installed WSL with Ubuntu, or installed it a long time ago, follow the previous entry in the series:
+http://pawper.dev/l/installing-wsl-windows-subsystem-linux
 
 ### Files Show as Modified Even Though You Didn't Change Them
 

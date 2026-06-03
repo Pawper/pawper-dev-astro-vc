@@ -87,7 +87,7 @@ Open **Windows Terminal as Administrator**:
 
 Once Windows Terminal opens with admin privileges, you'll see a command prompt. Regardless of which shell it displays (PowerShell, cmd.exe, or another), the `wsl --install` command works in any of them. Simply paste or type:
 
-```
+```pwsh
 wsl --install
 ```
 
@@ -121,16 +121,22 @@ WSL requires a system restart for Ubuntu to show up in your terminal application
 
 ### Step 5: Verify Installation
 
-Open a PowerShell terminal and verify everything works:
+Now that WSL and Ubuntu are installed, you can use Windows Terminal to access your Linux environment. Open Windows Terminal and you'll see a dropdown arrow in the top toolbar — click it and select "Ubuntu" to launch your WSL bash shell.
 
-```pwsh
-wsl --version
+![Open an Ubuntu terminal](https://res.cloudinary.com/dr1sonbsi/image/upload/v1780429232/pawper.dev/logs/5418f409-85dd-451a-9d9d-f171f80d7f2d.png)
+
+Verify everything works:
+
+```bash
+wsl.exe --version
 ```
+
+> Note: You can also run this command in PowerShell, just remove `.exe`
 
 You should see output showing WSL version 2.x.
 
 ```
-WSL version: 2.7.3.0
+WSL version: 2.7.3.0d
 Kernel version: 6.6.114.1-1
 WSLg version: 1.0.73
 MSRDC version: 1.2.6676
@@ -139,89 +145,221 @@ DXCore version: 10.0.26100.1-240331-1435.ge-release
 Windows version: 10.0.26200.8524
 ```
 
-> **Sources / additional material:**
->
-> https://docs.microsoft.com/en-us/windows/wsl/install
->
-> https://docs.microsoft.com/en-us/windows/wsl/about
->
-> https://docs.microsoft.com/en-us/windows/wsl/setup/environment
-
-### Step 6: Configure Windows Terminal for Ubuntu
-
-Now that WSL and Ubuntu are installed, you can use Windows Terminal to access your Linux environment. Open Windows Terminal and you'll see a dropdown arrow in the top toolbar — click it and select "Ubuntu" to launch your WSL bash shell.
-
-**Set Ubuntu as Default (Optional):** If you want Ubuntu to open automatically when you launch Windows Terminal, go to Settings (Ctrl+,), find "Startup" in the left sidebar, and set "Default profile" to "Ubuntu".
-
 ---
 
-## Configure WSL for Development
+## 💻 Install supoprt for Linux Graphical User Interfaces (GUIs)
 
-### Update Your Linux Packages
+WSL enables Linux GUI applications to feel native and natural to use on Windows.
 
-WSL comes with Ubuntu, but the package lists may be outdated. Run:
+- Launch Linux apps from the Windows Start menu
+- Pin Linux apps to the Windows task bar
+- Use alt-tab to switch between Linux and Windows apps
+- Cut + Paste across Windows and Linux apps
 
+> This support relies on Windows desktop, so if you are looking at desktop-focused tools or apps in the future, note that they may not be supported.
+
+### Identify your GPU Manufacturer
+1. Press Win + R on your keyboard.
+1. Type devmgmt.msc and press Enter to open the Device Manager.
+1. Click the arrow next to Display adapters.
+
+You will see your GPU listed there (e.g., "NVIDIA GeForce RTX 3060," "AMD Radeon Graphics," or "Intel UHD Graphics").
+
+> You may see multiple GPUs listed. Desktop PC builds often have an Integrated GPU (iGPU) and a Dedicated GPU (dGPU). You will need to install both.
+
+### Download the Correct Driver(s)
+:::tabs
+::tab[Intel GPU]
+https://downloadcenter.intel.com/
+::tab[AMD GPU]
+https://www.amd.com/support/download/drivers.html
+::tab[NVIDIA GPU]
+https://www.nvidia.com/drivers
+:::
+
+### Restart WSL
+In PowerShell:
+```pwsh
+wsl --shutdown
+```
+
+### Update the packages in your distribution
+In Ubuntu:
 ```bash
 sudo apt update
-sudo apt upgrade -y
 ```
 
-The `sudo` command runs commands with administrator privileges. You'll be prompted for your password (the one you created in Step 4).
-
-### Install Essential Build Tools
-
-Most web development depends on a C/C++ compiler. Install it:
-
+### X11 GUI Window System
+X11 draws GUIs (windows) to the screen. It also comes bundled with native-Linux applications such as such as a clock, calculator, and clipboard for copy & paste.
 ```bash
-sudo apt install build-essential -y
+sudo apt install x11-apps -y
 ```
 
-This installs `gcc`, `g++`, `make`, and other tools needed to compile native packages.
-
-### (Optional) Install Git
-
-If you don't have Git installed on your Windows machine, install it in WSL:
-
+### GUI File Manager: Install Nautilus
+Nautilus is a Linux-native file manager applicaiton, so it's going to perform significantly fast than if you open Linux files in Windows Explorer.
 ```bash
-sudo apt install git -y
+sudo apt install nautilus -y
 ```
 
-> **Note**: You can use either the Windows version or WSL version of Git. I recommend installing it in both places so you have flexibility.
-
-### (Optional) Install Node.js (via nvm)
-
-Many web tutorials use Node.js. The easiest way to manage Node versions is with nvm (Node Version Manager):
-
+Launch it from your Ubunut terminal:
 ```bash
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
+nautilus &
 ```
 
-Then reload your shell:
+![Nautilus File Manager](https://res.cloudinary.com/dr1sonbsi/image/upload/v1780444368/pawper.dev/logs/63796957-8ccd-41ae-9957-c0ec44024a45.png)
 
+### GUI Multimedia Player: Install VLC
+VLC is a free and open source multimedia player. Like Nautilus, it will perform better with multimedia files in Linux than opening them in Windows applications.
 ```bash
-source ~/.bashrc
+sudo apt install vlc -y
 ```
-
-Install Node.js:
-
+Launch it from your Ubunut terminal:
 ```bash
-nvm install node
+vlc &
 ```
 
-Verify:
+![VLC Media Player](https://res.cloudinary.com/dr1sonbsi/image/upload/v1780444599/pawper.dev/logs/e3f91008-fb17-4ea8-a90a-e8903a18d127.png)
 
+### GUI Web Browser
+There are many choices you can pick from.
+:::tabs
+::tab[Firefox]
 ```bash
-node --version
-npm --version
+sudo apt install firefox -y
+```
+Launch it from your Ubuntu terminal:
+```bash
+firefox &
 ```
 
----
+![Firefox Browser](https://res.cloudinary.com/dr1sonbsi/image/upload/v1780445516/pawper.dev/logs/39992344-0138-426c-8a63-99e20476916f.png)
 
-## Access Your Files
+::tab[Brave]
+```bash
+sudo curl -fsS https://dl.brave.com/install.sh | sh
+```
+Launch it from your Ubuntu terminal:
+```bash
+brave-browser &
+```
+> In Linux environments, applications like Brave use a "keyring" service to securely encrypt and store credentials. When you run Brave for the first time in WSL, it prompts you to create one:
+> ![Keyring Manager](https://res.cloudinary.com/dr1sonbsi/image/upload/v1780445186/pawper.dev/logs/Screenshot_2026-06-02_165839_qcwmao.png)
+> If you enter a password, you will be prompted to enter it every time Brave opens. If you leave it blank (click Cancel), it will prevent the prompt from appearing on every launch. To launch Brave with a flag to ignore the keyring entirely, enter:
+> ```bash
+> brave-browser --password-store=basic
+> ```
 
-WSL and Windows share a file system, but you need to know the paths:
+![Brave Browser](https://res.cloudinary.com/dr1sonbsi/image/upload/v1780446049/pawper.dev/logs/ad94c667-8953-4d3a-8557-b66ee3e10ce4.png)
 
-### From WSL, Access Windows Files
+::tab[Vivaldi]
+1. Change directories into the temp folder:
+  ```bash
+  cd /tmp
+  ```
+2. Download the package
+  ```bash
+  wget https://downloads.vivaldi.com/stable/vivaldi-stable_amd64.deb
+  ```
+3. Install the package and fix dependencies
+  ```bash
+  sudo apt install -f ./vivaldi-stable_amd64.deb -y
+  ```
+4. Remove the installer to keep your /tmp folder clean:
+  ```bash
+  rm vivaldi-stable_amd64.deb
+  ```
+Launch it from your Ubuntu terminal:
+```bash
+vivaldi &
+```
+> In Linux environments, applications like Vivaldi use a "keyring" service to securely encrypt and store credentials. When you run Vivaldi for the first time in WSL, it prompts you to create one:
+> ![Keyring Manager](https://res.cloudinary.com/dr1sonbsi/image/upload/v1780445186/pawper.dev/logs/Screenshot_2026-06-02_165839_qcwmao.png)
+> If you enter a password, you will be prompted to enter it every time Vivaldi opens. If you leave it blank (click Cancel), it will prevent the prompt from appearing on every launch. To launch Vivaldi with a flag to ignore the keyring entirely, enter:
+> ```bash
+> vivaldi --password-store=basic
+> ```
+
+![Vivaldi Browser](https://res.cloudinary.com/dr1sonbsi/image/upload/v1780446714/pawper.dev/logs/77d008be-6d32-40cf-9c42-c252434f641e.png)
+
+::tab[Microsoft Edge]
+1. Import the GPG key
+  ```bash
+  curl https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > microsoft.gpg
+  sudo install -o root -g root -m 644 microsoft.gpg /usr/share/keyrings/
+  ```
+2. Add the repository
+  ```bash
+  echo "deb [arch=amd64 signed-by=/usr/share/keyrings/microsoft.gpg] https://packages.microsoft.com/repos/edge stable main" | sudo tee /etc/apt/sources.list.d/microsoft-edge.list
+  ```
+3. Update and install
+  ```bash
+  sudo apt update
+  sudo apt install microsoft-edge-stable -y
+  ```
+Launch it from your Ubuntu terminal:
+```bash
+microsoft-edge &
+```
+
+> In Linux environments, applications like Edge use a "keyring" service to securely encrypt and store credentials. When you run Edge for the first time in WSL, it prompts you to create one:
+> ![Keyring Manager](https://res.cloudinary.com/dr1sonbsi/image/upload/v1780445186/pawper.dev/logs/Screenshot_2026-06-02_165839_qcwmao.png)
+> If you enter a password, you will be prompted to enter it every time Edge opens. If you leave it blank (click Cancel), it will prevent the prompt from appearing on every launch. To launch Edge with a flag to ignore the keyring entirely, enter:
+> ```bash
+> microsoft-edge --password-store=basic
+> ```
+
+![Edge Browser](https://res.cloudinary.com/dr1sonbsi/image/upload/v1780447108/pawper.dev/logs/487f0e76-1371-4019-9a87-45156325eaaa.png)
+
+::tab[Google Chrome]
+1. Change directories into the temp folder:
+  ```bash
+  cd /tmp
+  ```
+2. Download the package
+  ```bash
+  wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+  ```
+3. Install the package and fix dependencies
+  ```bash
+  sudo apt install -f ./google-chrome-stable_current_amd64.deb -y
+  ```
+4. Remove the installer to keep your /tmp folder clean:
+  ```bash
+  rm google-chrome-stable_current_amd64.deb
+  ```
+Launch it from your Ubuntu terminal:
+```bash
+google-chrome &
+```
+
+> In Linux environments, applications like Chrome use a "keyring" service to securely encrypt and store credentials. When you run Chrome for the first time in WSL, it prompts you to create one:
+> ![Keyring Manager](https://res.cloudinary.com/dr1sonbsi/image/upload/v1780445186/pawper.dev/logs/Screenshot_2026-06-02_165839_qcwmao.png)
+> If you enter a password, you will be prompted to enter it every time Chrome opens. If you leave it blank (click Cancel), it will prevent the prompt from appearing on every launch. To launch Chrome with a flag to ignore the keyring entirely, enter:
+> ```bash
+> google-chrome --password-store=basic
+> ```
+
+![Chrome Browser](https://res.cloudinary.com/dr1sonbsi/image/upload/v1780445189/pawper.dev/logs/Screenshot_2026-06-02_170439_vgydys.png)
+
+:::
+
+## Don't work across Windows and Linux filsystems
+
+Do not work across the filesystems unless you have a specific reason for doing so, as there is a performance impact. For this series, all work is done on the WSL side of the fence -- stick to that side.
+
+When you see `/mnt/` in the file path of a WSL command line, it means that you are working from a mounted drive. So the Windows file system `C:\` drive (`C:\Users\<user name>\Project`) will look like this when mounted in a WSL command line: `/mnt/c/Users/<user name>/Project$`. Keep your development projects in **WSL's home directory** (`~/projects/` or similar), not in Windows. This avoids file permission issues and improves performance.
+
+Navigate to WSL's home directory using this command:
+```bash
+cd ~
+```
+
+> We will cover how to navigate the Linux filesystem in the command line in the sixth entry of the series:
+> http://pawper.dev/l/the-command-line
+
+![Shared file system (Generated with ChatGPT)](https://res.cloudinary.com/dr1sonbsi/image/upload/v1779525456/pawper.dev/logs/86ad4ac8-5b08-4fdd-be8c-22689be7b2e5_dlngpd.png)
+
+### If you need to access Windows files
 
 Your Windows `C:` drive is mounted at `/mnt/c/` in WSL:
 
@@ -229,21 +367,10 @@ Your Windows `C:` drive is mounted at `/mnt/c/` in WSL:
 cd /mnt/c/Users/YourUsername/Documents
 ```
 
-### From Windows, Access WSL Files
-
-Your WSL home directory is located at:
-
+### If you need to open the current location in Windows File Explorer
+```bash
+explorer.exe .
 ```
-\\wsl$\Ubuntu\home\username\
-```
-
-Open File Explorer and type this path in the address bar. You can also open it with `explorer.exe ~` from the WSL terminal.
-
-### Best Practice
-
-Keep your development projects in **WSL's home directory** (`~/projects/` or similar), not in Windows. This avoids file permission issues and improves performance.
-
-![Shared file system (Generated with ChatGPT)](https://res.cloudinary.com/dr1sonbsi/image/upload/v1779525456/pawper.dev/logs/86ad4ac8-5b08-4fdd-be8c-22689be7b2e5_dlngpd.png)
 
 ---
 
@@ -272,6 +399,29 @@ passwd username
 
 Then exit and log back in as your regular user.
 
+### Keeping WSL updated
+
+In PowerShell:
+```pwsh
+wsl --update
+```
+
+### Need to shut down WSL
+
+In PowerShell, terminate any running sessions of WSL:
+
+```pwsh
+wsl --shutdown
+```
+
+### Need to mount another harddrive
+
+In PowerShell:
+
+```pwsh
+wsl --mount <DiskPath>
+```
+
 ---
 
 
@@ -282,5 +432,6 @@ Then exit and log back in as your regular user.
 > https://docs.microsoft.com/en-us/windows/wsl/setup/environment
 > https://docs.microsoft.com/en-us/windows/wsl/troubleshoot/common-issues
 > https://docs.microsoft.com/en-us/windows/wsl/setup/windows-terminal
+> https://learn.microsoft.com/en-us/windows/wsl/filesystems
 
 _This article was generated with AI for the purpose of providing practical information. I have reviewed it for accuracy and edited it appropriately._

@@ -46,7 +46,7 @@ The integrated terminal in VS Code can run any shell installed on your system. Y
 Use **zsh** (default in modern macOS).
 
 ::tab[Windows]
-Use **bash** (from Ubuntu through WSL). This gives you a Unix-based development environment that matches your production servers and aligns with most tutorials. If you haven't already, [install WSL](http://pawper.dev/l/installing-wsl-windows-subsystem-linux) and [configure VS Code to use it](http://pawper.dev/l/using-vs-code-with-wsl).
+If you have VS Code open in WSL, it will default to the Ubuntu (WSL) terminal, which is **bash**. This gives you a Unix-based development environment that matches your production servers and aligns with most tutorials. If you haven't already, [install WSL](http://pawper.dev/l/installing-wsl-windows-subsystem-linux) and [configure VS Code to use it](http://pawper.dev/l/using-vs-code-with-wsl).
 
 From here on we'll assume you're using Windows & VS Code with the Bash [shell](http://pawper.dev/l/operating-systems-terminals-shells#what-is-a-shell) from WSL in your VS Code integrated terminal.
 
@@ -54,9 +54,7 @@ From here on we'll assume you're using Windows & VS Code with the Bash [shell](h
 Use whatever shell your distribution defaults to — usually **bash** or **zsh**. VS Code picks it up automatically. No additional setup needed.
 :::
 
-## Setting Up the Integrated Terminal
-
-### Step 1: Open the Integrated Terminal
+## Opening the Integrated Terminal
 :::tabs
 ::tab[macOS]
 Press <kbd>Ctrl</kbd>+<kbd>`</kbd> (backtick) to open the integrated terminal. Note: VS Code uses <kbd>Ctrl</kbd> — not <kbd>⌘</kbd> — for this shortcut on macOS.
@@ -79,57 +77,27 @@ The terminal opens with **zsh** by default. No additional setup needed — it wo
 ::tab[Windows]
 **Ensure VS Code is remote connected with WSL**
 
-By default on Windows, VS Code opens terminals in PowerShell. But if you [have VS Code configured for WSL](http://pawper.dev/l/using-vs-code-with-wsl), the terminal should open with the Ubuntu (WSL) or Bash shell. If it opens to PowerShell, [ensure VS Code is remote connected with WSL](http://pawper.dev/l/using-vs-code-with-wsl#opening-a-wsl-project-folder).
+By default on Windows, VS Code opens terminals in PowerShell. But if you [have VS Code configured for WSL](http://pawper.dev/l/using-vs-code-with-wsl), the terminal should open with the Ubuntu (WSL) or Bash shell. If it opens to PowerShell, [ensure VS Code is remote connected with WSL](http://pawper.dev/l/using-vs-code-with-wsl#opening-a-wsl-project-folder). If you see the blue "WSL: Ubuntu" indicator, VS Code is remote connected with WSL.
+![Remote Connection WSL](https://res.cloudinary.com/dr1sonbsi/image/upload/v1780448132/pawper.dev/logs/fb00bc25-506b-4f93-9ba9-a8cca4cb8179.png)
+
+If you are not in WSL, you can open an Ubuntu terminal and enter:
+```bash
+code
+```
 
 ::tab[Linux]
 The terminal opens with your default shell (bash or zsh). No additional setup needed — it works out of the box.
 :::
-
-### Step 2: Create a New Terminal
-:::tabs
-::tab[macOS]
-Close your current terminal (click the X) and open a new one with <kbd>Ctrl</kbd>+<kbd>`</kbd>.
-
-::tab[Windows]
-Close your current terminal (click the X) and open a new one with <kbd>Ctrl</kbd>+<kbd>`</kbd>.
-
-::tab[Linux]
-Close your current terminal (click the X) and open a new one with <kbd>Ctrl</kbd>+<kbd>`</kbd>.
-:::
-
-Verify by running:
-
-```bash
-echo $SHELL
-```
-
-You should see `/bin/bash` (WSL) or `/bin/zsh` (macOS).
 
 ## Using the Integrated Terminal
 
 ### Basic Workflow
 
 Now that your terminal is set up, here's how you'll use it:
-
-:::tabs
-::tab[macOS]
-1. **Open a project folder**: File → Open Folder (or <kbd>⌘</kbd>+<kbd>O</kbd>), then select your project directory
-2. **Open the terminal**: <kbd>Ctrl</kbd>+<kbd>`</kbd>
-3. **Run commands**: Type whatever you need (`npm install`, `git commit`, etc.)
-4. **See output immediately**: Right above your code in the same window
-
-::tab[Windows]
 1. **Open a project folder**: File → Open Folder, then select your project directory
 2. **Open the terminal**: <kbd>Ctrl</kbd>+<kbd>`</kbd>
 3. **Run commands**: Type whatever you need (`npm install`, `git commit`, etc.)
 4. **See output immediately**: Right above your code in the same window
-
-::tab[Linux]
-1. **Open a project folder**: File → Open Folder, then select your project directory
-2. **Open the terminal**: <kbd>Ctrl</kbd>+<kbd>`</kbd>
-3. **Run commands**: Type whatever you need (`npm install`, `git commit`, etc.)
-4. **See output immediately**: Right above your code in the same window
-:::
 
 ### Multiple Terminals
 
@@ -138,18 +106,18 @@ You can open multiple terminal tabs within the integrated terminal:
 :::tabs
 ::tab[macOS]
 - **New terminal**: Click the **+** button in the terminal panel, or press <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>`</kbd>
-- **Switch between terminals**: Click the terminal name at the top. On MacBooks without dedicated <kbd>PageUp</kbd>/<kbd>PageDown</kbd> keys, use <kbd>Fn</kbd>+<kbd>↑</kbd>/<kbd>↓</kbd> or click the terminal in the panel
-- **Split terminals**: Click the split icon (or right-click and select "Split Terminal") to run two terminals side-by-side
+- **Switch between terminals**: Click the terminal name at the top, or use <kbd>Ctrl</kbd>+<kbd>PageUp</kbd>/<kbd>PageDown</kbd> to cycle through them. On MacBooks without dedicated <kbd>PageUp</kbd>/<kbd>PageDown</kbd> keys, use <kbd>Ctrl</kbd>+<kbd>Fn</kbd>+<kbd>↑</kbd>/<kbd>↓</kbd> or click the terminal in the panel
+- **Split terminals**: Click the split icon or enter <kbd>⌘</kbd>+<kbd>\\</kbd> to run two terminals side-by-side
 
 ::tab[Windows]
 - **New terminal**: Click the **+** button in the terminal panel, or press <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>`</kbd>
 - **Switch between terminals**: Click the terminal name at the top, or use <kbd>Ctrl</kbd>+<kbd>PageUp</kbd>/<kbd>PageDown</kbd> to cycle through them
-- **Split terminals**: Click the split icon (or right-click and select "Split Terminal") to run two terminals side-by-side
+- **Split terminals**: Click the split icon or enter <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>5</kbd> (uses the regular number 5 key) to run two terminals side-by-side
 
 ::tab[Linux]
 - **New terminal**: Click the **+** button in the terminal panel, or press <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>`</kbd>
 - **Switch between terminals**: Click the terminal name at the top, or use <kbd>Ctrl</kbd>+<kbd>PageUp</kbd>/<kbd>PageDown</kbd> to cycle through them
-- **Split terminals**: Click the split icon (or right-click and select "Split Terminal") to run two terminals side-by-side
+- **Split terminals**: Click the split icon or enter <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>5</kbd> (uses the regular number 5 key) to run two terminals side-by-side
 :::
 
 This is useful for:
@@ -167,8 +135,8 @@ Learn these keyboard shortcuts to work faster:
 |----------|--------|
 | <kbd>Ctrl</kbd>+<kbd>`</kbd> | Toggle terminal open/close |
 | <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>`</kbd> | Create new terminal |
-| <kbd>Fn</kbd>+<kbd>↑</kbd> | Previous terminal |
-| <kbd>Fn</kbd>+<kbd>↓</kbd> | Next terminal |
+| <kbd>Ctrl</kbd>+<kbd>Fn</kbd>+<kbd>↑</kbd> | Previous terminal |
+| <kbd>Ctrl</kbd>+<kbd>Fn</kbd>+<kbd>↓</kbd> | Next terminal |
 | <kbd>⌘</kbd>+<kbd>C</kbd> | Copy selected text |
 | <kbd>⌘</kbd>+<kbd>V</kbd> | Paste |
 | <kbd>⌘</kbd>+<kbd>W</kbd> | Close terminal |
