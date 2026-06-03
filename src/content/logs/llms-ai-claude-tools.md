@@ -62,7 +62,7 @@ The arc: models got bigger (more parameters, more training data) and better at f
 
 | Model | Who Makes It | Best For |
 |---|---|---|
-| **Claude Opus 4.7** | Anthropic | The writer and coder. Produces the most natural-sounding writing and is a favorite among software developers. |
+| **Claude Opus 4.8** | Anthropic | The writer and coder. Produces the most natural-sounding writing and is a favorite among software developers. |
 | **GPT-5.5** | OpenAI (makers of ChatGPT) | The reliable all-rounder. Great default choice if you want one tool that does a bit of everything well. Has the biggest ecosystem of apps and add-ons. |
 | **Gemini 3.1 Pro** | Google | The brainiac. Especially strong at science and logic questions, and works smoothly with Google apps like Docs and Gmail. |
 | **Grok 4.3** | xAI (Elon Musk's company) | The deep thinker. Aimed at really hard, expert-level questions. |

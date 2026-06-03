@@ -4,10 +4,44 @@ import ogImagesRaw from '../../data/og-images.json';
 
 const ogImages = ogImagesRaw as Record<string, string>;
 
+interface SeriesNav { slug: string; part: number; title: string; }
+
 export async function getStaticPaths() {
+  const slugify = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
   const logs = await getCollection('logs');
+
+  // Build series map: name -> sorted parts
+  const seriesMap = new Map<string, SeriesNav[]>();
+  for (const entry of logs) {
+    if (!entry.data.series) continue;
+    const name = entry.data.series.name;
+    const logSlug = entry.id.replace(/\.md$/, '').replace(/^drafts\//, '');
+    const arr = seriesMap.get(name) ?? [];
+    arr.push({ slug: logSlug, part: entry.data.series.part, title: entry.data.title });
+    seriesMap.set(name, arr);
+  }
+  for (const arr of seriesMap.values()) arr.sort((a, b) => a.part - b.part);
+
   return logs.map((entry) => {
     const slug = entry.id.replace(/\.md$/, '').replace(/^drafts\//, '');
+    const seriesData = entry.data.series;
+
+    let seriesName = '';
+    let seriesSlug = '';
+    let seriesPart: number | null = null;
+    let prevLog: SeriesNav | null = null;
+    let nextLog: SeriesNav | null = null;
+
+    if (seriesData) {
+      const arr = seriesMap.get(seriesData.name) ?? [];
+      const idx = arr.findIndex((l) => l.slug === slug);
+      seriesName = seriesData.name;
+      seriesSlug = slugify(seriesData.name);
+      seriesPart = seriesData.part;
+      prevLog = idx > 0 ? arr[idx - 1] : null;
+      nextLog = idx < arr.length - 1 ? arr[idx + 1] : null;
+    }
+
     return {
       params: { slug },
       props: {
@@ -16,12 +50,17 @@ export async function getStaticPaths() {
         hook: entry.data.hook ?? '',
         slug,
         body: entry.body ?? '',
+        seriesName,
+        seriesSlug,
+        seriesPart,
+        prevLog,
+        nextLog,
       },
     };
   });
 }
 
-const { title, kicker, hook, slug, body } = Astro.props;
+const { title, kicker, hook, slug, body, seriesName, seriesSlug, seriesPart, prevLog, nextLog } = Astro.props;
 const ogImage = ogImages[slug] ?? '';
 const siteUrl = Astro.site?.toString().replace(/\/$/, '') ?? 'https://pawper.dev';
 const pageUrl = `${siteUrl}/l/${slug}`;
@@ -63,7 +102,8 @@ const description = hook || `${kicker} — ${title}`;
     a { color: #4ecca3; }
     article { max-width: 720px; margin: 0 auto; padding: 0 24px 60px; }
     article h1 { font-size: 26px; font-weight: 600; margin: 0 0 6px; }
-    article .meta { color: rgba(240,240,240,0.45); font-size: 13px; margin: 0 0 32px; }
+    article .meta { color: rgba(240,240,240,0.45); font-size: 13px; margin: 0 0 12px; }
+    article .series-nav { font-size: 13px; margin: 0 0 28px; display: flex; flex-direction: column; gap: 4px; }
     article pre { white-space: pre-wrap; line-height: 1.75; font-size: 14px; margin: 0; font-family: inherit; }
   </style>
 </head>
@@ -74,6 +114,13 @@ const description = hook || `${kicker} — ${title}`;
   <article>
     <h1>{title}</h1>
     <p class="meta">{kicker}{hook ? ` — ${hook}` : ''}</p>
+    {seriesName && (
+      <div class="series-nav">
+        <span>Series: <a href={`${siteUrl}/ls/${seriesSlug}/`}>{seriesName}</a> — Part {seriesPart}</span>
+        {prevLog && <span>← <a href={`${siteUrl}/l/${prevLog.slug}/`}>Part {prevLog.part}: {prevLog.title}</a></span>}
+        {nextLog && <span>→ <a href={`${siteUrl}/l/${nextLog.slug}/`}>Part {nextLog.part}: {nextLog.title}</a></span>}
+      </div>
+    )}
     <pre>{body}</pre>
   </article>
 </body>
