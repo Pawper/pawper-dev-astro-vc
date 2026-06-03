@@ -102,11 +102,6 @@ Here are some settings that I recommend:
   "editor.wordWrap": "on",
 }
 ```
-You can create settings specific to a certain project as well. Just create a `.vscode` directory at the top level, and inside it create a `settings.json` file. Any specific settings here will override those settings within VS Code's main settings.json.
-
-![JavaScript React Language Mode](https://res.cloudinary.com/dr1sonbsi/image/upload/v1779696818/pawper.dev/logs/rjor2xf2ui82ffch7m98_qmyqo2.png)
-
-Here you can see that since this is a React project, I am setting all JavaScript files (`.js`) to be associated with the JavaScript React language mode (`"javascriptreact"`). The icons update as well to the React icon.
  
 > Sources / additional material:
 > https://code.visualstudio.com/docs/configure/settings
