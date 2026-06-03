@@ -14,11 +14,12 @@ export async function getStaticPaths() {
     const name = log.data.series.name;
     const slug = slugify(name);
     const existing = seriesMap.get(slug);
+    const isPartOne = log.data.series.part === 1;
     seriesMap.set(slug, {
       name,
       parts: Math.max(existing?.parts ?? 0, log.data.series.part ?? 1),
       kicker: log.data.kicker,
-      hook: existing?.hook ?? log.data.hook,
+      hook: isPartOne ? log.data.hook : existing?.hook,
     });
   }
 
