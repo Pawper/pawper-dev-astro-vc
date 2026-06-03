@@ -394,7 +394,7 @@ export default function DCLog({ id, html, anchor, onOpenLog, onOpenProject, onOp
 
       {(() => {
         const svc = SERVICES.find((s) => s.id === "mentoring");
-        if (!svc) return null;
+        if (!a.mentor || !svc) return null;
         return (
           <div style={mentorPurpleVars}>
             <CXCard style={{
