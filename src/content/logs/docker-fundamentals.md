@@ -188,9 +188,14 @@ You need Docker Desktop running on your machine.
   ![Use WSL 2 instead of Hyper-V](https://res.cloudinary.com/dr1sonbsi/image/upload/v1780464540/pawper.dev/logs/a37199ae-230c-43d6-85b6-f604faa936c4.png)
 3. Reboot if prompted.
 4. Launch Docker Desktop from the Start Menu.
-5. In Docker Desktop: **Settings → Resources → WSL Integration** → enable Ubuntu.
+5. In Docker Desktop: **Settings → Resources → WSL Integration** → enable it with Ubuntu.
+  ![Enable WSL Integration & Ubuntu](https://res.cloudinary.com/dr1sonbsi/image/upload/v1780465469/pawper.dev/logs/cf8a9531-603d-49fe-a647-79e734f5fc56.png)
+6. In a PowerShell terminal, restart WSL:
+```pwsh
+wsl --shutdown
+```
 
-> All terminal commands in this guide run in your **WSL terminal** (Ubuntu), not PowerShell. Open it from the Start Menu or Windows Terminal.
+> All further terminal commands in this guide run in your **WSL terminal** (Ubuntu), not PowerShell. Open it from the Start Menu or Windows Terminal.
 
 ::tab[Linux]
 Follow your distribution's guide: https://docs.docker.com/engine/install/
@@ -264,7 +269,9 @@ Your agent needs an AI model to think. Before you run setup, get your credential
 > Starting June 15, 2026 Claude subscribers will get a separate monthly "Agent SDK credit" for third-party tools like OpenClaw and Hermes. The official page is here: https://support.claude.com/en/articles/15036540-use-the-claude-agent-sdk-with-your-claude-plan
 >
 > **If you're before June 15, 2026** — the Agent SDK credit hasn't kicked in yet. Set up a pay-as-you-go API key at [console.anthropic.com](https://console.anthropic.com). Load a small amount of credit (even $5 is enough to experiment), generate an API key, and have it ready for onboarding. You only pay for what you use — no commitment, no second subscription.
->
+> ![Select 'Get API key'](https://res.cloudinary.com/dr1sonbsi/image/upload/v1780467063/pawper.dev/logs/61d1eca8-7780-49ba-992a-a6c1381165c1.png)
+> ![Create API Key](https://res.cloudinary.com/dr1sonbsi/image/upload/v1780467000/pawper.dev/logs/45f1942a-3960-4ccf-9282-98f8cc846695.png)
+> 
 > **Once June 15 hits** — opt in to the $20/month Agent SDK credit from your Claude account, and your agent authenticates through your subscription. That $20 covers light use. If you burn through it mid-month, the agent stops until your next billing cycle (unless you enable overage billing, which charges API rates).
 
 ::tab[ChatGPT]
@@ -319,10 +326,13 @@ OpenClaw supports Discord, Telegram, Slack, WhatsApp, and more — all configure
 Telegram's bot setup is the simplest of any platform — one conversation with a bot that makes bots.
 
 1. Open Telegram: https://telegram.org
-2. Search for **@BotFather** and start a chat
+2. Search for **@BotFather** and start a chat.
+  Direct link: https://t.me/BotFather
+  ![@BotFather](https://res.cloudinary.com/dr1sonbsi/image/upload/v1780466751/pawper.dev/logs/7e2ebbcb-31ba-4eba-9c4f-346f5c680ca3.png)
 3. Send `/newbot`
 4. Give it a display name (e.g., "My Agent")
 5. Give it a username ending in `bot` (e.g., `myagent_bot`)
+  > It can be tricky to give it a unique name. Try something like `ClawForPhillipBot`!
 6. BotFather replies with your **bot token** — copy it
 
 That's it. No developer portal, no OAuth app, no server to manage. You'll chat with your agent by messaging the bot directly.
@@ -361,9 +371,12 @@ Telegram's bot setup is the simplest of any platform — one conversation with a
 
 1. Open Telegram: https://telegram.org
 2. Search for **@BotFather** and start a chat
+  Direct link: https://t.me/BotFather
+  ![@BotFather](https://res.cloudinary.com/dr1sonbsi/image/upload/v1780466751/pawper.dev/logs/7e2ebbcb-31ba-4eba-9c4f-346f5c680ca3.png)
 3. Send `/newbot`
 4. Give it a display name (e.g., "My Agent")
 5. Give it a username ending in `bot` (e.g., `myagent_bot`)
+  > It can be tricky to give it a unique name. Try something like `ClawForPhillipBot`!
 6. BotFather replies with your **bot token** — copy it
 
 That's it. No developer portal, no OAuth app, no server to manage. You'll chat with your agent by messaging the bot directly.
@@ -411,16 +424,15 @@ Have your **Anthropic API key** ready — get one at [console.anthropic.com](htt
 ```wrap
 Set up OpenClaw in Docker connected to Telegram, using Claude (Anthropic) as the AI model.
 
-First, ask me for these four things and wait for all four before continuing:
-1. My Anthropic API key — I'll get one at console.anthropic.com if I don't have one.
-2. My Telegram bot token — if I don't have one, walk me through it: open Telegram → find @BotFather → send /newbot → give it a name and a username ending in bot → paste the token here.
+For an AI agent doing this setup: run every command yourself — never tell the user to open a terminal. Ask the user only for the §0 inputs, the §4 pairing code, and in-app actions (messaging the bot, opening the dashboard). Hold secrets in memory only. WAIT = hard gate.
 
-3. A name for your agent — something short and personal (e.g., "Aria", "Max", "Scout").
-4. A brief description of who you are and how it should behave (e.g., "I'm in NYC, a product designer. Be direct, no filler.").
+§0. Ask the user (WAIT for all four before continuing):
+1. Anthropic API key — sk-ant-... from console.anthropic.com → API Keys.
+2. Telegram bot token — @BotFather → /newbot → name + ...bot username.
+3. Agent name — something short (e.g. "Scout").
+4. Agent description — a complete sentence: who the user is + how to behave.
 
-Once you have all four, do the following yourself:
-
-1. Create ~/projects/openclaw/ and write this compose.yaml:
+§1. Write ~/projects/openclaw/compose.yaml:
 
 services:
   openclaw:
@@ -430,9 +442,9 @@ services:
       - openclaw-workspace:/workspace
     environment:
       - OPENCLAW_WORKSPACE=/workspace
+      - OPENCLAW_STATE_DIR=/workspace/.openclaw
     stdin_open: true
     tty: true
-
   openclaw-gateway:
     image: ghcr.io/openclaw/openclaw:latest
     container_name: openclaw-gateway
@@ -441,46 +453,67 @@ services:
       - openclaw-workspace:/workspace
     environment:
       - OPENCLAW_WORKSPACE=/workspace
+      - OPENCLAW_STATE_DIR=/workspace/.openclaw
     ports:
-      - "18789:18789"
-    command: openclaw gateway run
-
+      - "127.0.0.1:18789:18789"
+    command: openclaw gateway run --bind lan
 volumes:
   openclaw-workspace:
+    name: openclaw-workspace
 
-2. Run the setup wizard:
-cd ~/projects/openclaw
-docker compose run --rm openclaw openclaw onboard
+Validate: cd ~/projects/openclaw && docker compose config --quiet
 
-Navigate each prompt using the values I gave you:
-- Channel → Telegram, token → [my Telegram token]
-- Auth → Anthropic API key, key → [my Anthropic key]
-- Model → claude-haiku-4-5-20251001
-- Web search → DuckDuckGo
-- Skills → Skip | API keys → No | Hooks → session-memory only | Hatch → Yes
+§2. Run setup (from ~/projects/openclaw; substitute real values for <...>):
 
-3. Start the gateway:
-docker compose up -d openclaw-gateway
-docker logs openclaw-gateway — confirm "[gateway] connected"
+# Fix volume ownership first — a fresh named volume is root-owned but the container runs as uid 1000; skip this and onboarding fails with EACCES.
+docker run --rm --user root -v openclaw-workspace:/workspace ghcr.io/openclaw/openclaw:latest chown -R 1000:1000 /workspace
 
-4. Write SOUL.md using the name and description I gave you:
-docker run --rm -v openclaw-workspace:/workspace ghcr.io/openclaw/openclaw:latest \
-  sh -c 'printf "# [name]\n\nYou are [name], my personal AI assistant. [description]\n" > /workspace/SOUL.md'
+# Auth + workspace (apiKey, NOT "anthropic" which wants claude auth login)
+docker compose run --rm openclaw openclaw onboard --non-interactive --accept-risk --flow quickstart --auth-choice apiKey --anthropic-api-key '<ANTHROPIC_API_KEY>' --workspace /workspace --skip-channels --skip-search --skip-skills --skip-hooks --no-install-daemon --skip-health
+
+# Telegram channel
+docker compose run --rm openclaw openclaw channels add --channel telegram --token '<TELEGRAM_BOT_TOKEN>' --name '<AGENT_NAME>'
+
+# Model — must be in this build's catalog; an off-catalog id sets silently but fails at runtime with "Unknown model". Check options: docker compose run --rm openclaw openclaw models list
+docker compose run --rm openclaw openclaw models set anthropic/claude-sonnet-4-6
+
+# Web search + session-memory
+docker compose run --rm openclaw openclaw plugins enable duckduckgo
+docker compose run --rm openclaw openclaw hooks enable session-memory
+
+§3. Start + verify:
+docker compose up -d openclaw-gateway && sleep 6
+docker exec openclaw-gateway openclaw models status
+docker logs openclaw-gateway 2>&1 | grep -i "unknown model" && echo "BAD: model not in catalog"
+curl -s -o /dev/null -w "dashboard HTTP %{http_code}\n" http://127.0.0.1:18789/
+Telegram shows running, disconnected until pairing — that's normal.
+
+§4. Pair the user (WAIT):
+Ask the user: Message your bot /start in Telegram. It replies with a pairing code — paste it here.
+Once you have the code: docker exec openclaw-gateway openclaw pairing approve telegram <PAIRING_CODE>
+
+§5. Write the persona (<DESCRIPTION> is inserted verbatim — make it a complete, capitalized sentence):
+docker exec openclaw-gateway sh -c 'printf "# <AGENT_NAME>\n\nYou are <AGENT_NAME>, my personal AI assistant. <DESCRIPTION>\n" > /workspace/SOUL.md'
+docker compose restart openclaw-gateway
+
+§6. Give the user the dashboard URL — the UI is token-gated. Read the token:
+docker exec openclaw-gateway sh -c 'node -e "console.log(require(process.env.OPENCLAW_STATE_DIR+\"/openclaw.json\").gateway.auth.token)"'
+Tell the user: Your agent is live. Open this (logs you in automatically; keep it private): http://127.0.0.1:18789/#token=<GATEWAY_TOKEN>
 ```
 
 ::tab[Discord]
 ```wrap
 Set up OpenClaw in Docker connected to Discord, using Claude (Anthropic) as the AI model.
 
-First, ask me for these four things and wait for all four before continuing:
-1. My Anthropic API key — I'll get one at console.anthropic.com if I don't have one.
-2. My Discord bot token — if I don't have one, walk me through it: go to discord.com/developers/applications → New Application → Bot → Reset Token (copy it) → enable Message Content Intent → OAuth2 URL Generator (scope: bot, permissions: Send Messages / Read Message History / View Channels) → paste the generated URL in my browser and authorize for my server, then paste the bot token here.
-3. A name for your agent — something short and personal (e.g., "Aria", "Max", "Scout").
-4. A brief description of who you are and how it should behave (e.g., "I'm in NYC, a product designer. Be direct, no filler.").
+For an AI agent doing this setup: run every command yourself — never tell the user to open a terminal. Ask the user only for the §0 inputs and in-app actions (adding the bot to the server, opening the dashboard). Credentials go into compose.yaml — don't write them anywhere else. WAIT = hard gate.
 
-Once you have all four, do the following yourself:
+§0. Ask the user (WAIT for all four before continuing):
+1. Anthropic API key — sk-ant-... from console.anthropic.com → API Keys.
+2. Discord bot token — discord.com/developers/applications → New Application → Bot → Reset Token (copy it). Enable Message Content Intent. OAuth2 URL Generator: scope bot, permissions Send Messages / Read Message History / View Channels → paste the URL in browser → authorize for their server. Then paste the bot token here.
+3. Agent name — something short (e.g. "Scout").
+4. Agent description — a complete sentence: who the user is + how to behave.
 
-1. Create ~/projects/openclaw/ and write this compose.yaml:
+§1. Write ~/projects/openclaw/compose.yaml:
 
 services:
   openclaw:
@@ -490,9 +523,9 @@ services:
       - openclaw-workspace:/workspace
     environment:
       - OPENCLAW_WORKSPACE=/workspace
+      - OPENCLAW_STATE_DIR=/workspace/.openclaw
     stdin_open: true
     tty: true
-
   openclaw-gateway:
     image: ghcr.io/openclaw/openclaw:latest
     container_name: openclaw-gateway
@@ -501,31 +534,47 @@ services:
       - openclaw-workspace:/workspace
     environment:
       - OPENCLAW_WORKSPACE=/workspace
+      - OPENCLAW_STATE_DIR=/workspace/.openclaw
     ports:
-      - "18789:18789"
-    command: openclaw gateway run
-
+      - "127.0.0.1:18789:18789"
+    command: openclaw gateway run --bind lan
 volumes:
   openclaw-workspace:
+    name: openclaw-workspace
 
-2. Run the setup wizard:
-cd ~/projects/openclaw
-docker compose run --rm openclaw openclaw onboard
+Validate: cd ~/projects/openclaw && docker compose config --quiet
 
-Navigate each prompt using the values I gave you:
-- Channel → Discord (Bot API), token → [my Discord token]
-- Auth → Anthropic API key, key → [my Anthropic key]
-- Model → claude-haiku-4-5-20251001
-- Web search → DuckDuckGo
-- Skills → Skip | API keys → No | Hooks → session-memory only | Hatch → Yes
+§2. Run setup (from ~/projects/openclaw; substitute real values for <...>):
 
-3. Start the gateway:
-docker compose up -d openclaw-gateway
-docker logs openclaw-gateway — confirm "[gateway] connected"
+# Fix volume ownership first — a fresh named volume is root-owned but the container runs as uid 1000; skip this and onboarding fails with EACCES.
+docker run --rm --user root -v openclaw-workspace:/workspace ghcr.io/openclaw/openclaw:latest chown -R 1000:1000 /workspace
 
-4. Write SOUL.md using the name and description I gave you:
-docker run --rm -v openclaw-workspace:/workspace ghcr.io/openclaw/openclaw:latest \
-  sh -c 'printf "# [name]\n\nYou are [name], my personal AI assistant. [description]\n" > /workspace/SOUL.md'
+# Auth + workspace (apiKey, NOT "anthropic" which wants claude auth login)
+docker compose run --rm openclaw openclaw onboard --non-interactive --accept-risk --flow quickstart --auth-choice apiKey --anthropic-api-key '<ANTHROPIC_API_KEY>' --workspace /workspace --skip-channels --skip-search --skip-skills --skip-hooks --no-install-daemon --skip-health
+
+# Discord channel
+docker compose run --rm openclaw openclaw channels add --channel discord --token '<DISCORD_BOT_TOKEN>' --name '<AGENT_NAME>'
+
+# Model — must be in this build's catalog; an off-catalog id sets silently but fails at runtime with "Unknown model". Check options: docker compose run --rm openclaw openclaw models list
+docker compose run --rm openclaw openclaw models set anthropic/claude-sonnet-4-6
+
+# Web search + session-memory
+docker compose run --rm openclaw openclaw plugins enable duckduckgo
+docker compose run --rm openclaw openclaw hooks enable session-memory
+
+§3. Start + verify:
+docker compose up -d openclaw-gateway && sleep 6
+docker exec openclaw-gateway openclaw models status
+docker logs openclaw-gateway 2>&1 | grep -i "unknown model" && echo "BAD: model not in catalog"
+curl -s -o /dev/null -w "dashboard HTTP %{http_code}\n" http://127.0.0.1:18789/
+
+§4. Write the persona (<DESCRIPTION> is inserted verbatim — make it a complete, capitalized sentence):
+docker exec openclaw-gateway sh -c 'printf "# <AGENT_NAME>\n\nYou are <AGENT_NAME>, my personal AI assistant. <DESCRIPTION>\n" > /workspace/SOUL.md'
+docker compose restart openclaw-gateway
+
+§5. Give the user the dashboard URL — the UI is token-gated. Read the token:
+docker exec openclaw-gateway sh -c 'node -e "console.log(require(process.env.OPENCLAW_STATE_DIR+\"/openclaw.json\").gateway.auth.token)"'
+Tell the user: Your agent is live. Open this (logs you in automatically; keep it private): http://127.0.0.1:18789/#token=<GATEWAY_TOKEN>
 ```
 :::
 
@@ -535,20 +584,15 @@ docker run --rm -v openclaw-workspace:/workspace ghcr.io/openclaw/openclaw:lates
 ```wrap
 Set up Hermes in Docker connected to Telegram, using Claude (Anthropic) as the AI model.
 
-First, ask me for these four things and wait for all four before continuing:
-1. My Anthropic API key — I'll get one at console.anthropic.com if I don't have one.
-2. My Telegram bot token — if I don't have one, walk me through it: open Telegram → find @BotFather → send /newbot → give it a name and a username ending in bot → paste the token here.
+For an AI agent doing this setup: run every command yourself — never tell the user to open a terminal. Ask the user only for the §0 inputs and in-app actions (messaging the bot, opening the dashboard). Credentials go into compose.yaml — don't write them anywhere else. WAIT = hard gate.
 
-3. A name for your agent — something short and personal (e.g., "Aria", "Max", "Scout").
-4. A brief description of who you are and how it should behave (e.g., "I'm in NYC, a product designer. Be direct, no filler.").
+§0. Ask the user (WAIT for all four before continuing):
+1. Anthropic API key — sk-ant-... from console.anthropic.com → API Keys.
+2. Telegram bot token — @BotFather → /newbot → name + ...bot username.
+3. Agent name — something short (e.g. "Scout").
+4. Agent description — a complete sentence: who the user is + how to behave.
 
-Once you have all four, do the following yourself:
-
-1. Create ~/projects/hermes/ and write .env:
-ANTHROPIC_API_KEY=[my Anthropic key]
-TELEGRAM_BOT_TOKEN=[my Telegram token]
-
-2. Write compose.yaml:
+§1. Write ~/projects/hermes/compose.yaml (substitute real values for <...>):
 
 services:
   hermes-gateway:
@@ -557,10 +601,10 @@ services:
     restart: unless-stopped
     volumes:
       - hermes-workspace:/opt/data
-    env_file:
-      - .env
+    environment:
+      - ANTHROPIC_API_KEY=<ANTHROPIC_API_KEY>
+      - TELEGRAM_BOT_TOKEN=<TELEGRAM_BOT_TOKEN>
     command: hermes gateway run
-
   hermes-dashboard:
     image: nousresearch/hermes-agent:latest
     container_name: hermes-dashboard
@@ -569,40 +613,44 @@ services:
       - hermes-workspace:/opt/data
     ports:
       - "127.0.0.1:9119:9119"
-    env_file:
-      - .env
     command: hermes dashboard --port 9119 --host 0.0.0.0 --insecure
-
 volumes:
   hermes-workspace:
+    name: hermes-workspace
 
-3. Start:
-docker compose up -d hermes-gateway hermes-dashboard
-docker logs hermes-gateway — confirm "[hermes] gateway connected"
+Validate: cd ~/projects/hermes && docker compose config --quiet
 
-4. Write SOUL.md using the name and description I gave you:
-docker run --rm -v hermes-workspace:/opt/data nousresearch/hermes-agent:latest \
-  sh -c 'printf "# [name]\n\nYou are [name], my personal AI assistant. [description]\n" > /opt/data/SOUL.md'
+§2. Start + verify (from ~/projects/hermes):
+docker compose up -d hermes-gateway hermes-dashboard && sleep 6
+docker logs hermes-gateway 2>&1 | tail -10
+curl -s -o /dev/null -w "dashboard HTTP %{http_code}\n" http://127.0.0.1:9119/
+Confirm: logs show [hermes] gateway connected, dashboard returns HTTP 200.
+Telegram shows running, disconnected until pairing — that's normal.
+
+§3. Pair the user (WAIT):
+Ask the user: Message your bot /start in Telegram. It replies with a pairing code — paste it here.
+Once you have the code: docker exec hermes-gateway hermes pairing approve telegram <PAIRING_CODE>
+
+§4. Write the persona (<DESCRIPTION> is inserted verbatim — make it a complete, capitalized sentence):
+docker exec hermes-gateway sh -c 'printf "# <AGENT_NAME>\n\nYou are <AGENT_NAME>, my personal AI assistant. <DESCRIPTION>\n" > /opt/data/SOUL.md'
+docker compose restart hermes-gateway
+
+§5. Tell the user: Your agent is live. Dashboard: http://127.0.0.1:9119
 ```
 
 ::tab[Discord]
 ```wrap
 Set up Hermes in Docker connected to Discord, using Claude (Anthropic) as the AI model.
 
-First, ask me for these four things and wait for all four before continuing:
-1. My Anthropic API key — I'll get one at console.anthropic.com if I don't have one.
-2. My Discord bot token — if I don't have one, walk me through it: go to discord.com/developers/applications → New Application → Bot → Reset Token (copy it) → enable Message Content Intent → OAuth2 URL Generator (scope: bot, permissions: Send Messages / Read Message History / View Channels) → paste the generated URL in my browser and authorize for my server, then paste the bot token here.
+For an AI agent doing this setup: run every command yourself — never tell the user to open a terminal. Ask the user only for the §0 inputs and in-app actions (adding the bot to the server, opening the dashboard). Credentials go into compose.yaml — don't write them anywhere else. WAIT = hard gate.
 
-3. A name for your agent — something short and personal (e.g., "Aria", "Max", "Scout").
-4. A brief description of who you are and how it should behave (e.g., "I'm in NYC, a product designer. Be direct, no filler.").
+§0. Ask the user (WAIT for all four before continuing):
+1. Anthropic API key — sk-ant-... from console.anthropic.com → API Keys.
+2. Discord bot token — discord.com/developers/applications → New Application → Bot → Reset Token (copy it). Enable Message Content Intent. OAuth2 URL Generator: scope bot, permissions Send Messages / Read Message History / View Channels → paste the URL in browser → authorize for their server. Then paste the bot token here.
+3. Agent name — something short (e.g. "Scout").
+4. Agent description — a complete sentence: who the user is + how to behave.
 
-Once you have all four, do the following yourself:
-
-1. Create ~/projects/hermes/ and write .env:
-ANTHROPIC_API_KEY=[my Anthropic key]
-DISCORD_BOT_TOKEN=[my Discord token]
-
-2. Write compose.yaml:
+§1. Write ~/projects/hermes/compose.yaml (substitute real values for <...>):
 
 services:
   hermes-gateway:
@@ -611,10 +659,10 @@ services:
     restart: unless-stopped
     volumes:
       - hermes-workspace:/opt/data
-    env_file:
-      - .env
+    environment:
+      - ANTHROPIC_API_KEY=<ANTHROPIC_API_KEY>
+      - DISCORD_BOT_TOKEN=<DISCORD_BOT_TOKEN>
     command: hermes gateway run
-
   hermes-dashboard:
     image: nousresearch/hermes-agent:latest
     container_name: hermes-dashboard
@@ -623,20 +671,24 @@ services:
       - hermes-workspace:/opt/data
     ports:
       - "127.0.0.1:9119:9119"
-    env_file:
-      - .env
     command: hermes dashboard --port 9119 --host 0.0.0.0 --insecure
-
 volumes:
   hermes-workspace:
+    name: hermes-workspace
 
-3. Start:
-docker compose up -d hermes-gateway hermes-dashboard
-docker logs hermes-gateway — confirm "[hermes] gateway connected"
+Validate: cd ~/projects/hermes && docker compose config --quiet
 
-4. Write SOUL.md using the name and description I gave you:
-docker run --rm -v hermes-workspace:/opt/data nousresearch/hermes-agent:latest \
-  sh -c 'printf "# [name]\n\nYou are [name], my personal AI assistant. [description]\n" > /opt/data/SOUL.md'
+§2. Start + verify (from ~/projects/hermes):
+docker compose up -d hermes-gateway hermes-dashboard && sleep 6
+docker logs hermes-gateway 2>&1 | tail -10
+curl -s -o /dev/null -w "dashboard HTTP %{http_code}\n" http://127.0.0.1:9119/
+Confirm: logs show [hermes] gateway connected, dashboard returns HTTP 200.
+
+§3. Write the persona (<DESCRIPTION> is inserted verbatim — make it a complete, capitalized sentence):
+docker exec hermes-gateway sh -c 'printf "# <AGENT_NAME>\n\nYou are <AGENT_NAME>, my personal AI assistant. <DESCRIPTION>\n" > /opt/data/SOUL.md'
+docker compose restart hermes-gateway
+
+§4. Tell the user: Your agent is live. Dashboard: http://127.0.0.1:9119
 ```
 :::
 ::::
@@ -651,16 +703,15 @@ Have your **OpenAI API key** ready — get one at [platform.openai.com](https://
 ```wrap
 Set up OpenClaw in Docker connected to Telegram, using ChatGPT (OpenAI) as the AI model.
 
-First, ask me for these four things and wait for all four before continuing:
-1. My OpenAI API key — I'll get one at platform.openai.com if I don't have one. (Or tell me if I want to use ChatGPT OAuth — no key needed for that path.)
-2. My Telegram bot token — if I don't have one, walk me through it: open Telegram → find @BotFather → send /newbot → give it a name and a username ending in bot → paste the token here.
+For an AI agent doing this setup: run every command yourself — never tell the user to open a terminal. Ask the user only for the §0 inputs, the §4 pairing code, and in-app actions (messaging the bot, opening the dashboard). Hold secrets in memory only. WAIT = hard gate.
 
-3. A name for your agent — something short and personal (e.g., "Aria", "Max", "Scout").
-4. A brief description of who you are and how it should behave (e.g., "I'm in NYC, a product designer. Be direct, no filler.").
+§0. Ask the user (WAIT for all four before continuing):
+1. OpenAI API key — from platform.openai.com. (Or tell me if using ChatGPT OAuth — no key needed for that path.)
+2. Telegram bot token — @BotFather → /newbot → name + ...bot username.
+3. Agent name — something short (e.g. "Scout").
+4. Agent description — a complete sentence: who the user is + how to behave.
 
-Once you have all four, do the following yourself:
-
-1. Create ~/projects/openclaw/ and write this compose.yaml:
+§1. Write ~/projects/openclaw/compose.yaml:
 
 services:
   openclaw:
@@ -670,9 +721,9 @@ services:
       - openclaw-workspace:/workspace
     environment:
       - OPENCLAW_WORKSPACE=/workspace
+      - OPENCLAW_STATE_DIR=/workspace/.openclaw
     stdin_open: true
     tty: true
-
   openclaw-gateway:
     image: ghcr.io/openclaw/openclaw:latest
     container_name: openclaw-gateway
@@ -681,47 +732,67 @@ services:
       - openclaw-workspace:/workspace
     environment:
       - OPENCLAW_WORKSPACE=/workspace
+      - OPENCLAW_STATE_DIR=/workspace/.openclaw
     ports:
-      - "18789:18789"
-    command: openclaw gateway run
-
+      - "127.0.0.1:18789:18789"
+    command: openclaw gateway run --bind lan
 volumes:
   openclaw-workspace:
+    name: openclaw-workspace
 
-2. Run the setup wizard:
-cd ~/projects/openclaw
-docker compose run --rm openclaw openclaw onboard
+Validate: cd ~/projects/openclaw && docker compose config --quiet
 
-Navigate each prompt using the values I gave you:
-- Channel → Telegram, token → [my Telegram token]
-- Auth → ChatGPT OAuth (or OpenAI API key), key → [my OpenAI key if applicable]
-- Model → gpt-4o-mini
-- Web search → DuckDuckGo
-- Skills → Skip | API keys → No | Hooks → session-memory only | Hatch → Yes
+§2. Run setup (from ~/projects/openclaw; substitute real values for <...>):
 
-3. Start the gateway:
-docker compose up -d openclaw-gateway
-docker logs openclaw-gateway — confirm "[gateway] connected"
+# Fix volume ownership first — a fresh named volume is root-owned but the container runs as uid 1000; skip this and onboarding fails with EACCES.
+docker run --rm --user root -v openclaw-workspace:/workspace ghcr.io/openclaw/openclaw:latest chown -R 1000:1000 /workspace
 
-4. Write SOUL.md using the name and description I gave you:
-docker run --rm -v openclaw-workspace:/workspace ghcr.io/openclaw/openclaw:latest \
-  sh -c 'printf "# [name]\n\nYou are [name], my personal AI assistant. [description]\n" > /workspace/SOUL.md'
+# Auth + workspace
+docker compose run --rm openclaw openclaw onboard --non-interactive --accept-risk --flow quickstart --auth-choice apiKey --openai-api-key '<OPENAI_API_KEY>' --workspace /workspace --skip-channels --skip-search --skip-skills --skip-hooks --no-install-daemon --skip-health
+
+# Telegram channel
+docker compose run --rm openclaw openclaw channels add --channel telegram --token '<TELEGRAM_BOT_TOKEN>' --name '<AGENT_NAME>'
+
+# Model — must be in this build's catalog; an off-catalog id sets silently but fails at runtime with "Unknown model". Check options: docker compose run --rm openclaw openclaw models list
+docker compose run --rm openclaw openclaw models set openai/gpt-4o-mini
+
+# Web search + session-memory
+docker compose run --rm openclaw openclaw plugins enable duckduckgo
+docker compose run --rm openclaw openclaw hooks enable session-memory
+
+§3. Start + verify:
+docker compose up -d openclaw-gateway && sleep 6
+docker exec openclaw-gateway openclaw models status
+docker logs openclaw-gateway 2>&1 | grep -i "unknown model" && echo "BAD: model not in catalog"
+curl -s -o /dev/null -w "dashboard HTTP %{http_code}\n" http://127.0.0.1:18789/
+Telegram shows running, disconnected until pairing — that's normal.
+
+§4. Pair the user (WAIT):
+Ask the user: Message your bot /start in Telegram. It replies with a pairing code — paste it here.
+Once you have the code: docker exec openclaw-gateway openclaw pairing approve telegram <PAIRING_CODE>
+
+§5. Write the persona (<DESCRIPTION> is inserted verbatim — make it a complete, capitalized sentence):
+docker exec openclaw-gateway sh -c 'printf "# <AGENT_NAME>\n\nYou are <AGENT_NAME>, my personal AI assistant. <DESCRIPTION>\n" > /workspace/SOUL.md'
+docker compose restart openclaw-gateway
+
+§6. Give the user the dashboard URL — the UI is token-gated. Read the token:
+docker exec openclaw-gateway sh -c 'node -e "console.log(require(process.env.OPENCLAW_STATE_DIR+\"/openclaw.json\").gateway.auth.token)"'
+Tell the user: Your agent is live. Open this (logs you in automatically; keep it private): http://127.0.0.1:18789/#token=<GATEWAY_TOKEN>
 ```
 
 ::tab[Discord]
 ```wrap
 Set up OpenClaw in Docker connected to Discord, using ChatGPT (OpenAI) as the AI model.
 
-First, ask me for these four things and wait for all four before continuing:
-1. My OpenAI API key — I'll get one at platform.openai.com if I don't have one. (Or tell me if I want to use ChatGPT OAuth — no key needed for that path.)
-2. My Discord bot token — if I don't have one, walk me through it: go to discord.com/developers/applications → New Application → Bot → Reset Token (copy it) → enable Message Content Intent → OAuth2 URL Generator (scope: bot, permissions: Send Messages / Read Message History / View Channels) → paste the generated URL in my browser and authorize for my server, then paste the bot token here.
+For an AI agent doing this setup: run every command yourself — never tell the user to open a terminal. Ask the user only for the §0 inputs and in-app actions (adding the bot to the server, opening the dashboard). Credentials go into compose.yaml — don't write them anywhere else. WAIT = hard gate.
 
-3. A name for your agent — something short and personal (e.g., "Aria", "Max", "Scout").
-4. A brief description of who you are and how it should behave (e.g., "I'm in NYC, a product designer. Be direct, no filler.").
+§0. Ask the user (WAIT for all four before continuing):
+1. OpenAI API key — from platform.openai.com. (Or tell me if using ChatGPT OAuth — no key needed for that path.)
+2. Discord bot token — discord.com/developers/applications → New Application → Bot → Reset Token (copy it). Enable Message Content Intent. OAuth2 URL Generator: scope bot, permissions Send Messages / Read Message History / View Channels → paste the URL in browser → authorize for their server. Then paste the bot token here.
+3. Agent name — something short (e.g. "Scout").
+4. Agent description — a complete sentence: who the user is + how to behave.
 
-Once you have all four, do the following yourself:
-
-1. Create ~/projects/openclaw/ and write this compose.yaml:
+§1. Write ~/projects/openclaw/compose.yaml:
 
 services:
   openclaw:
@@ -731,9 +802,9 @@ services:
       - openclaw-workspace:/workspace
     environment:
       - OPENCLAW_WORKSPACE=/workspace
+      - OPENCLAW_STATE_DIR=/workspace/.openclaw
     stdin_open: true
     tty: true
-
   openclaw-gateway:
     image: ghcr.io/openclaw/openclaw:latest
     container_name: openclaw-gateway
@@ -742,31 +813,47 @@ services:
       - openclaw-workspace:/workspace
     environment:
       - OPENCLAW_WORKSPACE=/workspace
+      - OPENCLAW_STATE_DIR=/workspace/.openclaw
     ports:
-      - "18789:18789"
-    command: openclaw gateway run
-
+      - "127.0.0.1:18789:18789"
+    command: openclaw gateway run --bind lan
 volumes:
   openclaw-workspace:
+    name: openclaw-workspace
 
-2. Run the setup wizard:
-cd ~/projects/openclaw
-docker compose run --rm openclaw openclaw onboard
+Validate: cd ~/projects/openclaw && docker compose config --quiet
 
-Navigate each prompt using the values I gave you:
-- Channel → Discord (Bot API), token → [my Discord token]
-- Auth → ChatGPT OAuth (or OpenAI API key), key → [my OpenAI key if applicable]
-- Model → gpt-4o-mini
-- Web search → DuckDuckGo
-- Skills → Skip | API keys → No | Hooks → session-memory only | Hatch → Yes
+§2. Run setup (from ~/projects/openclaw; substitute real values for <...>):
 
-3. Start the gateway:
-docker compose up -d openclaw-gateway
-docker logs openclaw-gateway — confirm "[gateway] connected"
+# Fix volume ownership first — a fresh named volume is root-owned but the container runs as uid 1000; skip this and onboarding fails with EACCES.
+docker run --rm --user root -v openclaw-workspace:/workspace ghcr.io/openclaw/openclaw:latest chown -R 1000:1000 /workspace
 
-4. Write SOUL.md using the name and description I gave you:
-docker run --rm -v openclaw-workspace:/workspace ghcr.io/openclaw/openclaw:latest \
-  sh -c 'printf "# [name]\n\nYou are [name], my personal AI assistant. [description]\n" > /workspace/SOUL.md'
+# Auth + workspace
+docker compose run --rm openclaw openclaw onboard --non-interactive --accept-risk --flow quickstart --auth-choice apiKey --openai-api-key '<OPENAI_API_KEY>' --workspace /workspace --skip-channels --skip-search --skip-skills --skip-hooks --no-install-daemon --skip-health
+
+# Discord channel
+docker compose run --rm openclaw openclaw channels add --channel discord --token '<DISCORD_BOT_TOKEN>' --name '<AGENT_NAME>'
+
+# Model — must be in this build's catalog; an off-catalog id sets silently but fails at runtime with "Unknown model". Check options: docker compose run --rm openclaw openclaw models list
+docker compose run --rm openclaw openclaw models set openai/gpt-4o-mini
+
+# Web search + session-memory
+docker compose run --rm openclaw openclaw plugins enable duckduckgo
+docker compose run --rm openclaw openclaw hooks enable session-memory
+
+§3. Start + verify:
+docker compose up -d openclaw-gateway && sleep 6
+docker exec openclaw-gateway openclaw models status
+docker logs openclaw-gateway 2>&1 | grep -i "unknown model" && echo "BAD: model not in catalog"
+curl -s -o /dev/null -w "dashboard HTTP %{http_code}\n" http://127.0.0.1:18789/
+
+§4. Write the persona (<DESCRIPTION> is inserted verbatim — make it a complete, capitalized sentence):
+docker exec openclaw-gateway sh -c 'printf "# <AGENT_NAME>\n\nYou are <AGENT_NAME>, my personal AI assistant. <DESCRIPTION>\n" > /workspace/SOUL.md'
+docker compose restart openclaw-gateway
+
+§5. Give the user the dashboard URL — the UI is token-gated. Read the token:
+docker exec openclaw-gateway sh -c 'node -e "console.log(require(process.env.OPENCLAW_STATE_DIR+\"/openclaw.json\").gateway.auth.token)"'
+Tell the user: Your agent is live. Open this (logs you in automatically; keep it private): http://127.0.0.1:18789/#token=<GATEWAY_TOKEN>
 ```
 :::
 
@@ -776,20 +863,15 @@ docker run --rm -v openclaw-workspace:/workspace ghcr.io/openclaw/openclaw:lates
 ```wrap
 Set up Hermes in Docker connected to Telegram, using ChatGPT (OpenAI) as the AI model.
 
-First, ask me for these four things and wait for all four before continuing:
-1. My OpenAI API key — I'll get one at platform.openai.com if I don't have one.
-2. My Telegram bot token — if I don't have one, walk me through it: open Telegram → find @BotFather → send /newbot → give it a name and a username ending in bot → paste the token here.
+For an AI agent doing this setup: run every command yourself — never tell the user to open a terminal. Ask the user only for the §0 inputs and in-app actions (messaging the bot, opening the dashboard). Credentials go into compose.yaml — don't write them anywhere else. WAIT = hard gate.
 
-3. A name for your agent — something short and personal (e.g., "Aria", "Max", "Scout").
-4. A brief description of who you are and how it should behave (e.g., "I'm in NYC, a product designer. Be direct, no filler.").
+§0. Ask the user (WAIT for all four before continuing):
+1. OpenAI API key — from platform.openai.com.
+2. Telegram bot token — @BotFather → /newbot → name + ...bot username.
+3. Agent name — something short (e.g. "Scout").
+4. Agent description — a complete sentence: who the user is + how to behave.
 
-Once you have all four, do the following yourself:
-
-1. Create ~/projects/hermes/ and write .env:
-OPENAI_API_KEY=[my OpenAI key]
-TELEGRAM_BOT_TOKEN=[my Telegram token]
-
-2. Write compose.yaml:
+§1. Write ~/projects/hermes/compose.yaml (substitute real values for <...>):
 
 services:
   hermes-gateway:
@@ -798,10 +880,10 @@ services:
     restart: unless-stopped
     volumes:
       - hermes-workspace:/opt/data
-    env_file:
-      - .env
+    environment:
+      - OPENAI_API_KEY=<OPENAI_API_KEY>
+      - TELEGRAM_BOT_TOKEN=<TELEGRAM_BOT_TOKEN>
     command: hermes gateway run
-
   hermes-dashboard:
     image: nousresearch/hermes-agent:latest
     container_name: hermes-dashboard
@@ -810,40 +892,44 @@ services:
       - hermes-workspace:/opt/data
     ports:
       - "127.0.0.1:9119:9119"
-    env_file:
-      - .env
     command: hermes dashboard --port 9119 --host 0.0.0.0 --insecure
-
 volumes:
   hermes-workspace:
+    name: hermes-workspace
 
-3. Start:
-docker compose up -d hermes-gateway hermes-dashboard
-docker logs hermes-gateway — confirm "[hermes] gateway connected"
+Validate: cd ~/projects/hermes && docker compose config --quiet
 
-4. Write SOUL.md using the name and description I gave you:
-docker run --rm -v hermes-workspace:/opt/data nousresearch/hermes-agent:latest \
-  sh -c 'printf "# [name]\n\nYou are [name], my personal AI assistant. [description]\n" > /opt/data/SOUL.md'
+§2. Start + verify (from ~/projects/hermes):
+docker compose up -d hermes-gateway hermes-dashboard && sleep 6
+docker logs hermes-gateway 2>&1 | tail -10
+curl -s -o /dev/null -w "dashboard HTTP %{http_code}\n" http://127.0.0.1:9119/
+Confirm: logs show [hermes] gateway connected, dashboard returns HTTP 200.
+Telegram shows running, disconnected until pairing — that's normal.
+
+§3. Pair the user (WAIT):
+Ask the user: Message your bot /start in Telegram. It replies with a pairing code — paste it here.
+Once you have the code: docker exec hermes-gateway hermes pairing approve telegram <PAIRING_CODE>
+
+§4. Write the persona (<DESCRIPTION> is inserted verbatim — make it a complete, capitalized sentence):
+docker exec hermes-gateway sh -c 'printf "# <AGENT_NAME>\n\nYou are <AGENT_NAME>, my personal AI assistant. <DESCRIPTION>\n" > /opt/data/SOUL.md'
+docker compose restart hermes-gateway
+
+§5. Tell the user: Your agent is live. Dashboard: http://127.0.0.1:9119
 ```
 
 ::tab[Discord]
 ```wrap
 Set up Hermes in Docker connected to Discord, using ChatGPT (OpenAI) as the AI model.
 
-First, ask me for these four things and wait for all four before continuing:
-1. My OpenAI API key — I'll get one at platform.openai.com if I don't have one.
-2. My Discord bot token — if I don't have one, walk me through it: go to discord.com/developers/applications → New Application → Bot → Reset Token (copy it) → enable Message Content Intent → OAuth2 URL Generator (scope: bot, permissions: Send Messages / Read Message History / View Channels) → paste the generated URL in my browser and authorize for my server, then paste the bot token here.
+For an AI agent doing this setup: run every command yourself — never tell the user to open a terminal. Ask the user only for the §0 inputs and in-app actions (adding the bot to the server, opening the dashboard). Credentials go into compose.yaml — don't write them anywhere else. WAIT = hard gate.
 
-3. A name for your agent — something short and personal (e.g., "Aria", "Max", "Scout").
-4. A brief description of who you are and how it should behave (e.g., "I'm in NYC, a product designer. Be direct, no filler.").
+§0. Ask the user (WAIT for all four before continuing):
+1. OpenAI API key — from platform.openai.com.
+2. Discord bot token — discord.com/developers/applications → New Application → Bot → Reset Token (copy it). Enable Message Content Intent. OAuth2 URL Generator: scope bot, permissions Send Messages / Read Message History / View Channels → paste the URL in browser → authorize for their server. Then paste the bot token here.
+3. Agent name — something short (e.g. "Scout").
+4. Agent description — a complete sentence: who the user is + how to behave.
 
-Once you have all four, do the following yourself:
-
-1. Create ~/projects/hermes/ and write .env:
-OPENAI_API_KEY=[my OpenAI key]
-DISCORD_BOT_TOKEN=[my Discord token]
-
-2. Write compose.yaml:
+§1. Write ~/projects/hermes/compose.yaml (substitute real values for <...>):
 
 services:
   hermes-gateway:
@@ -852,10 +938,10 @@ services:
     restart: unless-stopped
     volumes:
       - hermes-workspace:/opt/data
-    env_file:
-      - .env
+    environment:
+      - OPENAI_API_KEY=<OPENAI_API_KEY>
+      - DISCORD_BOT_TOKEN=<DISCORD_BOT_TOKEN>
     command: hermes gateway run
-
   hermes-dashboard:
     image: nousresearch/hermes-agent:latest
     container_name: hermes-dashboard
@@ -864,20 +950,24 @@ services:
       - hermes-workspace:/opt/data
     ports:
       - "127.0.0.1:9119:9119"
-    env_file:
-      - .env
     command: hermes dashboard --port 9119 --host 0.0.0.0 --insecure
-
 volumes:
   hermes-workspace:
+    name: hermes-workspace
 
-3. Start:
-docker compose up -d hermes-gateway hermes-dashboard
-docker logs hermes-gateway — confirm "[hermes] gateway connected"
+Validate: cd ~/projects/hermes && docker compose config --quiet
 
-4. Write SOUL.md using the name and description I gave you:
-docker run --rm -v hermes-workspace:/opt/data nousresearch/hermes-agent:latest \
-  sh -c 'printf "# [name]\n\nYou are [name], my personal AI assistant. [description]\n" > /opt/data/SOUL.md'
+§2. Start + verify (from ~/projects/hermes):
+docker compose up -d hermes-gateway hermes-dashboard && sleep 6
+docker logs hermes-gateway 2>&1 | tail -10
+curl -s -o /dev/null -w "dashboard HTTP %{http_code}\n" http://127.0.0.1:9119/
+Confirm: logs show [hermes] gateway connected, dashboard returns HTTP 200.
+
+§3. Write the persona (<DESCRIPTION> is inserted verbatim — make it a complete, capitalized sentence):
+docker exec hermes-gateway sh -c 'printf "# <AGENT_NAME>\n\nYou are <AGENT_NAME>, my personal AI assistant. <DESCRIPTION>\n" > /opt/data/SOUL.md'
+docker compose restart hermes-gateway
+
+§4. Tell the user: Your agent is live. Dashboard: http://127.0.0.1:9119
 ```
 :::
 ::::
@@ -892,16 +982,15 @@ Have your **Gemini API key** ready — get one free at [aistudio.google.com](htt
 ```wrap
 Set up OpenClaw in Docker connected to Telegram, using Gemini (Google) as the AI model.
 
-First, ask me for these four things and wait for all four before continuing:
-1. My Gemini API key — I'll get one free at aistudio.google.com if I don't have one.
-2. My Telegram bot token — if I don't have one, walk me through it: open Telegram → find @BotFather → send /newbot → give it a name and a username ending in bot → paste the token here.
+For an AI agent doing this setup: run every command yourself — never tell the user to open a terminal. Ask the user only for the §0 inputs, the §4 pairing code, and in-app actions (messaging the bot, opening the dashboard). Hold secrets in memory only. WAIT = hard gate.
 
-3. A name for your agent — something short and personal (e.g., "Aria", "Max", "Scout").
-4. A brief description of who you are and how it should behave (e.g., "I'm in NYC, a product designer. Be direct, no filler.").
+§0. Ask the user (WAIT for all four before continuing):
+1. Gemini API key — free at aistudio.google.com (no billing required for the free tier).
+2. Telegram bot token — @BotFather → /newbot → name + ...bot username.
+3. Agent name — something short (e.g. "Scout").
+4. Agent description — a complete sentence: who the user is + how to behave.
 
-Once you have all four, do the following yourself:
-
-1. Create ~/projects/openclaw/ and write this compose.yaml:
+§1. Write ~/projects/openclaw/compose.yaml:
 
 services:
   openclaw:
@@ -911,9 +1000,9 @@ services:
       - openclaw-workspace:/workspace
     environment:
       - OPENCLAW_WORKSPACE=/workspace
+      - OPENCLAW_STATE_DIR=/workspace/.openclaw
     stdin_open: true
     tty: true
-
   openclaw-gateway:
     image: ghcr.io/openclaw/openclaw:latest
     container_name: openclaw-gateway
@@ -922,47 +1011,67 @@ services:
       - openclaw-workspace:/workspace
     environment:
       - OPENCLAW_WORKSPACE=/workspace
+      - OPENCLAW_STATE_DIR=/workspace/.openclaw
     ports:
-      - "18789:18789"
-    command: openclaw gateway run
-
+      - "127.0.0.1:18789:18789"
+    command: openclaw gateway run --bind lan
 volumes:
   openclaw-workspace:
+    name: openclaw-workspace
 
-2. Run the setup wizard:
-cd ~/projects/openclaw
-docker compose run --rm openclaw openclaw onboard
+Validate: cd ~/projects/openclaw && docker compose config --quiet
 
-Navigate each prompt using the values I gave you:
-- Channel → Telegram, token → [my Telegram token]
-- Auth → Gemini API key, key → [my Gemini key]
-- Model → gemini-2.5-flash
-- Web search → DuckDuckGo
-- Skills → Skip | API keys → No | Hooks → session-memory only | Hatch → Yes
+§2. Run setup (from ~/projects/openclaw; substitute real values for <...>):
 
-3. Start the gateway:
-docker compose up -d openclaw-gateway
-docker logs openclaw-gateway — confirm "[gateway] connected"
+# Fix volume ownership first — a fresh named volume is root-owned but the container runs as uid 1000; skip this and onboarding fails with EACCES.
+docker run --rm --user root -v openclaw-workspace:/workspace ghcr.io/openclaw/openclaw:latest chown -R 1000:1000 /workspace
 
-4. Write SOUL.md using the name and description I gave you:
-docker run --rm -v openclaw-workspace:/workspace ghcr.io/openclaw/openclaw:latest \
-  sh -c 'printf "# [name]\n\nYou are [name], my personal AI assistant. [description]\n" > /workspace/SOUL.md'
+# Auth + workspace
+docker compose run --rm openclaw openclaw onboard --non-interactive --accept-risk --flow quickstart --auth-choice apiKey --gemini-api-key '<GEMINI_API_KEY>' --workspace /workspace --skip-channels --skip-search --skip-skills --skip-hooks --no-install-daemon --skip-health
+
+# Telegram channel
+docker compose run --rm openclaw openclaw channels add --channel telegram --token '<TELEGRAM_BOT_TOKEN>' --name '<AGENT_NAME>'
+
+# Model — must be in this build's catalog; an off-catalog id sets silently but fails at runtime with "Unknown model". Check options: docker compose run --rm openclaw openclaw models list
+docker compose run --rm openclaw openclaw models set google/gemini-2.5-flash
+
+# Web search + session-memory
+docker compose run --rm openclaw openclaw plugins enable duckduckgo
+docker compose run --rm openclaw openclaw hooks enable session-memory
+
+§3. Start + verify:
+docker compose up -d openclaw-gateway && sleep 6
+docker exec openclaw-gateway openclaw models status
+docker logs openclaw-gateway 2>&1 | grep -i "unknown model" && echo "BAD: model not in catalog"
+curl -s -o /dev/null -w "dashboard HTTP %{http_code}\n" http://127.0.0.1:18789/
+Telegram shows running, disconnected until pairing — that's normal.
+
+§4. Pair the user (WAIT):
+Ask the user: Message your bot /start in Telegram. It replies with a pairing code — paste it here.
+Once you have the code: docker exec openclaw-gateway openclaw pairing approve telegram <PAIRING_CODE>
+
+§5. Write the persona (<DESCRIPTION> is inserted verbatim — make it a complete, capitalized sentence):
+docker exec openclaw-gateway sh -c 'printf "# <AGENT_NAME>\n\nYou are <AGENT_NAME>, my personal AI assistant. <DESCRIPTION>\n" > /workspace/SOUL.md'
+docker compose restart openclaw-gateway
+
+§6. Give the user the dashboard URL — the UI is token-gated. Read the token:
+docker exec openclaw-gateway sh -c 'node -e "console.log(require(process.env.OPENCLAW_STATE_DIR+\"/openclaw.json\").gateway.auth.token)"'
+Tell the user: Your agent is live. Open this (logs you in automatically; keep it private): http://127.0.0.1:18789/#token=<GATEWAY_TOKEN>
 ```
 
 ::tab[Discord]
 ```wrap
 Set up OpenClaw in Docker connected to Discord, using Gemini (Google) as the AI model.
 
-First, ask me for these four things and wait for all four before continuing:
-1. My Gemini API key — I'll get one free at aistudio.google.com if I don't have one.
-2. My Discord bot token — if I don't have one, walk me through it: go to discord.com/developers/applications → New Application → Bot → Reset Token (copy it) → enable Message Content Intent → OAuth2 URL Generator (scope: bot, permissions: Send Messages / Read Message History / View Channels) → paste the generated URL in my browser and authorize for my server, then paste the bot token here.
+For an AI agent doing this setup: run every command yourself — never tell the user to open a terminal. Ask the user only for the §0 inputs and in-app actions (adding the bot to the server, opening the dashboard). Credentials go into compose.yaml — don't write them anywhere else. WAIT = hard gate.
 
-3. A name for your agent — something short and personal (e.g., "Aria", "Max", "Scout").
-4. A brief description of who you are and how it should behave (e.g., "I'm in NYC, a product designer. Be direct, no filler.").
+§0. Ask the user (WAIT for all four before continuing):
+1. Gemini API key — free at aistudio.google.com (no billing required for the free tier).
+2. Discord bot token — discord.com/developers/applications → New Application → Bot → Reset Token (copy it). Enable Message Content Intent. OAuth2 URL Generator: scope bot, permissions Send Messages / Read Message History / View Channels → paste the URL in browser → authorize for their server. Then paste the bot token here.
+3. Agent name — something short (e.g. "Scout").
+4. Agent description — a complete sentence: who the user is + how to behave.
 
-Once you have all four, do the following yourself:
-
-1. Create ~/projects/openclaw/ and write this compose.yaml:
+§1. Write ~/projects/openclaw/compose.yaml:
 
 services:
   openclaw:
@@ -972,9 +1081,9 @@ services:
       - openclaw-workspace:/workspace
     environment:
       - OPENCLAW_WORKSPACE=/workspace
+      - OPENCLAW_STATE_DIR=/workspace/.openclaw
     stdin_open: true
     tty: true
-
   openclaw-gateway:
     image: ghcr.io/openclaw/openclaw:latest
     container_name: openclaw-gateway
@@ -983,31 +1092,47 @@ services:
       - openclaw-workspace:/workspace
     environment:
       - OPENCLAW_WORKSPACE=/workspace
+      - OPENCLAW_STATE_DIR=/workspace/.openclaw
     ports:
-      - "18789:18789"
-    command: openclaw gateway run
-
+      - "127.0.0.1:18789:18789"
+    command: openclaw gateway run --bind lan
 volumes:
   openclaw-workspace:
+    name: openclaw-workspace
 
-2. Run the setup wizard:
-cd ~/projects/openclaw
-docker compose run --rm openclaw openclaw onboard
+Validate: cd ~/projects/openclaw && docker compose config --quiet
 
-Navigate each prompt using the values I gave you:
-- Channel → Discord (Bot API), token → [my Discord token]
-- Auth → Gemini API key, key → [my Gemini key]
-- Model → gemini-2.5-flash
-- Web search → DuckDuckGo
-- Skills → Skip | API keys → No | Hooks → session-memory only | Hatch → Yes
+§2. Run setup (from ~/projects/openclaw; substitute real values for <...>):
 
-3. Start the gateway:
-docker compose up -d openclaw-gateway
-docker logs openclaw-gateway — confirm "[gateway] connected"
+# Fix volume ownership first — a fresh named volume is root-owned but the container runs as uid 1000; skip this and onboarding fails with EACCES.
+docker run --rm --user root -v openclaw-workspace:/workspace ghcr.io/openclaw/openclaw:latest chown -R 1000:1000 /workspace
 
-4. Write SOUL.md using the name and description I gave you:
-docker run --rm -v openclaw-workspace:/workspace ghcr.io/openclaw/openclaw:latest \
-  sh -c 'printf "# [name]\n\nYou are [name], my personal AI assistant. [description]\n" > /workspace/SOUL.md'
+# Auth + workspace
+docker compose run --rm openclaw openclaw onboard --non-interactive --accept-risk --flow quickstart --auth-choice apiKey --gemini-api-key '<GEMINI_API_KEY>' --workspace /workspace --skip-channels --skip-search --skip-skills --skip-hooks --no-install-daemon --skip-health
+
+# Discord channel
+docker compose run --rm openclaw openclaw channels add --channel discord --token '<DISCORD_BOT_TOKEN>' --name '<AGENT_NAME>'
+
+# Model — must be in this build's catalog; an off-catalog id sets silently but fails at runtime with "Unknown model". Check options: docker compose run --rm openclaw openclaw models list
+docker compose run --rm openclaw openclaw models set google/gemini-2.5-flash
+
+# Web search + session-memory
+docker compose run --rm openclaw openclaw plugins enable duckduckgo
+docker compose run --rm openclaw openclaw hooks enable session-memory
+
+§3. Start + verify:
+docker compose up -d openclaw-gateway && sleep 6
+docker exec openclaw-gateway openclaw models status
+docker logs openclaw-gateway 2>&1 | grep -i "unknown model" && echo "BAD: model not in catalog"
+curl -s -o /dev/null -w "dashboard HTTP %{http_code}\n" http://127.0.0.1:18789/
+
+§4. Write the persona (<DESCRIPTION> is inserted verbatim — make it a complete, capitalized sentence):
+docker exec openclaw-gateway sh -c 'printf "# <AGENT_NAME>\n\nYou are <AGENT_NAME>, my personal AI assistant. <DESCRIPTION>\n" > /workspace/SOUL.md'
+docker compose restart openclaw-gateway
+
+§5. Give the user the dashboard URL — the UI is token-gated. Read the token:
+docker exec openclaw-gateway sh -c 'node -e "console.log(require(process.env.OPENCLAW_STATE_DIR+\"/openclaw.json\").gateway.auth.token)"'
+Tell the user: Your agent is live. Open this (logs you in automatically; keep it private): http://127.0.0.1:18789/#token=<GATEWAY_TOKEN>
 ```
 :::
 
@@ -1017,20 +1142,15 @@ docker run --rm -v openclaw-workspace:/workspace ghcr.io/openclaw/openclaw:lates
 ```wrap
 Set up Hermes in Docker connected to Telegram, using Gemini (Google) as the AI model.
 
-First, ask me for these four things and wait for all four before continuing:
-1. My Gemini API key — I'll get one free at aistudio.google.com if I don't have one.
-2. My Telegram bot token — if I don't have one, walk me through it: open Telegram → find @BotFather → send /newbot → give it a name and a username ending in bot → paste the token here.
+For an AI agent doing this setup: run every command yourself — never tell the user to open a terminal. Ask the user only for the §0 inputs and in-app actions (messaging the bot, opening the dashboard). Credentials go into compose.yaml — don't write them anywhere else. WAIT = hard gate.
 
-3. A name for your agent — something short and personal (e.g., "Aria", "Max", "Scout").
-4. A brief description of who you are and how it should behave (e.g., "I'm in NYC, a product designer. Be direct, no filler.").
+§0. Ask the user (WAIT for all four before continuing):
+1. Gemini API key — free at aistudio.google.com (no billing required for the free tier).
+2. Telegram bot token — @BotFather → /newbot → name + ...bot username.
+3. Agent name — something short (e.g. "Scout").
+4. Agent description — a complete sentence: who the user is + how to behave.
 
-Once you have all four, do the following yourself:
-
-1. Create ~/projects/hermes/ and write .env:
-GOOGLE_API_KEY=[my Gemini key]
-TELEGRAM_BOT_TOKEN=[my Telegram token]
-
-2. Write compose.yaml:
+§1. Write ~/projects/hermes/compose.yaml (substitute real values for <...>):
 
 services:
   hermes-gateway:
@@ -1039,10 +1159,10 @@ services:
     restart: unless-stopped
     volumes:
       - hermes-workspace:/opt/data
-    env_file:
-      - .env
+    environment:
+      - GOOGLE_API_KEY=<GOOGLE_API_KEY>
+      - TELEGRAM_BOT_TOKEN=<TELEGRAM_BOT_TOKEN>
     command: hermes gateway run
-
   hermes-dashboard:
     image: nousresearch/hermes-agent:latest
     container_name: hermes-dashboard
@@ -1051,40 +1171,44 @@ services:
       - hermes-workspace:/opt/data
     ports:
       - "127.0.0.1:9119:9119"
-    env_file:
-      - .env
     command: hermes dashboard --port 9119 --host 0.0.0.0 --insecure
-
 volumes:
   hermes-workspace:
+    name: hermes-workspace
 
-3. Start:
-docker compose up -d hermes-gateway hermes-dashboard
-docker logs hermes-gateway — confirm "[hermes] gateway connected"
+Validate: cd ~/projects/hermes && docker compose config --quiet
 
-4. Write SOUL.md using the name and description I gave you:
-docker run --rm -v hermes-workspace:/opt/data nousresearch/hermes-agent:latest \
-  sh -c 'printf "# [name]\n\nYou are [name], my personal AI assistant. [description]\n" > /opt/data/SOUL.md'
+§2. Start + verify (from ~/projects/hermes):
+docker compose up -d hermes-gateway hermes-dashboard && sleep 6
+docker logs hermes-gateway 2>&1 | tail -10
+curl -s -o /dev/null -w "dashboard HTTP %{http_code}\n" http://127.0.0.1:9119/
+Confirm: logs show [hermes] gateway connected, dashboard returns HTTP 200.
+Telegram shows running, disconnected until pairing — that's normal.
+
+§3. Pair the user (WAIT):
+Ask the user: Message your bot /start in Telegram. It replies with a pairing code — paste it here.
+Once you have the code: docker exec hermes-gateway hermes pairing approve telegram <PAIRING_CODE>
+
+§4. Write the persona (<DESCRIPTION> is inserted verbatim — make it a complete, capitalized sentence):
+docker exec hermes-gateway sh -c 'printf "# <AGENT_NAME>\n\nYou are <AGENT_NAME>, my personal AI assistant. <DESCRIPTION>\n" > /opt/data/SOUL.md'
+docker compose restart hermes-gateway
+
+§5. Tell the user: Your agent is live. Dashboard: http://127.0.0.1:9119
 ```
 
 ::tab[Discord]
 ```wrap
 Set up Hermes in Docker connected to Discord, using Gemini (Google) as the AI model.
 
-First, ask me for these four things and wait for all four before continuing:
-1. My Gemini API key — I'll get one free at aistudio.google.com if I don't have one.
-2. My Discord bot token — if I don't have one, walk me through it: go to discord.com/developers/applications → New Application → Bot → Reset Token (copy it) → enable Message Content Intent → OAuth2 URL Generator (scope: bot, permissions: Send Messages / Read Message History / View Channels) → paste the generated URL in my browser and authorize for my server, then paste the bot token here.
+For an AI agent doing this setup: run every command yourself — never tell the user to open a terminal. Ask the user only for the §0 inputs and in-app actions (adding the bot to the server, opening the dashboard). Credentials go into compose.yaml — don't write them anywhere else. WAIT = hard gate.
 
-3. A name for your agent — something short and personal (e.g., "Aria", "Max", "Scout").
-4. A brief description of who you are and how it should behave (e.g., "I'm in NYC, a product designer. Be direct, no filler.").
+§0. Ask the user (WAIT for all four before continuing):
+1. Gemini API key — free at aistudio.google.com (no billing required for the free tier).
+2. Discord bot token — discord.com/developers/applications → New Application → Bot → Reset Token (copy it). Enable Message Content Intent. OAuth2 URL Generator: scope bot, permissions Send Messages / Read Message History / View Channels → paste the URL in browser → authorize for their server. Then paste the bot token here.
+3. Agent name — something short (e.g. "Scout").
+4. Agent description — a complete sentence: who the user is + how to behave.
 
-Once you have all four, do the following yourself:
-
-1. Create ~/projects/hermes/ and write .env:
-GOOGLE_API_KEY=[my Gemini key]
-DISCORD_BOT_TOKEN=[my Discord token]
-
-2. Write compose.yaml:
+§1. Write ~/projects/hermes/compose.yaml (substitute real values for <...>):
 
 services:
   hermes-gateway:
@@ -1093,10 +1217,10 @@ services:
     restart: unless-stopped
     volumes:
       - hermes-workspace:/opt/data
-    env_file:
-      - .env
+    environment:
+      - GOOGLE_API_KEY=<GOOGLE_API_KEY>
+      - DISCORD_BOT_TOKEN=<DISCORD_BOT_TOKEN>
     command: hermes gateway run
-
   hermes-dashboard:
     image: nousresearch/hermes-agent:latest
     container_name: hermes-dashboard
@@ -1105,20 +1229,24 @@ services:
       - hermes-workspace:/opt/data
     ports:
       - "127.0.0.1:9119:9119"
-    env_file:
-      - .env
     command: hermes dashboard --port 9119 --host 0.0.0.0 --insecure
-
 volumes:
   hermes-workspace:
+    name: hermes-workspace
 
-3. Start:
-docker compose up -d hermes-gateway hermes-dashboard
-docker logs hermes-gateway — confirm "[hermes] gateway connected"
+Validate: cd ~/projects/hermes && docker compose config --quiet
 
-4. Write SOUL.md using the name and description I gave you:
-docker run --rm -v hermes-workspace:/opt/data nousresearch/hermes-agent:latest \
-  sh -c 'printf "# [name]\n\nYou are [name], my personal AI assistant. [description]\n" > /opt/data/SOUL.md'
+§2. Start + verify (from ~/projects/hermes):
+docker compose up -d hermes-gateway hermes-dashboard && sleep 6
+docker logs hermes-gateway 2>&1 | tail -10
+curl -s -o /dev/null -w "dashboard HTTP %{http_code}\n" http://127.0.0.1:9119/
+Confirm: logs show [hermes] gateway connected, dashboard returns HTTP 200.
+
+§3. Write the persona (<DESCRIPTION> is inserted verbatim — make it a complete, capitalized sentence):
+docker exec hermes-gateway sh -c 'printf "# <AGENT_NAME>\n\nYou are <AGENT_NAME>, my personal AI assistant. <DESCRIPTION>\n" > /opt/data/SOUL.md'
+docker compose restart hermes-gateway
+
+§4. Tell the user: Your agent is live. Dashboard: http://127.0.0.1:9119
 ```
 :::
 ::::
@@ -1133,16 +1261,15 @@ Have your **OpenRouter API key** ready — get one free at [openrouter.ai](https
 ```wrap
 Set up OpenClaw in Docker connected to Telegram, using OpenRouter as the AI provider.
 
-First, ask me for these four things and wait for all four before continuing:
-1. My OpenRouter API key — I'll get one free at openrouter.ai if I don't have one.
-2. My Telegram bot token — if I don't have one, walk me through it: open Telegram → find @BotFather → send /newbot → give it a name and a username ending in bot → paste the token here.
+For an AI agent doing this setup: run every command yourself — never tell the user to open a terminal. Ask the user only for the §0 inputs, the §4 pairing code, and in-app actions (messaging the bot, opening the dashboard). Hold secrets in memory only. WAIT = hard gate.
 
-3. A name for your agent — something short and personal (e.g., "Aria", "Max", "Scout").
-4. A brief description of who you are and how it should behave (e.g., "I'm in NYC, a product designer. Be direct, no filler.").
+§0. Ask the user (WAIT for all four before continuing):
+1. OpenRouter API key — free at openrouter.ai (one key, 300+ models).
+2. Telegram bot token — @BotFather → /newbot → name + ...bot username.
+3. Agent name — something short (e.g. "Scout").
+4. Agent description — a complete sentence: who the user is + how to behave.
 
-Once you have all four, do the following yourself:
-
-1. Create ~/projects/openclaw/ and write this compose.yaml:
+§1. Write ~/projects/openclaw/compose.yaml:
 
 services:
   openclaw:
@@ -1152,9 +1279,9 @@ services:
       - openclaw-workspace:/workspace
     environment:
       - OPENCLAW_WORKSPACE=/workspace
+      - OPENCLAW_STATE_DIR=/workspace/.openclaw
     stdin_open: true
     tty: true
-
   openclaw-gateway:
     image: ghcr.io/openclaw/openclaw:latest
     container_name: openclaw-gateway
@@ -1163,47 +1290,67 @@ services:
       - openclaw-workspace:/workspace
     environment:
       - OPENCLAW_WORKSPACE=/workspace
+      - OPENCLAW_STATE_DIR=/workspace/.openclaw
     ports:
-      - "18789:18789"
-    command: openclaw gateway run
-
+      - "127.0.0.1:18789:18789"
+    command: openclaw gateway run --bind lan
 volumes:
   openclaw-workspace:
+    name: openclaw-workspace
 
-2. Run the setup wizard:
-cd ~/projects/openclaw
-docker compose run --rm openclaw openclaw onboard
+Validate: cd ~/projects/openclaw && docker compose config --quiet
 
-Navigate each prompt using the values I gave you:
-- Channel → Telegram, token → [my Telegram token]
-- Provider → OpenRouter, key → [my OpenRouter key]
-- Model → deepseek/deepseek-v4-0324
-- Web search → DuckDuckGo
-- Skills → Skip | API keys → No | Hooks → session-memory only | Hatch → Yes
+§2. Run setup (from ~/projects/openclaw; substitute real values for <...>):
 
-3. Start the gateway:
-docker compose up -d openclaw-gateway
-docker logs openclaw-gateway — confirm "[gateway] connected"
+# Fix volume ownership first — a fresh named volume is root-owned but the container runs as uid 1000; skip this and onboarding fails with EACCES.
+docker run --rm --user root -v openclaw-workspace:/workspace ghcr.io/openclaw/openclaw:latest chown -R 1000:1000 /workspace
 
-4. Write SOUL.md using the name and description I gave you:
-docker run --rm -v openclaw-workspace:/workspace ghcr.io/openclaw/openclaw:latest \
-  sh -c 'printf "# [name]\n\nYou are [name], my personal AI assistant. [description]\n" > /workspace/SOUL.md'
+# Auth + workspace
+docker compose run --rm openclaw openclaw onboard --non-interactive --accept-risk --flow quickstart --auth-choice apiKey --openrouter-api-key '<OPENROUTER_API_KEY>' --workspace /workspace --skip-channels --skip-search --skip-skills --skip-hooks --no-install-daemon --skip-health
+
+# Telegram channel
+docker compose run --rm openclaw openclaw channels add --channel telegram --token '<TELEGRAM_BOT_TOKEN>' --name '<AGENT_NAME>'
+
+# Model — must be in this build's catalog; an off-catalog id sets silently but fails at runtime with "Unknown model". Check options: docker compose run --rm openclaw openclaw models list
+docker compose run --rm openclaw openclaw models set openrouter/deepseek/deepseek-v4-0324
+
+# Web search + session-memory
+docker compose run --rm openclaw openclaw plugins enable duckduckgo
+docker compose run --rm openclaw openclaw hooks enable session-memory
+
+§3. Start + verify:
+docker compose up -d openclaw-gateway && sleep 6
+docker exec openclaw-gateway openclaw models status
+docker logs openclaw-gateway 2>&1 | grep -i "unknown model" && echo "BAD: model not in catalog"
+curl -s -o /dev/null -w "dashboard HTTP %{http_code}\n" http://127.0.0.1:18789/
+Telegram shows running, disconnected until pairing — that's normal.
+
+§4. Pair the user (WAIT):
+Ask the user: Message your bot /start in Telegram. It replies with a pairing code — paste it here.
+Once you have the code: docker exec openclaw-gateway openclaw pairing approve telegram <PAIRING_CODE>
+
+§5. Write the persona (<DESCRIPTION> is inserted verbatim — make it a complete, capitalized sentence):
+docker exec openclaw-gateway sh -c 'printf "# <AGENT_NAME>\n\nYou are <AGENT_NAME>, my personal AI assistant. <DESCRIPTION>\n" > /workspace/SOUL.md'
+docker compose restart openclaw-gateway
+
+§6. Give the user the dashboard URL — the UI is token-gated. Read the token:
+docker exec openclaw-gateway sh -c 'node -e "console.log(require(process.env.OPENCLAW_STATE_DIR+\"/openclaw.json\").gateway.auth.token)"'
+Tell the user: Your agent is live. Open this (logs you in automatically; keep it private): http://127.0.0.1:18789/#token=<GATEWAY_TOKEN>
 ```
 
 ::tab[Discord]
 ```wrap
 Set up OpenClaw in Docker connected to Discord, using OpenRouter as the AI provider.
 
-First, ask me for these four things and wait for all four before continuing:
-1. My OpenRouter API key — I'll get one free at openrouter.ai if I don't have one.
-2. My Discord bot token — if I don't have one, walk me through it: go to discord.com/developers/applications → New Application → Bot → Reset Token (copy it) → enable Message Content Intent → OAuth2 URL Generator (scope: bot, permissions: Send Messages / Read Message History / View Channels) → paste the generated URL in my browser and authorize for my server, then paste the bot token here.
+For an AI agent doing this setup: run every command yourself — never tell the user to open a terminal. Ask the user only for the §0 inputs and in-app actions (adding the bot to the server, opening the dashboard). Credentials go into compose.yaml — don't write them anywhere else. WAIT = hard gate.
 
-3. A name for your agent — something short and personal (e.g., "Aria", "Max", "Scout").
-4. A brief description of who you are and how it should behave (e.g., "I'm in NYC, a product designer. Be direct, no filler.").
+§0. Ask the user (WAIT for all four before continuing):
+1. OpenRouter API key — free at openrouter.ai (one key, 300+ models).
+2. Discord bot token — discord.com/developers/applications → New Application → Bot → Reset Token (copy it). Enable Message Content Intent. OAuth2 URL Generator: scope bot, permissions Send Messages / Read Message History / View Channels → paste the URL in browser → authorize for their server. Then paste the bot token here.
+3. Agent name — something short (e.g. "Scout").
+4. Agent description — a complete sentence: who the user is + how to behave.
 
-Once you have all four, do the following yourself:
-
-1. Create ~/projects/openclaw/ and write this compose.yaml:
+§1. Write ~/projects/openclaw/compose.yaml:
 
 services:
   openclaw:
@@ -1213,9 +1360,9 @@ services:
       - openclaw-workspace:/workspace
     environment:
       - OPENCLAW_WORKSPACE=/workspace
+      - OPENCLAW_STATE_DIR=/workspace/.openclaw
     stdin_open: true
     tty: true
-
   openclaw-gateway:
     image: ghcr.io/openclaw/openclaw:latest
     container_name: openclaw-gateway
@@ -1224,31 +1371,47 @@ services:
       - openclaw-workspace:/workspace
     environment:
       - OPENCLAW_WORKSPACE=/workspace
+      - OPENCLAW_STATE_DIR=/workspace/.openclaw
     ports:
-      - "18789:18789"
-    command: openclaw gateway run
-
+      - "127.0.0.1:18789:18789"
+    command: openclaw gateway run --bind lan
 volumes:
   openclaw-workspace:
+    name: openclaw-workspace
 
-2. Run the setup wizard:
-cd ~/projects/openclaw
-docker compose run --rm openclaw openclaw onboard
+Validate: cd ~/projects/openclaw && docker compose config --quiet
 
-Navigate each prompt using the values I gave you:
-- Channel → Discord (Bot API), token → [my Discord token]
-- Provider → OpenRouter, key → [my OpenRouter key]
-- Model → deepseek/deepseek-v4-0324
-- Web search → DuckDuckGo
-- Skills → Skip | API keys → No | Hooks → session-memory only | Hatch → Yes
+§2. Run setup (from ~/projects/openclaw; substitute real values for <...>):
 
-3. Start the gateway:
-docker compose up -d openclaw-gateway
-docker logs openclaw-gateway — confirm "[gateway] connected"
+# Fix volume ownership first — a fresh named volume is root-owned but the container runs as uid 1000; skip this and onboarding fails with EACCES.
+docker run --rm --user root -v openclaw-workspace:/workspace ghcr.io/openclaw/openclaw:latest chown -R 1000:1000 /workspace
 
-4. Write SOUL.md using the name and description I gave you:
-docker run --rm -v openclaw-workspace:/workspace ghcr.io/openclaw/openclaw:latest \
-  sh -c 'printf "# [name]\n\nYou are [name], my personal AI assistant. [description]\n" > /workspace/SOUL.md'
+# Auth + workspace
+docker compose run --rm openclaw openclaw onboard --non-interactive --accept-risk --flow quickstart --auth-choice apiKey --openrouter-api-key '<OPENROUTER_API_KEY>' --workspace /workspace --skip-channels --skip-search --skip-skills --skip-hooks --no-install-daemon --skip-health
+
+# Discord channel
+docker compose run --rm openclaw openclaw channels add --channel discord --token '<DISCORD_BOT_TOKEN>' --name '<AGENT_NAME>'
+
+# Model — must be in this build's catalog; an off-catalog id sets silently but fails at runtime with "Unknown model". Check options: docker compose run --rm openclaw openclaw models list
+docker compose run --rm openclaw openclaw models set openrouter/deepseek/deepseek-v4-0324
+
+# Web search + session-memory
+docker compose run --rm openclaw openclaw plugins enable duckduckgo
+docker compose run --rm openclaw openclaw hooks enable session-memory
+
+§3. Start + verify:
+docker compose up -d openclaw-gateway && sleep 6
+docker exec openclaw-gateway openclaw models status
+docker logs openclaw-gateway 2>&1 | grep -i "unknown model" && echo "BAD: model not in catalog"
+curl -s -o /dev/null -w "dashboard HTTP %{http_code}\n" http://127.0.0.1:18789/
+
+§4. Write the persona (<DESCRIPTION> is inserted verbatim — make it a complete, capitalized sentence):
+docker exec openclaw-gateway sh -c 'printf "# <AGENT_NAME>\n\nYou are <AGENT_NAME>, my personal AI assistant. <DESCRIPTION>\n" > /workspace/SOUL.md'
+docker compose restart openclaw-gateway
+
+§5. Give the user the dashboard URL — the UI is token-gated. Read the token:
+docker exec openclaw-gateway sh -c 'node -e "console.log(require(process.env.OPENCLAW_STATE_DIR+\"/openclaw.json\").gateway.auth.token)"'
+Tell the user: Your agent is live. Open this (logs you in automatically; keep it private): http://127.0.0.1:18789/#token=<GATEWAY_TOKEN>
 ```
 :::
 
@@ -1258,20 +1421,15 @@ docker run --rm -v openclaw-workspace:/workspace ghcr.io/openclaw/openclaw:lates
 ```wrap
 Set up Hermes in Docker connected to Telegram, using OpenRouter as the AI provider.
 
-First, ask me for these four things and wait for all four before continuing:
-1. My OpenRouter API key — I'll get one free at openrouter.ai if I don't have one.
-2. My Telegram bot token — if I don't have one, walk me through it: open Telegram → find @BotFather → send /newbot → give it a name and a username ending in bot → paste the token here.
+For an AI agent doing this setup: run every command yourself — never tell the user to open a terminal. Ask the user only for the §0 inputs and in-app actions (messaging the bot, opening the dashboard). Credentials go into compose.yaml — don't write them anywhere else. WAIT = hard gate.
 
-3. A name for your agent — something short and personal (e.g., "Aria", "Max", "Scout").
-4. A brief description of who you are and how it should behave (e.g., "I'm in NYC, a product designer. Be direct, no filler.").
+§0. Ask the user (WAIT for all four before continuing):
+1. OpenRouter API key — free at openrouter.ai (one key, 300+ models).
+2. Telegram bot token — @BotFather → /newbot → name + ...bot username.
+3. Agent name — something short (e.g. "Scout").
+4. Agent description — a complete sentence: who the user is + how to behave.
 
-Once you have all four, do the following yourself:
-
-1. Create ~/projects/hermes/ and write .env:
-OPENROUTER_API_KEY=[my OpenRouter key]
-TELEGRAM_BOT_TOKEN=[my Telegram token]
-
-2. Write compose.yaml:
+§1. Write ~/projects/hermes/compose.yaml (substitute real values for <...>):
 
 services:
   hermes-gateway:
@@ -1280,10 +1438,10 @@ services:
     restart: unless-stopped
     volumes:
       - hermes-workspace:/opt/data
-    env_file:
-      - .env
+    environment:
+      - OPENROUTER_API_KEY=<OPENROUTER_API_KEY>
+      - TELEGRAM_BOT_TOKEN=<TELEGRAM_BOT_TOKEN>
     command: hermes gateway run
-
   hermes-dashboard:
     image: nousresearch/hermes-agent:latest
     container_name: hermes-dashboard
@@ -1292,40 +1450,44 @@ services:
       - hermes-workspace:/opt/data
     ports:
       - "127.0.0.1:9119:9119"
-    env_file:
-      - .env
     command: hermes dashboard --port 9119 --host 0.0.0.0 --insecure
-
 volumes:
   hermes-workspace:
+    name: hermes-workspace
 
-3. Start:
-docker compose up -d hermes-gateway hermes-dashboard
-docker logs hermes-gateway — confirm "[hermes] gateway connected"
+Validate: cd ~/projects/hermes && docker compose config --quiet
 
-4. Write SOUL.md using the name and description I gave you:
-docker run --rm -v hermes-workspace:/opt/data nousresearch/hermes-agent:latest \
-  sh -c 'printf "# [name]\n\nYou are [name], my personal AI assistant. [description]\n" > /opt/data/SOUL.md'
+§2. Start + verify (from ~/projects/hermes):
+docker compose up -d hermes-gateway hermes-dashboard && sleep 6
+docker logs hermes-gateway 2>&1 | tail -10
+curl -s -o /dev/null -w "dashboard HTTP %{http_code}\n" http://127.0.0.1:9119/
+Confirm: logs show [hermes] gateway connected, dashboard returns HTTP 200.
+Telegram shows running, disconnected until pairing — that's normal.
+
+§3. Pair the user (WAIT):
+Ask the user: Message your bot /start in Telegram. It replies with a pairing code — paste it here.
+Once you have the code: docker exec hermes-gateway hermes pairing approve telegram <PAIRING_CODE>
+
+§4. Write the persona (<DESCRIPTION> is inserted verbatim — make it a complete, capitalized sentence):
+docker exec hermes-gateway sh -c 'printf "# <AGENT_NAME>\n\nYou are <AGENT_NAME>, my personal AI assistant. <DESCRIPTION>\n" > /opt/data/SOUL.md'
+docker compose restart hermes-gateway
+
+§5. Tell the user: Your agent is live. Dashboard: http://127.0.0.1:9119
 ```
 
 ::tab[Discord]
 ```wrap
 Set up Hermes in Docker connected to Discord, using OpenRouter as the AI provider.
 
-First, ask me for these four things and wait for all four before continuing:
-1. My OpenRouter API key — I'll get one free at openrouter.ai if I don't have one.
-2. My Discord bot token — if I don't have one, walk me through it: go to discord.com/developers/applications → New Application → Bot → Reset Token (copy it) → enable Message Content Intent → OAuth2 URL Generator (scope: bot, permissions: Send Messages / Read Message History / View Channels) → paste the generated URL in my browser and authorize for my server, then paste the bot token here.
+For an AI agent doing this setup: run every command yourself — never tell the user to open a terminal. Ask the user only for the §0 inputs and in-app actions (adding the bot to the server, opening the dashboard). Credentials go into compose.yaml — don't write them anywhere else. WAIT = hard gate.
 
-3. A name for your agent — something short and personal (e.g., "Aria", "Max", "Scout").
-4. A brief description of who you are and how it should behave (e.g., "I'm in NYC, a product designer. Be direct, no filler.").
+§0. Ask the user (WAIT for all four before continuing):
+1. OpenRouter API key — free at openrouter.ai (one key, 300+ models).
+2. Discord bot token — discord.com/developers/applications → New Application → Bot → Reset Token (copy it). Enable Message Content Intent. OAuth2 URL Generator: scope bot, permissions Send Messages / Read Message History / View Channels → paste the URL in browser → authorize for their server. Then paste the bot token here.
+3. Agent name — something short (e.g. "Scout").
+4. Agent description — a complete sentence: who the user is + how to behave.
 
-Once you have all four, do the following yourself:
-
-1. Create ~/projects/hermes/ and write .env:
-OPENROUTER_API_KEY=[my OpenRouter key]
-DISCORD_BOT_TOKEN=[my Discord token]
-
-2. Write compose.yaml:
+§1. Write ~/projects/hermes/compose.yaml (substitute real values for <...>):
 
 services:
   hermes-gateway:
@@ -1334,10 +1496,10 @@ services:
     restart: unless-stopped
     volumes:
       - hermes-workspace:/opt/data
-    env_file:
-      - .env
+    environment:
+      - OPENROUTER_API_KEY=<OPENROUTER_API_KEY>
+      - DISCORD_BOT_TOKEN=<DISCORD_BOT_TOKEN>
     command: hermes gateway run
-
   hermes-dashboard:
     image: nousresearch/hermes-agent:latest
     container_name: hermes-dashboard
@@ -1346,20 +1508,24 @@ services:
       - hermes-workspace:/opt/data
     ports:
       - "127.0.0.1:9119:9119"
-    env_file:
-      - .env
     command: hermes dashboard --port 9119 --host 0.0.0.0 --insecure
-
 volumes:
   hermes-workspace:
+    name: hermes-workspace
 
-3. Start:
-docker compose up -d hermes-gateway hermes-dashboard
-docker logs hermes-gateway — confirm "[hermes] gateway connected"
+Validate: cd ~/projects/hermes && docker compose config --quiet
 
-4. Write SOUL.md using the name and description I gave you:
-docker run --rm -v hermes-workspace:/opt/data nousresearch/hermes-agent:latest \
-  sh -c 'printf "# [name]\n\nYou are [name], my personal AI assistant. [description]\n" > /opt/data/SOUL.md'
+§2. Start + verify (from ~/projects/hermes):
+docker compose up -d hermes-gateway hermes-dashboard && sleep 6
+docker logs hermes-gateway 2>&1 | tail -10
+curl -s -o /dev/null -w "dashboard HTTP %{http_code}\n" http://127.0.0.1:9119/
+Confirm: logs show [hermes] gateway connected, dashboard returns HTTP 200.
+
+§3. Write the persona (<DESCRIPTION> is inserted verbatim — make it a complete, capitalized sentence):
+docker exec hermes-gateway sh -c 'printf "# <AGENT_NAME>\n\nYou are <AGENT_NAME>, my personal AI assistant. <DESCRIPTION>\n" > /opt/data/SOUL.md'
+docker compose restart hermes-gateway
+
+§4. Tell the user: Your agent is live. Dashboard: http://127.0.0.1:9119
 ```
 :::
 ::::
@@ -1374,15 +1540,15 @@ No API key needed. Make sure **Ollama** is installed and running on your machine
 ```wrap
 Set up OpenClaw in Docker connected to Telegram, using Ollama (local) as the AI model.
 
-First, confirm that Ollama is running on my machine (ollama serve) and I've pulled the model (ollama pull qwen3:14b). Then ask me for these three things and wait for all three before continuing:
-1. My Telegram bot token — if I don't have one, walk me through it: open Telegram → find @BotFather → send /newbot → give it a name and a username ending in bot → paste the token here.
+For an AI agent doing this setup: run every command yourself — never tell the user to open a terminal. Ask the user only for the §0 inputs, the §4 pairing code, and in-app actions (messaging the bot, opening the dashboard). Hold secrets in memory only. WAIT = hard gate.
 
-2. A name for your agent — something short and personal (e.g., "Aria", "Max", "Scout").
-3. A brief description of who you are and how it should behave (e.g., "I'm in NYC, a product designer. Be direct, no filler.").
+§0. Confirm + ask the user (WAIT for all three before continuing):
+0. Confirm Ollama is running (ollama serve) and the model is pulled (ollama pull qwen3:14b).
+1. Telegram bot token — @BotFather → /newbot → name + ...bot username.
+2. Agent name — something short (e.g. "Scout").
+3. Agent description — a complete sentence: who the user is + how to behave.
 
-Once you have all three, do the following yourself:
-
-1. Create ~/projects/openclaw/ and write this compose.yaml:
+§1. Write ~/projects/openclaw/compose.yaml:
 
 services:
   openclaw:
@@ -1392,11 +1558,11 @@ services:
       - openclaw-workspace:/workspace
     environment:
       - OPENCLAW_WORKSPACE=/workspace
+      - OPENCLAW_STATE_DIR=/workspace/.openclaw
     extra_hosts:
       - "host.docker.internal:host-gateway"
     stdin_open: true
     tty: true
-
   openclaw-gateway:
     image: ghcr.io/openclaw/openclaw:latest
     container_name: openclaw-gateway
@@ -1405,47 +1571,70 @@ services:
       - openclaw-workspace:/workspace
     environment:
       - OPENCLAW_WORKSPACE=/workspace
+      - OPENCLAW_STATE_DIR=/workspace/.openclaw
     extra_hosts:
       - "host.docker.internal:host-gateway"
     ports:
-      - "18789:18789"
-    command: openclaw gateway run
-
+      - "127.0.0.1:18789:18789"
+    command: openclaw gateway run --bind lan
 volumes:
   openclaw-workspace:
+    name: openclaw-workspace
 
-2. Run the setup wizard:
-cd ~/projects/openclaw
-docker compose run --rm openclaw openclaw onboard
+Validate: cd ~/projects/openclaw && docker compose config --quiet
 
-Navigate each prompt using the values I gave you:
-- Channel → Telegram, token → [my Telegram token]
-- Provider → Ollama (local), endpoint → http://host.docker.internal:11434, model → qwen3:14b
-- Web search → DuckDuckGo
-- Skills → Skip | API keys → No | Hooks → session-memory only | Hatch → Yes
+§2. Run setup (from ~/projects/openclaw; substitute real values for <...>):
 
-3. Start the gateway:
-docker compose up -d openclaw-gateway
-docker logs openclaw-gateway — confirm "[gateway] connected"
+# Fix volume ownership first — a fresh named volume is root-owned but the container runs as uid 1000; skip this and onboarding fails with EACCES.
+docker run --rm --user root -v openclaw-workspace:/workspace ghcr.io/openclaw/openclaw:latest chown -R 1000:1000 /workspace
 
-4. Write SOUL.md using the name and description I gave you:
-docker run --rm -v openclaw-workspace:/workspace ghcr.io/openclaw/openclaw:latest \
-  sh -c 'printf "# [name]\n\nYou are [name], my personal AI assistant. [description]\n" > /workspace/SOUL.md'
+# Auth + workspace (no API key for Ollama)
+docker compose run --rm openclaw openclaw onboard --non-interactive --accept-risk --flow quickstart --auth-choice none --workspace /workspace --skip-channels --skip-search --skip-skills --skip-hooks --no-install-daemon --skip-health
+
+# Telegram channel
+docker compose run --rm openclaw openclaw channels add --channel telegram --token '<TELEGRAM_BOT_TOKEN>' --name '<AGENT_NAME>'
+
+# Ollama endpoint + model
+docker compose run --rm openclaw openclaw config set ollama.endpoint http://host.docker.internal:11434
+docker compose run --rm openclaw openclaw models set ollama/qwen3:14b
+
+# Web search + session-memory
+docker compose run --rm openclaw openclaw plugins enable duckduckgo
+docker compose run --rm openclaw openclaw hooks enable session-memory
+
+§3. Start + verify:
+docker compose up -d openclaw-gateway && sleep 6
+docker exec openclaw-gateway openclaw models status
+docker logs openclaw-gateway 2>&1 | grep -i "unknown model" && echo "BAD: model not in catalog"
+curl -s -o /dev/null -w "dashboard HTTP %{http_code}\n" http://127.0.0.1:18789/
+Telegram shows running, disconnected until pairing — that's normal.
+
+§4. Pair the user (WAIT):
+Ask the user: Message your bot /start in Telegram. It replies with a pairing code — paste it here.
+Once you have the code: docker exec openclaw-gateway openclaw pairing approve telegram <PAIRING_CODE>
+
+§5. Write the persona (<DESCRIPTION> is inserted verbatim — make it a complete, capitalized sentence):
+docker exec openclaw-gateway sh -c 'printf "# <AGENT_NAME>\n\nYou are <AGENT_NAME>, my personal AI assistant. <DESCRIPTION>\n" > /workspace/SOUL.md'
+docker compose restart openclaw-gateway
+
+§6. Give the user the dashboard URL — the UI is token-gated. Read the token:
+docker exec openclaw-gateway sh -c 'node -e "console.log(require(process.env.OPENCLAW_STATE_DIR+\"/openclaw.json\").gateway.auth.token)"'
+Tell the user: Your agent is live. Open this (logs you in automatically; keep it private): http://127.0.0.1:18789/#token=<GATEWAY_TOKEN>
 ```
 
 ::tab[Discord]
 ```wrap
 Set up OpenClaw in Docker connected to Discord, using Ollama (local) as the AI model.
 
-First, confirm that Ollama is running on my machine (ollama serve) and I've pulled the model (ollama pull qwen3:14b). Then ask me for these three things and wait for all three before continuing:
-1. My Discord bot token — if I don't have one, walk me through it: go to discord.com/developers/applications → New Application → Bot → Reset Token (copy it) → enable Message Content Intent → OAuth2 URL Generator (scope: bot, permissions: Send Messages / Read Message History / View Channels) → paste the generated URL in my browser and authorize for my server, then paste the bot token here.
+For an AI agent doing this setup: run every command yourself — never tell the user to open a terminal. Ask the user only for the §0 inputs and in-app actions (adding the bot to the server, opening the dashboard). Credentials go into compose.yaml — don't write them anywhere else. WAIT = hard gate.
 
-2. A name for your agent — something short and personal (e.g., "Aria", "Max", "Scout").
-3. A brief description of who you are and how it should behave (e.g., "I'm in NYC, a product designer. Be direct, no filler.").
+§0. Confirm + ask the user (WAIT for all three before continuing):
+0. Confirm Ollama is running (ollama serve) and the model is pulled (ollama pull qwen3:14b).
+1. Discord bot token — discord.com/developers/applications → New Application → Bot → Reset Token (copy it). Enable Message Content Intent. OAuth2 URL Generator: scope bot, permissions Send Messages / Read Message History / View Channels → paste the URL in browser → authorize for their server. Then paste the bot token here.
+2. Agent name — something short (e.g. "Scout").
+3. Agent description — a complete sentence: who the user is + how to behave.
 
-Once you have all three, do the following yourself:
-
-1. Create ~/projects/openclaw/ and write this compose.yaml:
+§1. Write ~/projects/openclaw/compose.yaml:
 
 services:
   openclaw:
@@ -1455,11 +1644,11 @@ services:
       - openclaw-workspace:/workspace
     environment:
       - OPENCLAW_WORKSPACE=/workspace
+      - OPENCLAW_STATE_DIR=/workspace/.openclaw
     extra_hosts:
       - "host.docker.internal:host-gateway"
     stdin_open: true
     tty: true
-
   openclaw-gateway:
     image: ghcr.io/openclaw/openclaw:latest
     container_name: openclaw-gateway
@@ -1468,32 +1657,50 @@ services:
       - openclaw-workspace:/workspace
     environment:
       - OPENCLAW_WORKSPACE=/workspace
+      - OPENCLAW_STATE_DIR=/workspace/.openclaw
     extra_hosts:
       - "host.docker.internal:host-gateway"
     ports:
-      - "18789:18789"
-    command: openclaw gateway run
-
+      - "127.0.0.1:18789:18789"
+    command: openclaw gateway run --bind lan
 volumes:
   openclaw-workspace:
+    name: openclaw-workspace
 
-2. Run the setup wizard:
-cd ~/projects/openclaw
-docker compose run --rm openclaw openclaw onboard
+Validate: cd ~/projects/openclaw && docker compose config --quiet
 
-Navigate each prompt using the values I gave you:
-- Channel → Discord (Bot API), token → [my Discord token]
-- Provider → Ollama (local), endpoint → http://host.docker.internal:11434, model → qwen3:14b
-- Web search → DuckDuckGo
-- Skills → Skip | API keys → No | Hooks → session-memory only | Hatch → Yes
+§2. Run setup (from ~/projects/openclaw; substitute real values for <...>):
 
-3. Start the gateway:
-docker compose up -d openclaw-gateway
-docker logs openclaw-gateway — confirm "[gateway] connected"
+# Fix volume ownership first — a fresh named volume is root-owned but the container runs as uid 1000; skip this and onboarding fails with EACCES.
+docker run --rm --user root -v openclaw-workspace:/workspace ghcr.io/openclaw/openclaw:latest chown -R 1000:1000 /workspace
 
-4. Write SOUL.md using the name and description I gave you:
-docker run --rm -v openclaw-workspace:/workspace ghcr.io/openclaw/openclaw:latest \
-  sh -c 'printf "# [name]\n\nYou are [name], my personal AI assistant. [description]\n" > /workspace/SOUL.md'
+# Auth + workspace (no API key for Ollama)
+docker compose run --rm openclaw openclaw onboard --non-interactive --accept-risk --flow quickstart --auth-choice none --workspace /workspace --skip-channels --skip-search --skip-skills --skip-hooks --no-install-daemon --skip-health
+
+# Discord channel
+docker compose run --rm openclaw openclaw channels add --channel discord --token '<DISCORD_BOT_TOKEN>' --name '<AGENT_NAME>'
+
+# Ollama endpoint + model
+docker compose run --rm openclaw openclaw config set ollama.endpoint http://host.docker.internal:11434
+docker compose run --rm openclaw openclaw models set ollama/qwen3:14b
+
+# Web search + session-memory
+docker compose run --rm openclaw openclaw plugins enable duckduckgo
+docker compose run --rm openclaw openclaw hooks enable session-memory
+
+§3. Start + verify:
+docker compose up -d openclaw-gateway && sleep 6
+docker exec openclaw-gateway openclaw models status
+docker logs openclaw-gateway 2>&1 | grep -i "unknown model" && echo "BAD: model not in catalog"
+curl -s -o /dev/null -w "dashboard HTTP %{http_code}\n" http://127.0.0.1:18789/
+
+§4. Write the persona (<DESCRIPTION> is inserted verbatim — make it a complete, capitalized sentence):
+docker exec openclaw-gateway sh -c 'printf "# <AGENT_NAME>\n\nYou are <AGENT_NAME>, my personal AI assistant. <DESCRIPTION>\n" > /workspace/SOUL.md'
+docker compose restart openclaw-gateway
+
+§5. Give the user the dashboard URL — the UI is token-gated. Read the token:
+docker exec openclaw-gateway sh -c 'node -e "console.log(require(process.env.OPENCLAW_STATE_DIR+\"/openclaw.json\").gateway.auth.token)"'
+Tell the user: Your agent is live. Open this (logs you in automatically; keep it private): http://127.0.0.1:18789/#token=<GATEWAY_TOKEN>
 ```
 :::
 
@@ -1503,19 +1710,15 @@ docker run --rm -v openclaw-workspace:/workspace ghcr.io/openclaw/openclaw:lates
 ```wrap
 Set up Hermes in Docker connected to Telegram, using Ollama (local) as the AI model.
 
-First, confirm that Ollama is running on my machine (ollama serve) and I've pulled the model (ollama pull qwen3:14b). Then ask me for these three things and wait for all three before continuing:
-1. My Telegram bot token — if I don't have one, walk me through it: open Telegram → find @BotFather → send /newbot → give it a name and a username ending in bot → paste the token here.
+For an AI agent doing this setup: run every command yourself — never tell the user to open a terminal. Ask the user only for the §0 inputs and in-app actions (messaging the bot, opening the dashboard). Credentials go into compose.yaml — don't write them anywhere else. WAIT = hard gate.
 
-2. A name for your agent — something short and personal (e.g., "Aria", "Max", "Scout").
-3. A brief description of who you are and how it should behave (e.g., "I'm in NYC, a product designer. Be direct, no filler.").
+§0. Confirm + ask the user (WAIT for all three before continuing):
+0. Confirm Ollama is running (ollama serve) and the model is pulled (ollama pull qwen3:14b).
+1. Telegram bot token — @BotFather → /newbot → name + ...bot username.
+2. Agent name — something short (e.g. "Scout").
+3. Agent description — a complete sentence: who the user is + how to behave.
 
-Once you have all three, do the following yourself:
-
-1. Create ~/projects/hermes/ and write .env:
-OLLAMA_BASE_URL=http://host.docker.internal:11434
-TELEGRAM_BOT_TOKEN=[my Telegram token]
-
-2. Write compose.yaml:
+§1. Write ~/projects/hermes/compose.yaml (substitute real values for <...>):
 
 services:
   hermes-gateway:
@@ -1524,12 +1727,12 @@ services:
     restart: unless-stopped
     volumes:
       - hermes-workspace:/opt/data
+    environment:
+      - OLLAMA_BASE_URL=http://host.docker.internal:11434
+      - TELEGRAM_BOT_TOKEN=<TELEGRAM_BOT_TOKEN>
     extra_hosts:
       - "host.docker.internal:host-gateway"
-    env_file:
-      - .env
     command: hermes gateway run
-
   hermes-dashboard:
     image: nousresearch/hermes-agent:latest
     container_name: hermes-dashboard
@@ -1540,39 +1743,44 @@ services:
       - "127.0.0.1:9119:9119"
     extra_hosts:
       - "host.docker.internal:host-gateway"
-    env_file:
-      - .env
     command: hermes dashboard --port 9119 --host 0.0.0.0 --insecure
-
 volumes:
   hermes-workspace:
+    name: hermes-workspace
 
-3. Start:
-docker compose up -d hermes-gateway hermes-dashboard
-docker logs hermes-gateway — confirm "[hermes] gateway connected"
+Validate: cd ~/projects/hermes && docker compose config --quiet
 
-4. Write SOUL.md using the name and description I gave you:
-docker run --rm -v hermes-workspace:/opt/data nousresearch/hermes-agent:latest \
-  sh -c 'printf "# [name]\n\nYou are [name], my personal AI assistant. [description]\n" > /opt/data/SOUL.md'
+§2. Start + verify (from ~/projects/hermes):
+docker compose up -d hermes-gateway hermes-dashboard && sleep 6
+docker logs hermes-gateway 2>&1 | tail -10
+curl -s -o /dev/null -w "dashboard HTTP %{http_code}\n" http://127.0.0.1:9119/
+Confirm: logs show [hermes] gateway connected, dashboard returns HTTP 200.
+Telegram shows running, disconnected until pairing — that's normal.
+
+§3. Pair the user (WAIT):
+Ask the user: Message your bot /start in Telegram. It replies with a pairing code — paste it here.
+Once you have the code: docker exec hermes-gateway hermes pairing approve telegram <PAIRING_CODE>
+
+§4. Write the persona (<DESCRIPTION> is inserted verbatim — make it a complete, capitalized sentence):
+docker exec hermes-gateway sh -c 'printf "# <AGENT_NAME>\n\nYou are <AGENT_NAME>, my personal AI assistant. <DESCRIPTION>\n" > /opt/data/SOUL.md'
+docker compose restart hermes-gateway
+
+§5. Tell the user: Your agent is live. Dashboard: http://127.0.0.1:9119
 ```
 
 ::tab[Discord]
 ```wrap
 Set up Hermes in Docker connected to Discord, using Ollama (local) as the AI model.
 
-First, confirm that Ollama is running on my machine (ollama serve) and I've pulled the model (ollama pull qwen3:14b). Then ask me for these three things and wait for all three before continuing:
-1. My Discord bot token — if I don't have one, walk me through it: go to discord.com/developers/applications → New Application → Bot → Reset Token (copy it) → enable Message Content Intent → OAuth2 URL Generator (scope: bot, permissions: Send Messages / Read Message History / View Channels) → paste the generated URL in my browser and authorize for my server, then paste the bot token here.
+For an AI agent doing this setup: run every command yourself — never tell the user to open a terminal. Ask the user only for the §0 inputs and in-app actions (adding the bot to the server, opening the dashboard). Credentials go into compose.yaml — don't write them anywhere else. WAIT = hard gate.
 
-2. A name for your agent — something short and personal (e.g., "Aria", "Max", "Scout").
-3. A brief description of who you are and how it should behave (e.g., "I'm in NYC, a product designer. Be direct, no filler.").
+§0. Confirm + ask the user (WAIT for all three before continuing):
+0. Confirm Ollama is running (ollama serve) and the model is pulled (ollama pull qwen3:14b).
+1. Discord bot token — discord.com/developers/applications → New Application → Bot → Reset Token (copy it). Enable Message Content Intent. OAuth2 URL Generator: scope bot, permissions Send Messages / Read Message History / View Channels → paste the URL in browser → authorize for their server. Then paste the bot token here.
+2. Agent name — something short (e.g. "Scout").
+3. Agent description — a complete sentence: who the user is + how to behave.
 
-Once you have all three, do the following yourself:
-
-1. Create ~/projects/hermes/ and write .env:
-OLLAMA_BASE_URL=http://host.docker.internal:11434
-DISCORD_BOT_TOKEN=[my Discord token]
-
-2. Write compose.yaml:
+§1. Write ~/projects/hermes/compose.yaml (substitute real values for <...>):
 
 services:
   hermes-gateway:
@@ -1581,12 +1789,12 @@ services:
     restart: unless-stopped
     volumes:
       - hermes-workspace:/opt/data
+    environment:
+      - OLLAMA_BASE_URL=http://host.docker.internal:11434
+      - DISCORD_BOT_TOKEN=<DISCORD_BOT_TOKEN>
     extra_hosts:
       - "host.docker.internal:host-gateway"
-    env_file:
-      - .env
     command: hermes gateway run
-
   hermes-dashboard:
     image: nousresearch/hermes-agent:latest
     container_name: hermes-dashboard
@@ -1597,20 +1805,24 @@ services:
       - "127.0.0.1:9119:9119"
     extra_hosts:
       - "host.docker.internal:host-gateway"
-    env_file:
-      - .env
     command: hermes dashboard --port 9119 --host 0.0.0.0 --insecure
-
 volumes:
   hermes-workspace:
+    name: hermes-workspace
 
-3. Start:
-docker compose up -d hermes-gateway hermes-dashboard
-docker logs hermes-gateway — confirm "[hermes] gateway connected"
+Validate: cd ~/projects/hermes && docker compose config --quiet
 
-4. Write SOUL.md using the name and description I gave you:
-docker run --rm -v hermes-workspace:/opt/data nousresearch/hermes-agent:latest \
-  sh -c 'printf "# [name]\n\nYou are [name], my personal AI assistant. [description]\n" > /opt/data/SOUL.md'
+§2. Start + verify (from ~/projects/hermes):
+docker compose up -d hermes-gateway hermes-dashboard && sleep 6
+docker logs hermes-gateway 2>&1 | tail -10
+curl -s -o /dev/null -w "dashboard HTTP %{http_code}\n" http://127.0.0.1:9119/
+Confirm: logs show [hermes] gateway connected, dashboard returns HTTP 200.
+
+§3. Write the persona (<DESCRIPTION> is inserted verbatim — make it a complete, capitalized sentence):
+docker exec hermes-gateway sh -c 'printf "# <AGENT_NAME>\n\nYou are <AGENT_NAME>, my personal AI assistant. <DESCRIPTION>\n" > /opt/data/SOUL.md'
+docker compose restart hermes-gateway
+
+§4. Tell the user: Your agent is live. Dashboard: http://127.0.0.1:9119
 ```
 :::
 ::::
@@ -1645,6 +1857,7 @@ services:
       - openclaw-workspace:/workspace
     environment:
       - OPENCLAW_WORKSPACE=/workspace
+      - OPENCLAW_STATE_DIR=/workspace/.openclaw
     stdin_open: true
     tty: true
 
@@ -1656,12 +1869,14 @@ services:
       - openclaw-workspace:/workspace
     environment:
       - OPENCLAW_WORKSPACE=/workspace
+      - OPENCLAW_STATE_DIR=/workspace/.openclaw
     ports:
-      - "18789:18789"
-    command: openclaw gateway run
+      - "127.0.0.1:18789:18789"
+    command: openclaw gateway run --bind lan
 
 volumes:
   openclaw-workspace:
+    name: openclaw-workspace
 EOF
 ```
 
@@ -1669,7 +1884,7 @@ What this does:
 - `cat` command — outputs text. The `>` redirects it to a file. The `<< 'EOF'` means "read input until you see EOF" — so you can paste a multi-line block. If you mess up, press <kbd>Ctrl</kbd>+<kbd>C</kbd> to cancel.
 - `image: ghcr.io/openclaw/openclaw:latest` — Pull the official OpenClaw image from GitHub Container Registry. Under the hood this image starts from Node.js, installs OpenClaw via npm, and sets up the workspace — the same steps you'd write in a Dockerfile, already done for you.
 - `openclaw` service — used for interactive setup (onboarding). No `restart` here since it's a one-time run.
-- `openclaw-gateway` service — the always-running listener. `restart: unless-stopped` keeps it alive after crashes or reboots. `command:` overrides the default to run the gateway instead of onboarding. `ports:` exposes the web dashboard on port 18789.
+- `openclaw-gateway` service — the always-running listener. `restart: unless-stopped` keeps it alive after crashes or reboots. `command:` overrides the default to run the gateway instead of onboarding. `ports:` exposes the web dashboard on localhost port 18789 only — not reachable from other machines on the network.
 - `volumes:` — Both services share the same `openclaw-workspace` volume so the gateway can read the config that onboarding wrote.
 - `stdin_open: true` and `tty: true` — Allow interactive terminal input during setup.
 
@@ -1720,6 +1935,7 @@ services:
 
 volumes:
   hermes-workspace:
+    name: hermes-workspace
 EOF
 ```
 
@@ -1771,9 +1987,10 @@ The onboarding wizard will prompt you:
 |--------|--------|
 | Select channel | Telegram |
 | Telegram bot token | Paste from the channel setup step |
-| Anthropic auth method | Anthropic API key |
+| Select provider | Anthropic |
+| Auth method | API key |
 | API key | Paste your Anthropic key |
-| Model | `claude-haiku-4-5-20251001` |
+| Model | `claude-sonnet-4-6` |
 | Web search | DuckDuckGo |
 | Install missing skill dependencies | Skip |
 | Configure skills | Skip |
@@ -1786,9 +2003,10 @@ The onboarding wizard will prompt you:
 |--------|--------|
 | Select channel | Discord (Bot API) |
 | Discord bot token | Paste from the channel setup step |
-| Anthropic auth method | Anthropic API key |
+| Select provider | Anthropic |
+| Auth method | API key |
 | API key | Paste your Anthropic key |
-| Model | `claude-haiku-4-5-20251001` |
+| Model | `claude-sonnet-4-6` |
 | Web search | DuckDuckGo |
 | Install missing skill dependencies | Skip |
 | Configure skills | Skip |
@@ -1797,7 +2015,7 @@ The onboarding wizard will prompt you:
 | Hatch in Terminal | Yes |
 :::
 
-**On the model:** Haiku is fast and cheap — perfect for always-on. Switch to Sonnet later if needed.
+**On the model:** Sonnet is the current default — Haiku is faster and cheaper but unavailable at time of writing. Check `docker compose run --rm openclaw openclaw models list` and switch if Haiku is listed.
 
 ::tab[ChatGPT]
 :::tabs
@@ -1806,7 +2024,8 @@ The onboarding wizard will prompt you:
 |--------|--------|
 | Select channel | Telegram |
 | Telegram bot token | Paste from the channel setup step |
-| OpenAI auth method | ChatGPT OAuth (or OpenAI API key) |
+| Select provider | OpenAI |
+| Auth method | ChatGPT OAuth (or OpenAI API key) |
 | API key | Paste your OpenAI key (skip if using OAuth) |
 | Model | `gpt-4o-mini` |
 | Web search | DuckDuckGo |
@@ -1821,7 +2040,8 @@ The onboarding wizard will prompt you:
 |--------|--------|
 | Select channel | Discord (Bot API) |
 | Discord bot token | Paste from the channel setup step |
-| OpenAI auth method | ChatGPT OAuth (or OpenAI API key) |
+| Select provider | OpenAI |
+| Auth method | ChatGPT OAuth (or OpenAI API key) |
 | API key | Paste your OpenAI key (skip if using OAuth) |
 | Model | `gpt-4o-mini` |
 | Web search | DuckDuckGo |
@@ -1842,7 +2062,8 @@ The onboarding wizard will prompt you:
 |--------|--------|
 | Select channel | Telegram |
 | Telegram bot token | Paste from the channel setup step |
-| Google AI auth method | Gemini API key |
+| Select provider | Google |
+| Auth method | Gemini API key |
 | API key | Paste your Gemini key |
 | Model | `gemini-2.5-flash` |
 | Web search | DuckDuckGo |
@@ -1856,7 +2077,8 @@ The onboarding wizard will prompt you:
 |--------|--------|
 | Select channel | Discord (Bot API) |
 | Discord bot token | Paste from the channel setup step |
-| Google AI auth method | Gemini API key |
+| Select provider | Google |
+| Auth method | Gemini API key |
 | API key | Paste your Gemini key |
 | Model | `gemini-2.5-flash` |
 | Web search | DuckDuckGo |
@@ -1962,9 +2184,9 @@ The first run takes a minute — Docker is pulling the Hermes image from Docker 
 |--------|--------|
 | Select provider | Anthropic |
 | API key | Paste your Anthropic key |
-| Model | `claude-haiku-4-5-20251001` |
+| Model | `claude-sonnet-4-6` |
 
-**On the model:** Haiku is fast and cheap — perfect for always-on. Switch to Sonnet later if needed.
+**On the model:** Sonnet is the current default — Haiku is faster and cheaper but unavailable at time of writing. Switch once it reappears in the model list.
 
 ::tab[ChatGPT]
 | Prompt | Choose |
@@ -2060,7 +2282,7 @@ Once setup has returned you to the prompt, start it:
 ::tab[OpenClaw]
 ```bash
 cd ~/projects/openclaw
-docker compose up -d openclaw-gateway
+docker compose up -d openclaw-gateway && sleep 6
 ```
 
 The `-d` flag runs it in the background — no terminal to leave open, no second window needed. It keeps running even after you close the terminal or restart your machine (the `restart: unless-stopped` in your compose.yaml handles that).
@@ -2068,15 +2290,17 @@ The `-d` flag runs it in the background — no terminal to leave open, no second
 Verify it connected:
 
 ```bash
+docker exec openclaw-gateway openclaw models status
 docker logs openclaw-gateway
+curl -s -o /dev/null -w "dashboard HTTP %{http_code}\n" http://127.0.0.1:18789/
 ```
 
-You should see:
+You should see `[gateway] ready` in the logs and `dashboard HTTP 200` from curl. The models status output confirms which model and auth method the gateway loaded.
 
-```
-[gateway] loading configuration...
-[gateway] resolving authentication...
-[gateway] connected
+**Telegram users:** The channel will show `running, disconnected` until you pair — that's normal. **Pair your account before the agent can respond.** Message your bot `/start` in Telegram. It replies with a pairing code, then run:
+
+```bash
+docker exec openclaw-gateway openclaw pairing approve telegram <PAIRING_CODE>
 ```
 
 Your agent is now live. On Discord, tag it in a channel; on Telegram, message the bot directly. It will respond.
@@ -2086,7 +2310,7 @@ Your agent is now live. On Discord, tag it in a channel; on Telegram, message th
 ::tab[Hermes]
 ```bash
 cd ~/projects/hermes
-docker compose up -d hermes-gateway hermes-dashboard
+docker compose up -d hermes-gateway hermes-dashboard && sleep 6
 ```
 
 The `-d` flag runs both in the background — the gateway listens to your chat platform, the dashboard is available in your browser. Both keep running after you close the terminal (`restart: unless-stopped` handles that).
@@ -2095,14 +2319,15 @@ Verify the gateway connected:
 
 ```bash
 docker logs hermes-gateway
+curl -s -o /dev/null -w "dashboard HTTP %{http_code}\n" http://127.0.0.1:9119/
 ```
 
-You should see:
+You should see `[hermes] gateway connected` in the logs and `dashboard HTTP 200` from curl.
 
-```
-[hermes] loading configuration...
-[hermes] gateway connected
-[hermes] listening for messages...
+**Telegram users:** The channel will show `running, disconnected` until you pair — that's normal. **Pair your account before the agent can respond.** Message your bot `/start` in Telegram. It replies with a pairing code, then run:
+
+```bash
+docker exec hermes-gateway hermes pairing approve telegram <PAIRING_CODE>
 ```
 
 Your agent is now live. On Discord, tag it in a channel; on Telegram, message the bot directly. It will respond.
@@ -2112,19 +2337,29 @@ Your agent is now live. On Discord, tag it in a channel; on Telegram, message th
 
 ## The Web Dashboard
 
-Once the gateway is running, your agent's web dashboard is available in your browser. Chat still happens through Telegram or Discord — the dashboard is a monitoring and management interface, not a chat UI.
+Once the gateway is running, your agent's web dashboard is available in your browser. It includes a built-in chat UI alongside monitoring and management — so you can talk to your agent directly from the browser as well as through Telegram or Discord.
 
 :::tabs
 ::tab[OpenClaw]
+The dashboard is token-gated. Look up your token once — it persists in the volume across restarts and only changes if you re-run onboarding or `docker compose down -v`:
+
+```bash
+docker exec openclaw-gateway sh -c 'node -e "console.log(require(process.env.OPENCLAW_STATE_DIR+\"/openclaw.json\").gateway.auth.token)"'
 ```
-http://localhost:18789
+
+Bookmark this URL — it stays the same until you wipe the volume:
+
 ```
+http://127.0.0.1:18789/#token=<GATEWAY_TOKEN>
+```
+
+![OpenClaw WebUI](https://res.cloudinary.com/dr1sonbsi/image/upload/v1780470950/pawper.dev/logs/57d0cf0a-8973-43e5-bfd1-b07680ecedc0.png)
 
 This is your control panel — a visual interface for everything your agent is doing and everything you've configured.
 
 **Monitor your agent** — See incoming and outgoing messages in real time. Watch what your agent thinks, what actions it takes, and what it responds with.
 
-**Manage your model** — Change which AI model your agent uses without re-running onboarding. Switch from Haiku to Sonnet, or switch providers entirely.
+**Manage your model** — Change which AI model your agent uses without re-running onboarding. Switch models or providers entirely.
 
 **Manage skills** — View installed skills, enable or disable them, and configure skill-specific settings.
 
@@ -2136,7 +2371,7 @@ This is your control panel — a visual interface for everything your agent is d
 
 ::tab[Hermes]
 ```
-http://localhost:9119
+http://127.0.0.1:9119
 ```
 
 The `hermes-dashboard` service is already defined in your `compose.yaml` and starts alongside the gateway. Open the URL above once both are running.
@@ -2151,24 +2386,6 @@ The `hermes-dashboard` service is already defined in your `compose.yaml` and sta
 
 **View memories and state** — See session memory and the agent's self-improvement logs.
 :::
-
-### Remote Access
-
-If you're accessing from another device on the same network (like a phone or tablet), use your machine's local IP instead of `localhost`:
-
-:::tabs
-::tab[OpenClaw]
-```
-http://192.168.x.x:18789
-```
-
-::tab[Hermes]
-```
-http://192.168.x.x:9119
-```
-:::
-
-> The dashboard is only accessible on your local network. It is not exposed to the internet unless you deliberately set up a tunnel — which you should not do for the dashboard.
 
 ---
 
@@ -2210,24 +2427,40 @@ You've moved from learning tools to building systems.
 
 :::tabs
 ::tab[OpenClaw]
-Each time you start your machine, to start your agent:
+All commands run from `~/projects/openclaw` (where `compose.yaml` lives — running elsewhere gives `no configuration file provided: not found`).
 
-```bash
-cd ~/projects/openclaw
-docker compose up -d openclaw-gateway
-```
+| Goal | Command |
+|---|---|
+| Start (detached) | `docker compose up -d openclaw-gateway` |
+| Pause (keep container + data) | `docker compose stop openclaw-gateway` |
+| Resume after pause | `docker compose start openclaw-gateway` |
+| Restart (after config/persona changes) | `docker compose restart openclaw-gateway` |
+| Stop + remove container, **keep data** | `docker compose down` |
+| Full wipe (**delete** config/creds/pairing) | `docker compose down -v` |
+| Tail logs | `docker logs -f openclaw-gateway` |
+| Status / health | `docker ps` · `docker exec openclaw-gateway openclaw status` |
 
-The `-d` flag runs it in the background — no terminal to babysit. Check status anytime with `docker logs openclaw-gateway`.
+- **`stop` vs `down`:** `stop` leaves the container in place (fastest resume). `down` removes the container but config/creds/pairing survive in the `openclaw-workspace` volume, so `up -d` rebuilds and it just works.
+- **`down -v` is destructive** — erases pairing, token, and model config; you'd re-run setup from scratch.
+- **Auto-start:** `restart: unless-stopped` brings it back on reboot *unless* you explicitly `stop` it (then it stays down until `start`/`up`).
 
 ::tab[Hermes]
-Each time you start your machine, to start your agent:
+All commands run from `~/projects/hermes` (where `compose.yaml` lives — running elsewhere gives `no configuration file provided: not found`).
 
-```bash
-cd ~/projects/hermes
-docker compose up -d hermes-gateway hermes-dashboard
-```
+| Goal | Command |
+|---|---|
+| Start (detached) | `docker compose up -d hermes-gateway hermes-dashboard` |
+| Pause (keep containers + data) | `docker compose stop hermes-gateway hermes-dashboard` |
+| Resume after pause | `docker compose start hermes-gateway hermes-dashboard` |
+| Restart (after config/persona changes) | `docker compose restart hermes-gateway` |
+| Stop + remove containers, **keep data** | `docker compose down` |
+| Full wipe (**delete** config/creds/memories) | `docker compose down -v` |
+| Tail logs | `docker logs -f hermes-gateway` |
+| Status / health | `docker ps` |
 
-The `-d` flag runs both in the background. Check status anytime with `docker logs hermes-gateway` or `docker logs hermes-dashboard`.
+- **`stop` vs `down`:** `stop` leaves the containers in place (fastest resume). `down` removes them but config, SOUL.md, and memories survive in the `hermes-workspace` volume, so `up -d` rebuilds and it just works.
+- **`down -v` is destructive** — erases credentials, SOUL.md, memories, and pairing; you'd need to reconfigure from scratch.
+- **Auto-start:** `restart: unless-stopped` brings both services back on reboot *unless* you explicitly `stop` them (then they stay down until `start`/`up`).
 :::
 
 ### Auto-Start on Login (Optional)
@@ -2312,6 +2545,8 @@ launchctl load ~/Library/LaunchAgents/ai.hermes.gateway.plist
 ```
 
 To disable: `launchctl unload ~/Library/LaunchAgents/ai.hermes.gateway.plist`
+
+Docker Desktop must also be set to start on login: open Docker Desktop → **Settings → General** → enable **Start Docker Desktop when you sign in**.
 ::::
 
 ::tab[Windows]
@@ -2412,14 +2647,17 @@ To disable: `systemctl --user disable hermes-gateway`
 | `docker: command not found` | Docker Desktop isn't running. Launch it. |
 | `openclaw: command not found` | Expected — it's inside Docker. Use `docker compose run`. |
 | `hermes: command not found` | Expected — it's inside Docker. Use `docker compose run`. |
-| Gateway says "Missing config" (OpenClaw) | Config wasn't saved. Re-run: `docker compose run --rm openclaw openclaw onboard` |
+| Gateway says "Missing config" (OpenClaw) | Config wasn't saved. Re-run: `docker compose run --rm openclaw openclaw onboard` — **note: this wipes pairing and the gateway token; you'll need to re-pair and re-fetch the dashboard URL.** |
 | Gateway says "Missing config" (Hermes) | Re-run both setup steps: `hermes setup` then `hermes gateway setup` |
 | Discord bot not responding | Check **Message Content Intent** is enabled in the Discord Developer Portal. |
-| Telegram bot not responding | Make sure you copied the full token from BotFather and pasted it correctly during setup. |
-| Onboarding starts fresh every time (OpenClaw) | Workspace volume isn't being used. Check `OPENCLAW_WORKSPACE=/workspace` in your `compose.yaml` and re-run onboarding. |
+| Telegram bot not responding | First check pairing — the bot needs to be paired before it can respond. If you haven't paired, send `/start` to the bot and run the pairing command (see Start the Gateway). If already paired, verify the bot token was copied correctly from BotFather. |
+| Telegram bot replies "access not configured" (OpenClaw) | Account not paired. Send `/start` to the bot in Telegram — it replies with a pairing code — then run: `docker exec openclaw-gateway openclaw pairing approve telegram <CODE>` |
+| Telegram bot replies "access not configured" (Hermes) | Account not paired. Send `/start` to the bot in Telegram — it replies with a pairing code — then run: `docker exec hermes-gateway hermes pairing approve telegram <CODE>` |
+| Onboarding starts fresh every time (OpenClaw) | Workspace volume isn't being used. Check that both `OPENCLAW_WORKSPACE=/workspace` and `OPENCLAW_STATE_DIR=/workspace/.openclaw` are set in your `compose.yaml` and re-run onboarding. |
 | Setup starts fresh every time (Hermes) | Workspace volume isn't being used. Check the `hermes-workspace:/opt/data` mount in your `compose.yaml` and re-run setup. |
 | (Windows WSL) Docker can't find files | Keep files in WSL home (`~/`), not Windows side (`/mnt/c/`). |
 | (macOS Apple Silicon) "Architecture" warnings | Normal — emulated via Rosetta. Performance is fine. |
+| "volume already exists" warning on `docker compose run` | Harmless — Docker reuses the pre-existing volume and its data. |
 
 ---
 
