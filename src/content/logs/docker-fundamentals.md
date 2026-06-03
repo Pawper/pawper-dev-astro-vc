@@ -185,6 +185,7 @@ You need Docker Desktop running on your machine.
 ::tab[Windows]
 1. Download: https://docs.docker.com/desktop/setup/install/windows-install/
 2. Run the installer. Keep **Use WSL 2 instead of Hyper-V** checked.
+  ![Use WSL 2 instead of Hyper-V](https://res.cloudinary.com/dr1sonbsi/image/upload/v1780464540/pawper.dev/logs/a37199ae-230c-43d6-85b6-f604faa936c4.png)
 3. Reboot if prompted.
 4. Launch Docker Desktop from the Start Menu.
 5. In Docker Desktop: **Settings → Resources → WSL Integration** → enable Ubuntu.

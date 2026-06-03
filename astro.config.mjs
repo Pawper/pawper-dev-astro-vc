@@ -70,7 +70,7 @@ function draftEditApi() {
 
 export default defineConfig({
   site: 'https://pawper.dev',
-  trailingSlash: 'always',
+  trailingSlash: process.env.NODE_ENV === 'development' ? 'ignore' : 'always',
   integrations: [react(), draftEditApi()],
   markdown: {
     remarkPlugins: [remarkDirective, remarkTabsPlugin('site')],
