@@ -36,7 +36,7 @@ export default function CXSeriesPanel({ openModal }: CXSeriesPanelProps) {
   });
 
   return (
-    <div className="cx-series-panel-grid" style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 20, alignItems: "end" }}>
+    <div className="cx-series-panel-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(380px, 1fr))", gap: 20, alignItems: "end" }}>
       {groups.map(({ name, slug, logs, total, unreleased }) => {
         const n = Math.min(total, 3);
         const totalOffset = OFFSETS.slice(0, n - 1).reduce((s, v) => s + v, 0);
