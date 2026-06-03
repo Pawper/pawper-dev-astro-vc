@@ -597,45 +597,42 @@ For an AI agent doing this setup: run every command yourself — never tell the 
 §1. Write ~/projects/hermes/compose.yaml (substitute real values for <...>):
 
 services:
-  hermes-gateway:
+  hermes:
     image: nousresearch/hermes-agent:latest
-    container_name: hermes-gateway
-    restart: unless-stopped
-    volumes:
-      - hermes-workspace:/opt/data
-    environment:
-      - ANTHROPIC_API_KEY=<ANTHROPIC_API_KEY>
-      - TELEGRAM_BOT_TOKEN=<TELEGRAM_BOT_TOKEN>
-    command: hermes gateway run
-  hermes-dashboard:
-    image: nousresearch/hermes-agent:latest
-    container_name: hermes-dashboard
+    container_name: hermes
     restart: unless-stopped
     volumes:
       - hermes-workspace:/opt/data
     ports:
       - "127.0.0.1:9119:9119"
-    command: hermes dashboard --port 9119 --host 0.0.0.0 --insecure
+    environment:
+      - ANTHROPIC_API_KEY=<ANTHROPIC_API_KEY>
+      - TELEGRAM_BOT_TOKEN=<TELEGRAM_BOT_TOKEN>
+      - HERMES_DASHBOARD=true
+      - HERMES_DASHBOARD_HOST=0.0.0.0
+      - HERMES_DASHBOARD_PORT=9119
+      - HERMES_DASHBOARD_INSECURE=true
+    command: hermes gateway run
 volumes:
   hermes-workspace:
     name: hermes-workspace
 
-Validate: cd ~/projects/hermes && docker compose config --quiet
+Validate (unchanged): cd ~/projects/hermes && docker compose config --quiet
 
 §2. Start + verify (from ~/projects/hermes):
-docker compose up -d hermes-gateway hermes-dashboard && sleep 6
-docker logs hermes-gateway 2>&1 | tail -10
+docker compose up -d && sleep 8
+docker logs hermes 2>&1 | grep -v "s6-log: fatal" | tail -10
 curl -s -o /dev/null -w "dashboard HTTP %{http_code}\n" http://127.0.0.1:9119/
-Confirm: logs show [hermes] gateway connected, dashboard returns HTTP 200.
-Telegram shows running, disconnected until pairing — that's normal.
+Confirm: gateway log shows ✓ telegram connected and Gateway running with 1 platform(s); dashboard returns HTTP 200. The dashboard now correctly shows Gateway Status: Running and Telegram as connected.
+Note: the runtime log lives at /opt/data/logs/gateway.log inside the container; docker logs hermes shows the s6 supervisor output. The s6-log ... Resource busy spam from the old shared-volume setup is gone.
 
 §3. Pair the user (WAIT):
 Ask the user: Message your bot /start in Telegram. It replies with a pairing code — paste it here.
-Once you have the code: docker exec hermes-gateway hermes pairing approve telegram <PAIRING_CODE>
+Once you have the code: docker exec hermes hermes pairing approve telegram <PAIRING_CODE>
 
 §4. Write the persona (<DESCRIPTION> is inserted verbatim — make it a complete, capitalized sentence):
-docker exec hermes-gateway sh -c 'printf "# <AGENT_NAME>\n\nYou are <AGENT_NAME>, my personal AI assistant. <DESCRIPTION>\n" > /opt/data/SOUL.md'
-docker compose restart hermes-gateway
+docker exec hermes sh -c 'printf "# <AGENT_NAME>\n\nYou are <AGENT_NAME>, my personal AI assistant. <DESCRIPTION>\n" > /opt/data/SOUL.md'
+docker compose restart hermes
 
 §5. Tell the user: Your agent is live. Dashboard: http://127.0.0.1:9119
 ```
@@ -655,40 +652,38 @@ For an AI agent doing this setup: run every command yourself — never tell the 
 §1. Write ~/projects/hermes/compose.yaml (substitute real values for <...>):
 
 services:
-  hermes-gateway:
+  hermes:
     image: nousresearch/hermes-agent:latest
-    container_name: hermes-gateway
-    restart: unless-stopped
-    volumes:
-      - hermes-workspace:/opt/data
-    environment:
-      - ANTHROPIC_API_KEY=<ANTHROPIC_API_KEY>
-      - DISCORD_BOT_TOKEN=<DISCORD_BOT_TOKEN>
-    command: hermes gateway run
-  hermes-dashboard:
-    image: nousresearch/hermes-agent:latest
-    container_name: hermes-dashboard
+    container_name: hermes
     restart: unless-stopped
     volumes:
       - hermes-workspace:/opt/data
     ports:
       - "127.0.0.1:9119:9119"
-    command: hermes dashboard --port 9119 --host 0.0.0.0 --insecure
+    environment:
+      - ANTHROPIC_API_KEY=<ANTHROPIC_API_KEY>
+      - DISCORD_BOT_TOKEN=<DISCORD_BOT_TOKEN>
+      - HERMES_DASHBOARD=true
+      - HERMES_DASHBOARD_HOST=0.0.0.0
+      - HERMES_DASHBOARD_PORT=9119
+      - HERMES_DASHBOARD_INSECURE=true
+    command: hermes gateway run
 volumes:
   hermes-workspace:
     name: hermes-workspace
 
-Validate: cd ~/projects/hermes && docker compose config --quiet
+Validate (unchanged): cd ~/projects/hermes && docker compose config --quiet
 
 §2. Start + verify (from ~/projects/hermes):
-docker compose up -d hermes-gateway hermes-dashboard && sleep 6
-docker logs hermes-gateway 2>&1 | tail -10
+docker compose up -d && sleep 8
+docker logs hermes 2>&1 | grep -v "s6-log: fatal" | tail -10
 curl -s -o /dev/null -w "dashboard HTTP %{http_code}\n" http://127.0.0.1:9119/
-Confirm: logs show [hermes] gateway connected, dashboard returns HTTP 200.
+Confirm: gateway log shows ✓ discord connected and Gateway running with 1 platform(s); dashboard returns HTTP 200. The dashboard now correctly shows Gateway Status: Running and Discord as connected.
+Note: the runtime log lives at /opt/data/logs/gateway.log inside the container; docker logs hermes shows the s6 supervisor output. The s6-log ... Resource busy spam from the old shared-volume setup is gone.
 
 §3. Write the persona (<DESCRIPTION> is inserted verbatim — make it a complete, capitalized sentence):
-docker exec hermes-gateway sh -c 'printf "# <AGENT_NAME>\n\nYou are <AGENT_NAME>, my personal AI assistant. <DESCRIPTION>\n" > /opt/data/SOUL.md'
-docker compose restart hermes-gateway
+docker exec hermes sh -c 'printf "# <AGENT_NAME>\n\nYou are <AGENT_NAME>, my personal AI assistant. <DESCRIPTION>\n" > /opt/data/SOUL.md'
+docker compose restart hermes
 
 §4. Tell the user: Your agent is live. Dashboard: http://127.0.0.1:9119
 ```
@@ -876,45 +871,42 @@ For an AI agent doing this setup: run every command yourself — never tell the 
 §1. Write ~/projects/hermes/compose.yaml (substitute real values for <...>):
 
 services:
-  hermes-gateway:
+  hermes:
     image: nousresearch/hermes-agent:latest
-    container_name: hermes-gateway
-    restart: unless-stopped
-    volumes:
-      - hermes-workspace:/opt/data
-    environment:
-      - OPENAI_API_KEY=<OPENAI_API_KEY>
-      - TELEGRAM_BOT_TOKEN=<TELEGRAM_BOT_TOKEN>
-    command: hermes gateway run
-  hermes-dashboard:
-    image: nousresearch/hermes-agent:latest
-    container_name: hermes-dashboard
+    container_name: hermes
     restart: unless-stopped
     volumes:
       - hermes-workspace:/opt/data
     ports:
       - "127.0.0.1:9119:9119"
-    command: hermes dashboard --port 9119 --host 0.0.0.0 --insecure
+    environment:
+      - OPENAI_API_KEY=<OPENAI_API_KEY>
+      - TELEGRAM_BOT_TOKEN=<TELEGRAM_BOT_TOKEN>
+      - HERMES_DASHBOARD=true
+      - HERMES_DASHBOARD_HOST=0.0.0.0
+      - HERMES_DASHBOARD_PORT=9119
+      - HERMES_DASHBOARD_INSECURE=true
+    command: hermes gateway run
 volumes:
   hermes-workspace:
     name: hermes-workspace
 
-Validate: cd ~/projects/hermes && docker compose config --quiet
+Validate (unchanged): cd ~/projects/hermes && docker compose config --quiet
 
 §2. Start + verify (from ~/projects/hermes):
-docker compose up -d hermes-gateway hermes-dashboard && sleep 6
-docker logs hermes-gateway 2>&1 | tail -10
+docker compose up -d && sleep 8
+docker logs hermes 2>&1 | grep -v "s6-log: fatal" | tail -10
 curl -s -o /dev/null -w "dashboard HTTP %{http_code}\n" http://127.0.0.1:9119/
-Confirm: logs show [hermes] gateway connected, dashboard returns HTTP 200.
-Telegram shows running, disconnected until pairing — that's normal.
+Confirm: gateway log shows ✓ telegram connected and Gateway running with 1 platform(s); dashboard returns HTTP 200. The dashboard now correctly shows Gateway Status: Running and Telegram as connected.
+Note: the runtime log lives at /opt/data/logs/gateway.log inside the container; docker logs hermes shows the s6 supervisor output. The s6-log ... Resource busy spam from the old shared-volume setup is gone.
 
 §3. Pair the user (WAIT):
 Ask the user: Message your bot /start in Telegram. It replies with a pairing code — paste it here.
-Once you have the code: docker exec hermes-gateway hermes pairing approve telegram <PAIRING_CODE>
+Once you have the code: docker exec hermes hermes pairing approve telegram <PAIRING_CODE>
 
 §4. Write the persona (<DESCRIPTION> is inserted verbatim — make it a complete, capitalized sentence):
-docker exec hermes-gateway sh -c 'printf "# <AGENT_NAME>\n\nYou are <AGENT_NAME>, my personal AI assistant. <DESCRIPTION>\n" > /opt/data/SOUL.md'
-docker compose restart hermes-gateway
+docker exec hermes sh -c 'printf "# <AGENT_NAME>\n\nYou are <AGENT_NAME>, my personal AI assistant. <DESCRIPTION>\n" > /opt/data/SOUL.md'
+docker compose restart hermes
 
 §5. Tell the user: Your agent is live. Dashboard: http://127.0.0.1:9119
 ```
@@ -934,40 +926,38 @@ For an AI agent doing this setup: run every command yourself — never tell the 
 §1. Write ~/projects/hermes/compose.yaml (substitute real values for <...>):
 
 services:
-  hermes-gateway:
+  hermes:
     image: nousresearch/hermes-agent:latest
-    container_name: hermes-gateway
-    restart: unless-stopped
-    volumes:
-      - hermes-workspace:/opt/data
-    environment:
-      - OPENAI_API_KEY=<OPENAI_API_KEY>
-      - DISCORD_BOT_TOKEN=<DISCORD_BOT_TOKEN>
-    command: hermes gateway run
-  hermes-dashboard:
-    image: nousresearch/hermes-agent:latest
-    container_name: hermes-dashboard
+    container_name: hermes
     restart: unless-stopped
     volumes:
       - hermes-workspace:/opt/data
     ports:
       - "127.0.0.1:9119:9119"
-    command: hermes dashboard --port 9119 --host 0.0.0.0 --insecure
+    environment:
+      - OPENAI_API_KEY=<OPENAI_API_KEY>
+      - DISCORD_BOT_TOKEN=<DISCORD_BOT_TOKEN>
+      - HERMES_DASHBOARD=true
+      - HERMES_DASHBOARD_HOST=0.0.0.0
+      - HERMES_DASHBOARD_PORT=9119
+      - HERMES_DASHBOARD_INSECURE=true
+    command: hermes gateway run
 volumes:
   hermes-workspace:
     name: hermes-workspace
 
-Validate: cd ~/projects/hermes && docker compose config --quiet
+Validate (unchanged): cd ~/projects/hermes && docker compose config --quiet
 
 §2. Start + verify (from ~/projects/hermes):
-docker compose up -d hermes-gateway hermes-dashboard && sleep 6
-docker logs hermes-gateway 2>&1 | tail -10
+docker compose up -d && sleep 8
+docker logs hermes 2>&1 | grep -v "s6-log: fatal" | tail -10
 curl -s -o /dev/null -w "dashboard HTTP %{http_code}\n" http://127.0.0.1:9119/
-Confirm: logs show [hermes] gateway connected, dashboard returns HTTP 200.
+Confirm: gateway log shows ✓ discord connected and Gateway running with 1 platform(s); dashboard returns HTTP 200. The dashboard now correctly shows Gateway Status: Running and Discord as connected.
+Note: the runtime log lives at /opt/data/logs/gateway.log inside the container; docker logs hermes shows the s6 supervisor output. The s6-log ... Resource busy spam from the old shared-volume setup is gone.
 
 §3. Write the persona (<DESCRIPTION> is inserted verbatim — make it a complete, capitalized sentence):
-docker exec hermes-gateway sh -c 'printf "# <AGENT_NAME>\n\nYou are <AGENT_NAME>, my personal AI assistant. <DESCRIPTION>\n" > /opt/data/SOUL.md'
-docker compose restart hermes-gateway
+docker exec hermes sh -c 'printf "# <AGENT_NAME>\n\nYou are <AGENT_NAME>, my personal AI assistant. <DESCRIPTION>\n" > /opt/data/SOUL.md'
+docker compose restart hermes
 
 §4. Tell the user: Your agent is live. Dashboard: http://127.0.0.1:9119
 ```
@@ -1155,45 +1145,42 @@ For an AI agent doing this setup: run every command yourself — never tell the 
 §1. Write ~/projects/hermes/compose.yaml (substitute real values for <...>):
 
 services:
-  hermes-gateway:
+  hermes:
     image: nousresearch/hermes-agent:latest
-    container_name: hermes-gateway
-    restart: unless-stopped
-    volumes:
-      - hermes-workspace:/opt/data
-    environment:
-      - GOOGLE_API_KEY=<GOOGLE_API_KEY>
-      - TELEGRAM_BOT_TOKEN=<TELEGRAM_BOT_TOKEN>
-    command: hermes gateway run
-  hermes-dashboard:
-    image: nousresearch/hermes-agent:latest
-    container_name: hermes-dashboard
+    container_name: hermes
     restart: unless-stopped
     volumes:
       - hermes-workspace:/opt/data
     ports:
       - "127.0.0.1:9119:9119"
-    command: hermes dashboard --port 9119 --host 0.0.0.0 --insecure
+    environment:
+      - GOOGLE_API_KEY=<GOOGLE_API_KEY>
+      - TELEGRAM_BOT_TOKEN=<TELEGRAM_BOT_TOKEN>
+      - HERMES_DASHBOARD=true
+      - HERMES_DASHBOARD_HOST=0.0.0.0
+      - HERMES_DASHBOARD_PORT=9119
+      - HERMES_DASHBOARD_INSECURE=true
+    command: hermes gateway run
 volumes:
   hermes-workspace:
     name: hermes-workspace
 
-Validate: cd ~/projects/hermes && docker compose config --quiet
+Validate (unchanged): cd ~/projects/hermes && docker compose config --quiet
 
 §2. Start + verify (from ~/projects/hermes):
-docker compose up -d hermes-gateway hermes-dashboard && sleep 6
-docker logs hermes-gateway 2>&1 | tail -10
+docker compose up -d && sleep 8
+docker logs hermes 2>&1 | grep -v "s6-log: fatal" | tail -10
 curl -s -o /dev/null -w "dashboard HTTP %{http_code}\n" http://127.0.0.1:9119/
-Confirm: logs show [hermes] gateway connected, dashboard returns HTTP 200.
-Telegram shows running, disconnected until pairing — that's normal.
+Confirm: gateway log shows ✓ telegram connected and Gateway running with 1 platform(s); dashboard returns HTTP 200. The dashboard now correctly shows Gateway Status: Running and Telegram as connected.
+Note: the runtime log lives at /opt/data/logs/gateway.log inside the container; docker logs hermes shows the s6 supervisor output. The s6-log ... Resource busy spam from the old shared-volume setup is gone.
 
 §3. Pair the user (WAIT):
 Ask the user: Message your bot /start in Telegram. It replies with a pairing code — paste it here.
-Once you have the code: docker exec hermes-gateway hermes pairing approve telegram <PAIRING_CODE>
+Once you have the code: docker exec hermes hermes pairing approve telegram <PAIRING_CODE>
 
 §4. Write the persona (<DESCRIPTION> is inserted verbatim — make it a complete, capitalized sentence):
-docker exec hermes-gateway sh -c 'printf "# <AGENT_NAME>\n\nYou are <AGENT_NAME>, my personal AI assistant. <DESCRIPTION>\n" > /opt/data/SOUL.md'
-docker compose restart hermes-gateway
+docker exec hermes sh -c 'printf "# <AGENT_NAME>\n\nYou are <AGENT_NAME>, my personal AI assistant. <DESCRIPTION>\n" > /opt/data/SOUL.md'
+docker compose restart hermes
 
 §5. Tell the user: Your agent is live. Dashboard: http://127.0.0.1:9119
 ```
@@ -1213,40 +1200,38 @@ For an AI agent doing this setup: run every command yourself — never tell the 
 §1. Write ~/projects/hermes/compose.yaml (substitute real values for <...>):
 
 services:
-  hermes-gateway:
+  hermes:
     image: nousresearch/hermes-agent:latest
-    container_name: hermes-gateway
-    restart: unless-stopped
-    volumes:
-      - hermes-workspace:/opt/data
-    environment:
-      - GOOGLE_API_KEY=<GOOGLE_API_KEY>
-      - DISCORD_BOT_TOKEN=<DISCORD_BOT_TOKEN>
-    command: hermes gateway run
-  hermes-dashboard:
-    image: nousresearch/hermes-agent:latest
-    container_name: hermes-dashboard
+    container_name: hermes
     restart: unless-stopped
     volumes:
       - hermes-workspace:/opt/data
     ports:
       - "127.0.0.1:9119:9119"
-    command: hermes dashboard --port 9119 --host 0.0.0.0 --insecure
+    environment:
+      - GOOGLE_API_KEY=<GOOGLE_API_KEY>
+      - DISCORD_BOT_TOKEN=<DISCORD_BOT_TOKEN>
+      - HERMES_DASHBOARD=true
+      - HERMES_DASHBOARD_HOST=0.0.0.0
+      - HERMES_DASHBOARD_PORT=9119
+      - HERMES_DASHBOARD_INSECURE=true
+    command: hermes gateway run
 volumes:
   hermes-workspace:
     name: hermes-workspace
 
-Validate: cd ~/projects/hermes && docker compose config --quiet
+Validate (unchanged): cd ~/projects/hermes && docker compose config --quiet
 
 §2. Start + verify (from ~/projects/hermes):
-docker compose up -d hermes-gateway hermes-dashboard && sleep 6
-docker logs hermes-gateway 2>&1 | tail -10
+docker compose up -d && sleep 8
+docker logs hermes 2>&1 | grep -v "s6-log: fatal" | tail -10
 curl -s -o /dev/null -w "dashboard HTTP %{http_code}\n" http://127.0.0.1:9119/
-Confirm: logs show [hermes] gateway connected, dashboard returns HTTP 200.
+Confirm: gateway log shows ✓ discord connected and Gateway running with 1 platform(s); dashboard returns HTTP 200. The dashboard now correctly shows Gateway Status: Running and Discord as connected.
+Note: the runtime log lives at /opt/data/logs/gateway.log inside the container; docker logs hermes shows the s6 supervisor output. The s6-log ... Resource busy spam from the old shared-volume setup is gone.
 
 §3. Write the persona (<DESCRIPTION> is inserted verbatim — make it a complete, capitalized sentence):
-docker exec hermes-gateway sh -c 'printf "# <AGENT_NAME>\n\nYou are <AGENT_NAME>, my personal AI assistant. <DESCRIPTION>\n" > /opt/data/SOUL.md'
-docker compose restart hermes-gateway
+docker exec hermes sh -c 'printf "# <AGENT_NAME>\n\nYou are <AGENT_NAME>, my personal AI assistant. <DESCRIPTION>\n" > /opt/data/SOUL.md'
+docker compose restart hermes
 
 §4. Tell the user: Your agent is live. Dashboard: http://127.0.0.1:9119
 ```
@@ -1434,45 +1419,42 @@ For an AI agent doing this setup: run every command yourself — never tell the 
 §1. Write ~/projects/hermes/compose.yaml (substitute real values for <...>):
 
 services:
-  hermes-gateway:
+  hermes:
     image: nousresearch/hermes-agent:latest
-    container_name: hermes-gateway
-    restart: unless-stopped
-    volumes:
-      - hermes-workspace:/opt/data
-    environment:
-      - OPENROUTER_API_KEY=<OPENROUTER_API_KEY>
-      - TELEGRAM_BOT_TOKEN=<TELEGRAM_BOT_TOKEN>
-    command: hermes gateway run
-  hermes-dashboard:
-    image: nousresearch/hermes-agent:latest
-    container_name: hermes-dashboard
+    container_name: hermes
     restart: unless-stopped
     volumes:
       - hermes-workspace:/opt/data
     ports:
       - "127.0.0.1:9119:9119"
-    command: hermes dashboard --port 9119 --host 0.0.0.0 --insecure
+    environment:
+      - OPENROUTER_API_KEY=<OPENROUTER_API_KEY>
+      - TELEGRAM_BOT_TOKEN=<TELEGRAM_BOT_TOKEN>
+      - HERMES_DASHBOARD=true
+      - HERMES_DASHBOARD_HOST=0.0.0.0
+      - HERMES_DASHBOARD_PORT=9119
+      - HERMES_DASHBOARD_INSECURE=true
+    command: hermes gateway run
 volumes:
   hermes-workspace:
     name: hermes-workspace
 
-Validate: cd ~/projects/hermes && docker compose config --quiet
+Validate (unchanged): cd ~/projects/hermes && docker compose config --quiet
 
 §2. Start + verify (from ~/projects/hermes):
-docker compose up -d hermes-gateway hermes-dashboard && sleep 6
-docker logs hermes-gateway 2>&1 | tail -10
+docker compose up -d && sleep 8
+docker logs hermes 2>&1 | grep -v "s6-log: fatal" | tail -10
 curl -s -o /dev/null -w "dashboard HTTP %{http_code}\n" http://127.0.0.1:9119/
-Confirm: logs show [hermes] gateway connected, dashboard returns HTTP 200.
-Telegram shows running, disconnected until pairing — that's normal.
+Confirm: gateway log shows ✓ telegram connected and Gateway running with 1 platform(s); dashboard returns HTTP 200. The dashboard now correctly shows Gateway Status: Running and Telegram as connected.
+Note: the runtime log lives at /opt/data/logs/gateway.log inside the container; docker logs hermes shows the s6 supervisor output. The s6-log ... Resource busy spam from the old shared-volume setup is gone.
 
 §3. Pair the user (WAIT):
 Ask the user: Message your bot /start in Telegram. It replies with a pairing code — paste it here.
-Once you have the code: docker exec hermes-gateway hermes pairing approve telegram <PAIRING_CODE>
+Once you have the code: docker exec hermes hermes pairing approve telegram <PAIRING_CODE>
 
 §4. Write the persona (<DESCRIPTION> is inserted verbatim — make it a complete, capitalized sentence):
-docker exec hermes-gateway sh -c 'printf "# <AGENT_NAME>\n\nYou are <AGENT_NAME>, my personal AI assistant. <DESCRIPTION>\n" > /opt/data/SOUL.md'
-docker compose restart hermes-gateway
+docker exec hermes sh -c 'printf "# <AGENT_NAME>\n\nYou are <AGENT_NAME>, my personal AI assistant. <DESCRIPTION>\n" > /opt/data/SOUL.md'
+docker compose restart hermes
 
 §5. Tell the user: Your agent is live. Dashboard: http://127.0.0.1:9119
 ```
@@ -1492,40 +1474,38 @@ For an AI agent doing this setup: run every command yourself — never tell the 
 §1. Write ~/projects/hermes/compose.yaml (substitute real values for <...>):
 
 services:
-  hermes-gateway:
+  hermes:
     image: nousresearch/hermes-agent:latest
-    container_name: hermes-gateway
-    restart: unless-stopped
-    volumes:
-      - hermes-workspace:/opt/data
-    environment:
-      - OPENROUTER_API_KEY=<OPENROUTER_API_KEY>
-      - DISCORD_BOT_TOKEN=<DISCORD_BOT_TOKEN>
-    command: hermes gateway run
-  hermes-dashboard:
-    image: nousresearch/hermes-agent:latest
-    container_name: hermes-dashboard
+    container_name: hermes
     restart: unless-stopped
     volumes:
       - hermes-workspace:/opt/data
     ports:
       - "127.0.0.1:9119:9119"
-    command: hermes dashboard --port 9119 --host 0.0.0.0 --insecure
+    environment:
+      - OPENROUTER_API_KEY=<OPENROUTER_API_KEY>
+      - DISCORD_BOT_TOKEN=<DISCORD_BOT_TOKEN>
+      - HERMES_DASHBOARD=true
+      - HERMES_DASHBOARD_HOST=0.0.0.0
+      - HERMES_DASHBOARD_PORT=9119
+      - HERMES_DASHBOARD_INSECURE=true
+    command: hermes gateway run
 volumes:
   hermes-workspace:
     name: hermes-workspace
 
-Validate: cd ~/projects/hermes && docker compose config --quiet
+Validate (unchanged): cd ~/projects/hermes && docker compose config --quiet
 
 §2. Start + verify (from ~/projects/hermes):
-docker compose up -d hermes-gateway hermes-dashboard && sleep 6
-docker logs hermes-gateway 2>&1 | tail -10
+docker compose up -d && sleep 8
+docker logs hermes 2>&1 | grep -v "s6-log: fatal" | tail -10
 curl -s -o /dev/null -w "dashboard HTTP %{http_code}\n" http://127.0.0.1:9119/
-Confirm: logs show [hermes] gateway connected, dashboard returns HTTP 200.
+Confirm: gateway log shows ✓ discord connected and Gateway running with 1 platform(s); dashboard returns HTTP 200. The dashboard now correctly shows Gateway Status: Running and Discord as connected.
+Note: the runtime log lives at /opt/data/logs/gateway.log inside the container; docker logs hermes shows the s6 supervisor output. The s6-log ... Resource busy spam from the old shared-volume setup is gone.
 
 §3. Write the persona (<DESCRIPTION> is inserted verbatim — make it a complete, capitalized sentence):
-docker exec hermes-gateway sh -c 'printf "# <AGENT_NAME>\n\nYou are <AGENT_NAME>, my personal AI assistant. <DESCRIPTION>\n" > /opt/data/SOUL.md'
-docker compose restart hermes-gateway
+docker exec hermes sh -c 'printf "# <AGENT_NAME>\n\nYou are <AGENT_NAME>, my personal AI assistant. <DESCRIPTION>\n" > /opt/data/SOUL.md'
+docker compose restart hermes
 
 §4. Tell the user: Your agent is live. Dashboard: http://127.0.0.1:9119
 ```
@@ -1723,49 +1703,44 @@ For an AI agent doing this setup: run every command yourself — never tell the 
 §1. Write ~/projects/hermes/compose.yaml (substitute real values for <...>):
 
 services:
-  hermes-gateway:
+  hermes:
     image: nousresearch/hermes-agent:latest
-    container_name: hermes-gateway
-    restart: unless-stopped
-    volumes:
-      - hermes-workspace:/opt/data
-    environment:
-      - OLLAMA_BASE_URL=http://host.docker.internal:11434
-      - TELEGRAM_BOT_TOKEN=<TELEGRAM_BOT_TOKEN>
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
-    command: hermes gateway run
-  hermes-dashboard:
-    image: nousresearch/hermes-agent:latest
-    container_name: hermes-dashboard
+    container_name: hermes
     restart: unless-stopped
     volumes:
       - hermes-workspace:/opt/data
     ports:
       - "127.0.0.1:9119:9119"
+    environment:
+      - OLLAMA_BASE_URL=http://host.docker.internal:11434
+      - TELEGRAM_BOT_TOKEN=<TELEGRAM_BOT_TOKEN>
+      - HERMES_DASHBOARD=true
+      - HERMES_DASHBOARD_HOST=0.0.0.0
+      - HERMES_DASHBOARD_PORT=9119
+      - HERMES_DASHBOARD_INSECURE=true
     extra_hosts:
       - "host.docker.internal:host-gateway"
-    command: hermes dashboard --port 9119 --host 0.0.0.0 --insecure
+    command: hermes gateway run
 volumes:
   hermes-workspace:
     name: hermes-workspace
 
-Validate: cd ~/projects/hermes && docker compose config --quiet
+Validate (unchanged): cd ~/projects/hermes && docker compose config --quiet
 
 §2. Start + verify (from ~/projects/hermes):
-docker compose up -d hermes-gateway hermes-dashboard && sleep 6
-docker logs hermes-gateway 2>&1 | tail -10
+docker compose up -d && sleep 8
+docker logs hermes 2>&1 | grep -v "s6-log: fatal" | tail -10
 curl -s -o /dev/null -w "dashboard HTTP %{http_code}\n" http://127.0.0.1:9119/
-Confirm: logs show [hermes] gateway connected, dashboard returns HTTP 200.
-Telegram shows running, disconnected until pairing — that's normal.
+Confirm: gateway log shows ✓ telegram connected and Gateway running with 1 platform(s); dashboard returns HTTP 200. The dashboard now correctly shows Gateway Status: Running and Telegram as connected.
+Note: the runtime log lives at /opt/data/logs/gateway.log inside the container; docker logs hermes shows the s6 supervisor output. The s6-log ... Resource busy spam from the old shared-volume setup is gone.
 
 §3. Pair the user (WAIT):
 Ask the user: Message your bot /start in Telegram. It replies with a pairing code — paste it here.
-Once you have the code: docker exec hermes-gateway hermes pairing approve telegram <PAIRING_CODE>
+Once you have the code: docker exec hermes hermes pairing approve telegram <PAIRING_CODE>
 
 §4. Write the persona (<DESCRIPTION> is inserted verbatim — make it a complete, capitalized sentence):
-docker exec hermes-gateway sh -c 'printf "# <AGENT_NAME>\n\nYou are <AGENT_NAME>, my personal AI assistant. <DESCRIPTION>\n" > /opt/data/SOUL.md'
-docker compose restart hermes-gateway
+docker exec hermes sh -c 'printf "# <AGENT_NAME>\n\nYou are <AGENT_NAME>, my personal AI assistant. <DESCRIPTION>\n" > /opt/data/SOUL.md'
+docker compose restart hermes
 
 §5. Tell the user: Your agent is live. Dashboard: http://127.0.0.1:9119
 ```
@@ -1785,44 +1760,40 @@ For an AI agent doing this setup: run every command yourself — never tell the 
 §1. Write ~/projects/hermes/compose.yaml (substitute real values for <...>):
 
 services:
-  hermes-gateway:
+  hermes:
     image: nousresearch/hermes-agent:latest
-    container_name: hermes-gateway
-    restart: unless-stopped
-    volumes:
-      - hermes-workspace:/opt/data
-    environment:
-      - OLLAMA_BASE_URL=http://host.docker.internal:11434
-      - DISCORD_BOT_TOKEN=<DISCORD_BOT_TOKEN>
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
-    command: hermes gateway run
-  hermes-dashboard:
-    image: nousresearch/hermes-agent:latest
-    container_name: hermes-dashboard
+    container_name: hermes
     restart: unless-stopped
     volumes:
       - hermes-workspace:/opt/data
     ports:
       - "127.0.0.1:9119:9119"
+    environment:
+      - OLLAMA_BASE_URL=http://host.docker.internal:11434
+      - DISCORD_BOT_TOKEN=<DISCORD_BOT_TOKEN>
+      - HERMES_DASHBOARD=true
+      - HERMES_DASHBOARD_HOST=0.0.0.0
+      - HERMES_DASHBOARD_PORT=9119
+      - HERMES_DASHBOARD_INSECURE=true
     extra_hosts:
       - "host.docker.internal:host-gateway"
-    command: hermes dashboard --port 9119 --host 0.0.0.0 --insecure
+    command: hermes gateway run
 volumes:
   hermes-workspace:
     name: hermes-workspace
 
-Validate: cd ~/projects/hermes && docker compose config --quiet
+Validate (unchanged): cd ~/projects/hermes && docker compose config --quiet
 
 §2. Start + verify (from ~/projects/hermes):
-docker compose up -d hermes-gateway hermes-dashboard && sleep 6
-docker logs hermes-gateway 2>&1 | tail -10
+docker compose up -d && sleep 8
+docker logs hermes 2>&1 | grep -v "s6-log: fatal" | tail -10
 curl -s -o /dev/null -w "dashboard HTTP %{http_code}\n" http://127.0.0.1:9119/
-Confirm: logs show [hermes] gateway connected, dashboard returns HTTP 200.
+Confirm: gateway log shows ✓ discord connected and Gateway running with 1 platform(s); dashboard returns HTTP 200. The dashboard now correctly shows Gateway Status: Running and Discord as connected.
+Note: the runtime log lives at /opt/data/logs/gateway.log inside the container; docker logs hermes shows the s6 supervisor output. The s6-log ... Resource busy spam from the old shared-volume setup is gone.
 
 §3. Write the persona (<DESCRIPTION> is inserted verbatim — make it a complete, capitalized sentence):
-docker exec hermes-gateway sh -c 'printf "# <AGENT_NAME>\n\nYou are <AGENT_NAME>, my personal AI assistant. <DESCRIPTION>\n" > /opt/data/SOUL.md'
-docker compose restart hermes-gateway
+docker exec hermes sh -c 'printf "# <AGENT_NAME>\n\nYou are <AGENT_NAME>, my personal AI assistant. <DESCRIPTION>\n" > /opt/data/SOUL.md'
+docker compose restart hermes
 
 §4. Tell the user: Your agent is live. Dashboard: http://127.0.0.1:9119
 ```
@@ -2312,7 +2283,7 @@ Your agent is now live. On Discord, tag it in a channel; on Telegram, message th
 ::tab[Hermes]
 ```bash
 cd ~/projects/hermes
-docker compose up -d hermes-gateway hermes-dashboard && sleep 6
+docker compose up -d && sleep 8
 ```
 
 The `-d` flag runs both in the background — the gateway listens to your chat platform, the dashboard is available in your browser. Both keep running after you close the terminal (`restart: unless-stopped` handles that).
@@ -2329,7 +2300,7 @@ You should see `[hermes] gateway connected` in the logs and `dashboard HTTP 200`
 **Telegram users:** The channel will show `running, disconnected` until you pair — that's normal. **Pair your account before the agent can respond.** Message your bot `/start` in Telegram. It replies with a pairing code, then run:
 
 ```bash
-docker exec hermes-gateway hermes pairing approve telegram <PAIRING_CODE>
+docker exec hermes hermes pairing approve telegram <PAIRING_CODE>
 ```
 
 Your agent is now live. On Discord, tag it in a channel; on Telegram, message the bot directly. It will respond.
@@ -2339,7 +2310,7 @@ Your agent is now live. On Discord, tag it in a channel; on Telegram, message th
 
 ## The Web Dashboard
 
-Once the gateway is running, your agent's web dashboard is available in your browser. It includes a built-in chat UI alongside monitoring and management — so you can talk to your agent directly from the browser as well as through Telegram or Discord.
+Once the gateway is running, your agent's web dashboard is available in your browser — a visual interface for monitoring and managing your agent.
 
 :::tabs
 ::tab[OpenClaw]
@@ -2355,9 +2326,13 @@ Bookmark this URL — it stays the same until you wipe the volume:
 http://127.0.0.1:18789/#token=<GATEWAY_TOKEN>
 ```
 
-![OpenClaw WebUI](https://res.cloudinary.com/dr1sonbsi/image/upload/v1780470950/pawper.dev/logs/57d0cf0a-8973-43e5-bfd1-b07680ecedc0.png)
+> If you used Quick Setup, your coding agent should have given you this URL.
+
+![OpenClaw Dashboard](https://res.cloudinary.com/dr1sonbsi/image/upload/v1780470950/pawper.dev/logs/57d0cf0a-8973-43e5-bfd1-b07680ecedc0.png)
 
 This is your control panel — a visual interface for everything your agent is doing and everything you've configured.
+
+**Chat with your agent** — Talk to your agent directly from the browser. It's a separate session from your bot channel, but the same persona and workspace.
 
 **Monitor your agent** — See incoming and outgoing messages in real time. Watch what your agent thinks, what actions it takes, and what it responds with.
 
@@ -2376,7 +2351,11 @@ This is your control panel — a visual interface for everything your agent is d
 http://127.0.0.1:9119
 ```
 
-The `hermes-dashboard` service is already defined in your `compose.yaml` and starts alongside the gateway. Open the URL above once both are running.
+> If you used Quick Setup, your coding agent should have given you this URL.
+
+![Hermes Dashboard](https://res.cloudinary.com/dr1sonbsi/image/upload/v1780512774/pawper.dev/logs/bf96b501-bb74-4c9a-b8d9-fd8405e52f80.png)
+
+The dashboard runs inside the `hermes` container alongside the gateway. Open the URL above once the container is running.
 
 **Monitor your agent** — View incoming and outgoing messages, agent reasoning, and actions taken in real time.
 
@@ -2387,6 +2366,97 @@ The `hermes-dashboard` service is already defined in your `compose.yaml` and sta
 **Edit your agent definition** — View and edit `SOUL.md` directly.
 
 **View memories and state** — See session memory and the agent's self-improvement logs.
+
+> **No browser chat** — The Hermes dashboard is a monitoring and management interface only. To talk to your agent, use the bot channel you set up (Telegram or Discord) or [drop into an interactive chat from the CLI](#using-interactive-chat-from-the-cli).
+:::
+
+---
+
+## Using Interactive Chat from the CLI
+
+You can drop into a conversation with your agent directly from the terminal — no browser, no Telegram, no Discord. This is the same persona and workspace as your bot; it's just a separate session.
+
+:::tabs
+::tab[OpenClaw]
+**Drop into an interactive chat**
+
+```bash
+docker exec -it openclaw-gateway openclaw chat
+```
+
+Opens the OpenClaw TUI — same persona, same model, same workspace (they all share the `/workspace` volume). It's just a separate session from your bot conversation.
+
+The `-it` flags are required for an interactive terminal session:
+
+- `-i` keeps stdin open so you can type
+- `-t` allocates a pseudo-TTY so the prompt and slash-commands render correctly
+
+Without `-it` the chat has no terminal to talk to and will error or hang. (`exec` runs a new process inside the already-running container — you're not restarting anything.)
+
+Inside the session, type normally; use slash-commands like `/help` and `/status`, and exit with `/exit` or Ctrl-D.
+
+**One-shot question (no interactive session)**
+
+Handy for quick checks or scripting — runs a single agent turn directly in-process:
+
+```bash
+docker exec openclaw-gateway openclaw agent --local -m "What can you help me with?"
+```
+
+`--local` bypasses the gateway service and runs the agent embedded in the CLI process — no `-t` needed since there's no interactive prompt.
+
+**Optional convenience**
+
+If you'll do this often, add an alias so you don't retype the docker exec each time:
+
+```bash
+echo "alias scout='docker exec -it openclaw-gateway openclaw chat'" >> ~/.bashrc && source ~/.bashrc
+# then just:  scout
+```
+
+::tab[Hermes]
+**Drop into an interactive chat**
+
+```bash
+docker exec -it hermes hermes chat
+```
+
+That opens the full interactive REPL — same Hermes persona, same model, same workspace (they all share the `/opt/data` volume). It's just a separate session from your bot conversation.
+
+The `-it` flags are the key part of "CLI'ing in":
+
+- `-i` keeps stdin open so you can type
+- `-t` allocates a pseudo-TTY so the prompt, spinner, and slash-commands render
+
+Without `-it` the chat has no terminal to talk to and will error or hang. (`exec` runs a new process inside the already-running container — you're not restarting anything.)
+
+Inside the session, type normally; use slash-commands like `/help`, and exit with `/exit` or Ctrl-D.
+
+**One-shot question (no interactive session)**
+
+Handy for quick checks or scripting — no `-t` needed since you're not typing interactively:
+
+```bash
+docker exec -i hermes hermes chat -q "What can you help me with?"
+docker exec -i hermes hermes chat -Q -q "..."   # -Q = quiet: final answer only, no banner
+```
+
+**Resume a past session**
+
+```bash
+docker exec -it hermes hermes chat --continue        # most recent session
+docker exec -it hermes hermes chat --resume <ID>     # specific one (ID is printed on exit)
+```
+
+**Optional convenience**
+
+If you'll do this often, add an alias so you don't retype the docker exec each time:
+
+```bash
+echo "alias hermes='docker exec -it hermes hermes chat'" >> ~/.bashrc && source ~/.bashrc
+# then just:  hermes
+```
+
 :::
 
 ---
@@ -2454,7 +2524,7 @@ All commands run from `~/projects/hermes` (where `compose.yaml` lives — runnin
 | Start (detached) | `docker compose up -d hermes-gateway hermes-dashboard` |
 | Pause (keep containers + data) | `docker compose stop hermes-gateway hermes-dashboard` |
 | Resume after pause | `docker compose start hermes-gateway hermes-dashboard` |
-| Restart (after config/persona changes) | `docker compose restart hermes-gateway` |
+| Restart (after config/persona changes) | `docker compose restart hermes` |
 | Stop + remove containers, **keep data** | `docker compose down` |
 | Full wipe (**delete** config/creds/memories) | `docker compose down -v` |
 | Tail logs | `docker logs -f hermes-gateway` |
@@ -2714,7 +2784,7 @@ A new window opens inside the container.
   hermes model
   hermes gateway setup
   ```
-- After editing `SOUL.md` or config, restart the gateway to apply (from the host, in `~/projects/hermes`): `docker compose restart hermes-gateway`.
+- After editing `SOUL.md` or config, restart the gateway to apply (from the host, in `~/projects/hermes`): `docker compose restart hermes`.
 
 ### Gotchas
 
