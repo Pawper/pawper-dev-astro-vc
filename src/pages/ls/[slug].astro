@@ -4,15 +4,18 @@ import ogImagesRaw from '../../data/og-images.json';
 
 const ogImages = ogImagesRaw as Record<string, string>;
 
+interface SeriesLog { part: number; title: string; slug: string; hook?: string; }
+
 export async function getStaticPaths() {
   const slugify = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
   const logs = await getCollection('logs');
 
-  const seriesMap = new Map<string, { name: string; parts: number; kicker: string; hook?: string }>();
+  const seriesMap = new Map<string, { name: string; parts: number; kicker: string; hook?: string; logs: SeriesLog[] }>();
   for (const log of logs) {
     if (!log.data.series) continue;
     const name = log.data.series.name;
     const slug = slugify(name);
+    const logSlug = log.id.replace(/\.md$/, '').replace(/^drafts\//, '');
     const existing = seriesMap.get(slug);
     const isPartOne = log.data.series.part === 1;
     seriesMap.set(slug, {
@@ -20,16 +23,17 @@ export async function getStaticPaths() {
       parts: Math.max(existing?.parts ?? 0, log.data.series.part ?? 1),
       kicker: log.data.kicker,
       hook: isPartOne ? log.data.hook : existing?.hook,
+      logs: [...(existing?.logs ?? []), { part: log.data.series.part, title: log.data.title, slug: logSlug, hook: log.data.hook }],
     });
   }
 
-  return Array.from(seriesMap.entries()).map(([slug, { name, parts, kicker, hook }]) => ({
+  return Array.from(seriesMap.entries()).map(([slug, { name, parts, kicker, hook, logs }]) => ({
     params: { slug },
-    props: { name, parts, kicker, hook: hook ?? '', slug },
+    props: { name, parts, kicker, hook: hook ?? '', slug, seriesLogs: logs.sort((a, b) => a.part - b.part) },
   }));
 }
 
-const { name, parts, kicker, hook, slug } = Astro.props;
+const { name, parts, kicker, hook, slug, seriesLogs } = Astro.props;
 const siteUrl = Astro.site?.toString().replace(/\/$/, '') ?? 'https://pawper.dev';
 const pageUrl = `${siteUrl}/ls/${slug}`;
 const description = hook || `${parts}-part ${kicker.toLowerCase()} series — ${name}`;
@@ -65,11 +69,35 @@ const ogImage = ogImages[`series/${slug}`] ?? '';
   </script>
 
   <style>
-    body { font-family: monospace; background: #0e0e12; color: #f0f0f0; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
+    body { font-family: monospace; background: #0e0e12; color: #f0f0f0; margin: 0; padding: 0; }
+    #redirect { display: flex; align-items: center; justify-content: center; padding: 60px 20px; }
     a { color: #4ecca3; }
+    article { max-width: 720px; margin: 0 auto; padding: 0 24px 60px; }
+    article h1 { font-size: 26px; font-weight: 600; margin: 0 0 6px; }
+    article h2 { font-size: 15px; font-weight: 600; margin: 28px 0 10px; }
+    article .meta { color: rgba(240,240,240,0.45); font-size: 13px; margin: 0 0 4px; }
+    article ol { padding-left: 20px; margin: 0; line-height: 2; }
+    article li { font-size: 14px; }
+    article .log-hook { color: rgba(240,240,240,0.45); font-size: 13px; }
   </style>
 </head>
 <body>
-  <p>Redirecting… <a href={`/?modal=series&id=${slug}`}>Click here if not redirected.</a></p>
+  <div id="redirect">
+    <p>Redirecting… <a href={`/?modal=series&id=${slug}`}>Click here if not redirected.</a></p>
+  </div>
+  <article>
+    <h1>{name}</h1>
+    <p class="meta">{kicker}{hook ? ` — ${hook}` : ''}</p>
+    <p class="meta">{parts}-part series</p>
+    <h2>Parts</h2>
+    <ol>
+      {seriesLogs.map((log) => (
+        <li>
+          <a href={`${siteUrl}/l/${log.slug}`}>Part {log.part}: {log.title}</a>
+          {log.hook && <span class="log-hook"> — {log.hook}</span>}
+        </li>
+      ))}
+    </ol>
+  </article>
 </body>
 </html>

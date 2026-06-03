@@ -8,12 +8,15 @@ export function getStaticPaths() {
       title: p.title,
       description: p.description,
       image: p.image ?? '',
+      githubURL: p.githubURL ?? '',
+      webURL: p.webURL ?? '',
+      readme: p.readme ?? '',
     },
   }));
 }
 
 const { id } = Astro.params;
-const { title, description, image } = Astro.props;
+const { title, description, image, githubURL, webURL, readme } = Astro.props;
 const siteUrl = Astro.site?.toString().replace(/\/$/, '') ?? 'https://pawper.dev';
 const pageUrl = `${siteUrl}/p/${id}`;
 ---
@@ -45,11 +48,28 @@ const pageUrl = `${siteUrl}/p/${id}`;
   </script>
 
   <style>
-    body { font-family: monospace; background: #0e0e12; color: #f0f0f0; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
+    body { font-family: monospace; background: #0e0e12; color: #f0f0f0; margin: 0; padding: 0; }
+    #redirect { display: flex; align-items: center; justify-content: center; padding: 60px 20px; }
     a { color: #4ecca3; }
+    article { max-width: 720px; margin: 0 auto; padding: 0 24px 60px; }
+    article h1 { font-size: 26px; font-weight: 600; margin: 0 0 10px; }
+    article .desc { font-size: 15px; line-height: 1.6; margin: 0 0 20px; }
+    article .links { display: flex; gap: 24px; margin-bottom: 32px; font-size: 14px; }
+    article pre { white-space: pre-wrap; line-height: 1.75; font-size: 14px; margin: 0; font-family: inherit; }
   </style>
 </head>
 <body>
-  <p>Redirecting… <a href={`/?modal=project&id=${encodeURIComponent(id)}`}>Click here if not redirected.</a></p>
+  <div id="redirect">
+    <p>Redirecting… <a href={`/?modal=project&id=${encodeURIComponent(id)}`}>Click here if not redirected.</a></p>
+  </div>
+  <article>
+    <h1>{title}</h1>
+    <p class="desc">{description}</p>
+    <div class="links">
+      {webURL && <a href={webURL}>Visit ↗</a>}
+      {githubURL && <a href={githubURL}>View Source ↗</a>}
+    </div>
+    {readme && <pre>{readme}</pre>}
+  </article>
 </body>
 </html>

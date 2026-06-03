@@ -15,12 +15,13 @@ export async function getStaticPaths() {
         kicker: entry.data.kicker,
         hook: entry.data.hook ?? '',
         slug,
+        body: entry.body ?? '',
       },
     };
   });
 }
 
-const { title, kicker, hook, slug } = Astro.props;
+const { title, kicker, hook, slug, body } = Astro.props;
 const ogImage = ogImages[slug] ?? '';
 const siteUrl = Astro.site?.toString().replace(/\/$/, '') ?? 'https://pawper.dev';
 const pageUrl = `${siteUrl}/l/${slug}`;
@@ -57,11 +58,23 @@ const description = hook || `${kicker} — ${title}`;
   </script>
 
   <style>
-    body { font-family: monospace; background: #0e0e12; color: #f0f0f0; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
+    body { font-family: monospace; background: #0e0e12; color: #f0f0f0; margin: 0; padding: 0; }
+    #redirect { display: flex; align-items: center; justify-content: center; padding: 60px 20px; }
     a { color: #4ecca3; }
+    article { max-width: 720px; margin: 0 auto; padding: 0 24px 60px; }
+    article h1 { font-size: 26px; font-weight: 600; margin: 0 0 6px; }
+    article .meta { color: rgba(240,240,240,0.45); font-size: 13px; margin: 0 0 32px; }
+    article pre { white-space: pre-wrap; line-height: 1.75; font-size: 14px; margin: 0; font-family: inherit; }
   </style>
 </head>
 <body>
-  <p>Redirecting… <a href={`/?modal=log&id=${slug}`}>Click here if not redirected.</a></p>
+  <div id="redirect">
+    <p>Redirecting… <a href={`/?modal=log&id=${slug}`}>Click here if not redirected.</a></p>
+  </div>
+  <article>
+    <h1>{title}</h1>
+    <p class="meta">{kicker}{hook ? ` — ${hook}` : ''}</p>
+    <pre>{body}</pre>
+  </article>
 </body>
 </html>
