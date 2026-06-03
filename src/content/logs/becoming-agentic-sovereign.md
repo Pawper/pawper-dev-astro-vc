@@ -395,6 +395,12 @@ Hermes can also create and refine skills on its own. After completing a complex 
 
 ---
 
+## Accessing Your Agent Container via VS Code Remote
+
+Once your agent is running, you can open its container directly in VS Code — browse files, edit your `SOUL.md`, inspect skills, and run commands — without shelling in manually. This is covered in full in the previous article: [Inspecting Your Agent Container via VS Code Remote](https://pawper.dev/l/docker-fundamentals#inspecting-your-agent-container-via-vs-code-remote).
+
+---
+
 ## Morning Ritual
 
 Every morning, your agent can prompt you to initialize your daily note. Here's how to set it up.
@@ -408,7 +414,7 @@ Create `/workspace/skills/morning-ritual.md`:
 ```markdown
 ---
 name: morning-ritual
-description: Initialize the daily note and check in on today's intentions
+description: "Initialize the daily note and check in on today's intentions"
 ---
 
 # Morning Ritual
@@ -439,7 +445,7 @@ Hermes skills are directories, not single files. Create the directory and `SKILL
 ```markdown
 ---
 name: morning-ritual
-description: Initialize the daily note and check in on today's intentions
+description: "Initialize the daily note and check in on today's intentions"
 ---
 
 # Morning Ritual
@@ -467,7 +473,11 @@ Invoke it in chat with `/morning-ritual`.
 
 ### Schedule It
 
-Add a cron job to run this skill every morning. On the host machine:
+Add a cron job to run this skill every morning.
+
+:::tabs
+::tab[OpenClaw]
+On the host machine:
 
 ```bash
 crontab -e
@@ -475,15 +485,16 @@ crontab -e
 
 Add the line:
 
-:::tabs
-::tab[OpenClaw]
 ```
 0 7 * * * docker exec openclaw-gateway openclaw agent --message "/morning-ritual"
 ```
+
 ::tab[Hermes]
-```
-0 7 * * * docker exec hermes hermes chat -q "/morning-ritual"
-```
+Hermes has a built-in cron system — no need to touch the host's crontab or shell into the container. Just tell your agent from any chat session (CLI, Telegram, Discord — wherever):
+
+> "Set up a cron job to run my morning-ritual skill every day at 7am"
+
+Hermes handles the scheduling internally.
 :::
 
 This fires at 7\:00 AM daily. Adjust the time to match when you actually start your day.
@@ -502,7 +513,24 @@ Now your agent knows what you're working on. That context improves everything it
 
 ## Evening Ritual—Three Blessings
 
-Add another skill cron job -- At the end of your day, another prompt:
+At the end of your day, another prompt:
+
+:::tabs
+::tab[OpenClaw]
+```bash
+crontab -e
+```
+
+```
+0 21 * * * docker exec openclaw-gateway openclaw agent --message "/evening-ritual"
+```
+
+::tab[Hermes]
+Tell your agent from any chat session:
+
+> "Set up a cron job to run my evening-ritual skill every day at 9pm"
+
+:::
 
 **Agent:** "Let's close out the day. What went well today? Why? What are you grateful for?"
 
@@ -561,7 +589,24 @@ Your agent helps you prepare. You do the work.
 Beyond daily rituals, add longer-cycle reviews:
 
 ### Weekly Review (Sunday Evening)
-Add another skill cron job: 
+
+:::tabs
+::tab[OpenClaw]
+```bash
+crontab -e
+```
+
+```
+0 18 * * 0 docker exec openclaw-gateway openclaw agent --message "/weekly-review"
+```
+
+::tab[Hermes]
+Tell your agent from any chat session:
+
+> "Set up a cron job to run my weekly-review skill every Sunday at 6pm"
+
+:::
+
 - What did I do this week?
 - Did I accomplish my intentions?
 - What habits did I maintain?
@@ -569,7 +614,24 @@ Add another skill cron job:
 - What's next week's focus?
 
 ### Monthly Review (Last day of month)
-Add another skill cron job: 
+
+:::tabs
+::tab[OpenClaw]
+```bash
+crontab -e
+```
+
+```
+0 18 28-31 * * docker exec openclaw-gateway openclaw agent --message "/monthly-review"
+```
+
+::tab[Hermes]
+Tell your agent from any chat session:
+
+> "Set up a cron job to run my monthly-review skill on the last day of every month at 6pm"
+
+:::
+
 - What did I accomplish this month?
 - What am I learning about myself?
 - How is my personal OS serving me?
