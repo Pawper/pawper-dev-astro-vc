@@ -1276,12 +1276,15 @@ export function enhanceProse(el: HTMLElement, opts: ProseOptions = {}): () => vo
       const pillRow = document.createElement("div");
       pillRow.style.cssText = "display: flex; justify-content: center; margin-top: 8px;";
 
-      const expandBtn = document.createElement("span");
-      expandBtn.className = "pw-mono";
-      expandBtn.textContent = "SEE MORE";
+      const expandBtn = document.createElement("button");
+      expandBtn.className = "pw-mono cx-proj-btn";
+      expandBtn.textContent = "show";
       expandBtn.style.cssText = `
-        font-size: 10px; letter-spacing: 0.04em;
-        color: var(--section-deep); cursor: pointer; user-select: none;
+        font-size: 10px; padding: 4px 8px; letter-spacing: 0.08em;
+        border-radius: 2px; border: none;
+        background: rgba(var(--section-rgb), 0.22); color: var(--ink-soft);
+        font-weight: 700; text-transform: uppercase; white-space: nowrap;
+        cursor: pointer; transition: background 0.15s, color 0.15s; opacity: 1;
       `;
       expandBtn.addEventListener("mouseenter", () => { soundHover(); });
 
@@ -1294,14 +1297,12 @@ export function enhanceProse(el: HTMLElement, opts: ProseOptions = {}): () => vo
           wrapper.style.maxHeight = "";
           wrapper.style.overflow = "visible";
           fade.style.display = "none";
-          expandBtn.textContent = "less";
-          expandBtn.style.textTransform = "uppercase";
+          expandBtn.textContent = "hide";
         } else {
           wrapper.style.maxHeight = `${halfVH}px`;
           wrapper.style.overflow = "hidden";
           fade.style.display = "";
-          expandBtn.textContent = "SEE MORE";
-          expandBtn.style.textTransform = "";
+          expandBtn.textContent = "show";
           wrapper.scrollIntoView({ behavior: "smooth", block: "nearest" });
         }
       });

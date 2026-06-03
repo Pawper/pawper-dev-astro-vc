@@ -378,6 +378,8 @@ Telegram's bot setup is the simplest of any platform — one conversation with a
 5. Give it a username ending in `bot` (e.g., `myagent_bot`)
   > It can be tricky to give it a unique name. Try something like `ClawForPhillipBot`!
 6. BotFather replies with your **bot token** — copy it
+7. Click the link to open a chat with your bot (it's not running yet).
+  ![Bot token & link to chat](https://res.cloudinary.com/dr1sonbsi/image/upload/v1780510339/pawper.dev/logs/unnamed_5_nkhq6v.png)
 
 That's it. No developer portal, no OAuth app, no server to manage. You'll chat with your agent by messaging the bot directly.
 
