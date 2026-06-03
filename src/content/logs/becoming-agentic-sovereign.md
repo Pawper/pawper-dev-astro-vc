@@ -324,40 +324,20 @@ services:
   hermes:
     image: nousresearch/hermes-agent:latest
     container_name: hermes
+    restart: unless-stopped
     volumes:
       - hermes-workspace:/opt/data
       - vault:/vault
+    ports:
+      - "127.0.0.1:9119:9119"
     environment:
       - HERMES_VAULT=/vault
       # Keep your existing API key and bot token env vars from your original compose.yaml (e.g. ANTHROPIC_API_KEY, TELEGRAM_BOT_TOKEN)
-    stdin_open: true
-    tty: true
-
-  hermes-gateway:
-    image: nousresearch/hermes-agent:latest
-    container_name: hermes-gateway
-    restart: unless-stopped
-    volumes:
-      - hermes-workspace:/opt/data
-      - vault:/vault
-    environment:
-      - HERMES_VAULT=/vault
-      # Keep your existing API key and bot token env vars from your original compose.yaml
+      - HERMES_DASHBOARD=true
+      - HERMES_DASHBOARD_HOST=0.0.0.0
+      - HERMES_DASHBOARD_PORT=9119
+      - HERMES_DASHBOARD_INSECURE=true
     command: hermes gateway run
-
-  hermes-dashboard:
-    image: nousresearch/hermes-agent:latest
-    container_name: hermes-dashboard
-    restart: unless-stopped
-    volumes:
-      - hermes-workspace:/opt/data
-      - vault:/vault
-    environment:
-      - HERMES_VAULT=/vault
-      # Keep your existing API key and bot token env vars from your original compose.yaml
-    ports:
-      - "127.0.0.1:9119:9119"
-    command: hermes dashboard --port 9119 --host 0.0.0.0 --insecure
 
   syncthing:
     image: syncthing/syncthing
@@ -379,7 +359,7 @@ volumes:
 
 ### How State Persists
 
-The key is `hermes-workspace:/opt/data` — all Hermes services mount the same volume alongside the `vault` volume. This tells Docker: "Create a persistent storage called `hermes-workspace` and mount it at `/opt/data` inside the container."
+The key is `hermes-workspace:/opt/data` — the `hermes` service mounts both the workspace volume and the `vault` volume. This tells Docker: "Create a persistent storage called `hermes-workspace` and mount it at `/opt/data` inside the container."
 
 Your agent's configuration, memories, and state go into `/opt/data`. Your vault goes into `/vault`. Both survive container restarts because they're mounted volumes.
 :::
@@ -502,7 +482,7 @@ Add the line:
 ```
 ::tab[Hermes]
 ```
-0 7 * * * docker exec hermes-gateway hermes chat -q "/morning-ritual"
+0 7 * * * docker exec hermes hermes chat -q "/morning-ritual"
 ```
 :::
 
