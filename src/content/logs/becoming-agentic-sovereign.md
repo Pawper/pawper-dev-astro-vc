@@ -274,6 +274,7 @@ services:
       - vault:/vault
     environment:
       - OPENCLAW_WORKSPACE=/workspace
+      - OPENCLAW_STATE_DIR=/workspace/.openclaw
       - OBSIDIAN_VAULT=/vault
     stdin_open: true
     tty: true
@@ -287,8 +288,11 @@ services:
       - vault:/vault
     environment:
       - OPENCLAW_WORKSPACE=/workspace
+      - OPENCLAW_STATE_DIR=/workspace/.openclaw
       - OBSIDIAN_VAULT=/vault
-    command: openclaw gateway run
+    ports:
+      - "127.0.0.1:18789:18789"
+    command: openclaw gateway run --bind lan
 
   syncthing:
     image: syncthing/syncthing
@@ -298,11 +302,12 @@ services:
       - vault:/vault
       - syncthing-config:/var/syncthing
     ports:
-      - "8384:8384"    # Web UI (for setup)
-      - "22000:22000"  # Sync protocol
+      - "127.0.0.1:8384:8384"    # Web UI (for setup)
+      - "22001:22000"  # Sync protocol (22000 is typically used by host Syncthing)
 
 volumes:
   openclaw-workspace:
+    name: openclaw-workspace
   vault:
   syncthing-config:
 ```
@@ -324,6 +329,7 @@ services:
       - vault:/vault
     environment:
       - HERMES_VAULT=/vault
+      # Keep your existing API key and bot token env vars from your original compose.yaml (e.g. ANTHROPIC_API_KEY, TELEGRAM_BOT_TOKEN)
     stdin_open: true
     tty: true
 
@@ -336,6 +342,7 @@ services:
       - vault:/vault
     environment:
       - HERMES_VAULT=/vault
+      # Keep your existing API key and bot token env vars from your original compose.yaml
     command: hermes gateway run
 
   hermes-dashboard:
@@ -347,6 +354,7 @@ services:
       - vault:/vault
     environment:
       - HERMES_VAULT=/vault
+      # Keep your existing API key and bot token env vars from your original compose.yaml
     ports:
       - "127.0.0.1:9119:9119"
     command: hermes dashboard --port 9119 --host 0.0.0.0 --insecure
@@ -359,11 +367,12 @@ services:
       - vault:/vault
       - syncthing-config:/var/syncthing
     ports:
-      - "8384:8384"    # Web UI (for setup)
-      - "22000:22000"  # Sync protocol
+      - "127.0.0.1:8384:8384"    # Web UI (for setup)
+      - "22001:22000"  # Sync protocol (22000 is typically used by host Syncthing)
 
 volumes:
   hermes-workspace:
+    name: hermes-workspace
   vault:
   syncthing-config:
 ```
