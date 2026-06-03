@@ -1280,18 +1280,10 @@ export function enhanceProse(el: HTMLElement, opts: ProseOptions = {}): () => vo
       expandBtn.className = "pw-mono";
       expandBtn.textContent = "SEE MORE";
       expandBtn.style.cssText = `
-        font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+        font-size: 10px; letter-spacing: 0.04em;
         color: var(--section-deep); cursor: pointer; user-select: none;
-        padding: 4px 12px; border: 1px solid var(--section-deep);
-        border-radius: 999px; opacity: 0.7; transition: opacity 0.15s;
       `;
-      expandBtn.addEventListener("mouseenter", () => {
-        soundHover();
-        expandBtn.style.opacity = "1";
-      });
-      expandBtn.addEventListener("mouseleave", () => {
-        expandBtn.style.opacity = "0.7";
-      });
+      expandBtn.addEventListener("mouseenter", () => { soundHover(); });
 
       let codeExpanded = false;
       expandBtn.addEventListener("click", (e) => {
@@ -1302,12 +1294,14 @@ export function enhanceProse(el: HTMLElement, opts: ProseOptions = {}): () => vo
           wrapper.style.maxHeight = "";
           wrapper.style.overflow = "visible";
           fade.style.display = "none";
-          expandBtn.textContent = "SEE LESS";
+          expandBtn.textContent = "less";
+          expandBtn.style.textTransform = "uppercase";
         } else {
           wrapper.style.maxHeight = `${halfVH}px`;
           wrapper.style.overflow = "hidden";
           fade.style.display = "";
           expandBtn.textContent = "SEE MORE";
+          expandBtn.style.textTransform = "";
           wrapper.scrollIntoView({ behavior: "smooth", block: "nearest" });
         }
       });
