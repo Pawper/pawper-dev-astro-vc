@@ -259,10 +259,57 @@ Expected after the next deploy: **a2aAgentCard flips to pass.** Level stays at 2
 - `src/pages/sitemap.xml.ts` *(new)*
 - `netlify.toml` *(edited — three `[[headers]]` blocks, including Link header on `/`)*
 - `.gitignore` *(edited — ignore `.netlify` CLI scratch)*
+- `netlify/edge-functions/markdown-negotiation.ts` *(new — Accept: text/markdown handler for `/`)*
 - `project.md` *(this file — updated)*
 
 ## Commit log
 
 - `c7fc9e7` — feat: ship agent-discovery layer for isitagentready
 - `e0939b4` — chore: ignore local .netlify directory
-- *(next)* — fix: A2A agent-card supportedInterfaces (v1.0.0 required field)
+- `4973ec0` — fix: A2A agent-card supportedInterfaces (v1.0.0 required field)
+- *(next)* — feat: markdown content negotiation via Netlify edge function
+
+## Markdown content negotiation (next step toward Level 3)
+
+The `markdownNegotiation` check failed in the post-deploy scan because Astro static output only serves HTML. The Cloudflare "Markdown for Agents" spec calls for **same URL, different Accept header**:
+
+- Agent sends `Accept: text/markdown` to e.g. `https://pawper.dev/`.
+- Server responds with `Content-Type: text/markdown; charset=utf-8` and `Vary: Accept`.
+- Body is the page's content as markdown, with non-content stripped, YAML frontmatter from meta tags, and JSON-LD as fenced code.
+
+### Implementation: `netlify/edge-functions/markdown-negotiation.ts`
+
+Netlify auto-discovers edge functions from `netlify/edge-functions/` — no `netlify.toml` block needed. The function exports `config = { path: "/" }` so it only intercepts the homepage.
+
+Logic:
+1. Read `Accept` header from the incoming request.
+2. If it does not include `text/markdown` (the browser-default `text/html,...` doesn't), return `undefined` so Astro's static HTML response passes through unchanged. **Browser path is untouched.**
+3. Otherwise, return a hand-curated homepage markdown with proper YAML frontmatter and the same structural sections as `/llms.txt`.
+
+The body covers: what the site is, the five agent-discovery surfaces, the route map, and a pointer at `/llms.txt` for the full site tree. ~50 lines of markdown inlined as a template literal.
+
+### Why hand-curated instead of HTML-to-Markdown conversion
+
+The "right" implementation calls `context.next()` to fetch the rendered HTML, strips nav/footer/scripts, runs Turndown or similar, and returns. That's:
+- Heavy at the edge (extra hop + JS conversion per request)
+- Brittle (selectors break as the site evolves)
+- Lossy (LCARS-styled UI doesn't translate cleanly to markdown)
+
+For a static portfolio whose homepage content is well-known, **a curated markdown response is more accurate and 10× cheaper**. If/when this gets applied to dynamic pages (logs, projects), the right move is to use the content collection sources directly, not HTML conversion.
+
+### Expected scanner delta after deploy
+
+| Check | Before | After deploy |
+|---|---|---|
+| markdownNegotiation | fail | **pass** ("Site supports text/markdown via Accept negotiation") |
+
+That's 8 → 9 fresh passes. Whether it pushes to **Level 3 "Agent-Readable"** depends on the scanner's ladder weighting — `agentSkills` and `webMcp` may also gate L3. We'll know on re-scan.
+
+### Sanity check after deploy
+
+```powershell
+# Should return text/markdown
+Invoke-WebRequest -Uri "https://pawper.dev/" -Headers @{ Accept = "text/markdown" } -UseBasicParsing | Select-Object -Expand Headers
+# Should return text/html as before
+Invoke-WebRequest -Uri "https://pawper.dev/" -UseBasicParsing | Select-Object -Expand Headers
+```
