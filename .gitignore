@@ -27,3 +27,6 @@ src/data/og-images.json
 src/data/og-link-cache.json
 public/resume.pdf
 public/resume-preview.png
+
+# Local Netlify folder
+.netlify
