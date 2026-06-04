@@ -21,6 +21,19 @@
     Access-Control-Allow-Methods = "GET, OPTIONS"
     Cache-Control = "public, max-age=300"
 
+# RFC 9727 — the api-catalog file has no extension; force the standardized
+# Content-Type so the linkset is correctly identified.
+[[headers]]
+  for = "/.well-known/api-catalog"
+  [headers.values]
+    Content-Type = "application/linkset+json; charset=utf-8"
+
+# Agent-Skills SKILL.md files are markdown.
+[[headers]]
+  for = "/.well-known/agent-skills/*"
+  [headers.values]
+    Content-Type = "text/markdown; charset=utf-8"
+
 [[headers]]
   for = "/llms.txt"
   [headers.values]
@@ -29,13 +42,21 @@
     Content-Type = "text/plain; charset=utf-8"
     Cache-Control = "public, max-age=300"
 
+[[headers]]
+  for = "/auth.md"
+  [headers.values]
+    Access-Control-Allow-Origin = "*"
+    Access-Control-Allow-Methods = "GET, OPTIONS"
+    Content-Type = "text/markdown; charset=utf-8"
+    Cache-Control = "public, max-age=300"
+
 # ---- Link headers on the homepage (RFC 8288) ----------------------------
 # Point agents at the machine-readable surfaces. The isitagentready scanner
 # requires Link headers on / to pass the `linkHeaders` check.
 [[headers]]
   for = "/"
   [headers.values]
-    Link = '''</llms.txt>; rel="service-doc"; type="text/plain", </.well-known/agent-card.json>; rel="https://a2a-protocol.org/rel/agent-card"; type="application/json", </.well-known/mcp.json>; rel="https://modelcontextprotocol.io/rel/server-card"; type="application/json", </.well-known/ai-agent.json>; rel="https://aiia.dev/rel/manifest"; type="application/json", </.well-known/oauth-protected-resource>; rel="oauth-protected-resource"; type="application/json", </feed.xml>; rel="alternate"; type="application/rss+xml", </sitemap.xml>; rel="sitemap"; type="application/xml"'''
+    Link = '''</llms.txt>; rel="service-doc"; type="text/plain", </.well-known/api-catalog>; rel="api-catalog"; type="application/linkset+json", </.well-known/agent-card.json>; rel="https://a2a-protocol.org/rel/agent-card"; type="application/json", </.well-known/mcp.json>; rel="https://modelcontextprotocol.io/rel/server-card"; type="application/json", </.well-known/ai-agent.json>; rel="https://aiia.dev/rel/manifest"; type="application/json", </.well-known/oauth-protected-resource>; rel="oauth-protected-resource"; type="application/json", </feed.xml>; rel="alternate"; type="application/rss+xml", </sitemap.xml>; rel="sitemap"; type="application/xml"'''
 
 [[redirects]]
   from = "/l/faq-editors-ides-vs-code-3fp0"

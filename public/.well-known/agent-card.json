@@ -57,6 +57,36 @@
       ]
     },
     {
+      "id": "browse-services",
+      "name": "Browse services",
+      "description": "List the six service types Phillip offers (employment, contracting, consulting, coaching, speaking, mentoring), with status and endorsements pulled from Airtable.",
+      "tags": ["services", "hiring", "engagements"],
+      "examples": [
+        "What services is Phillip currently open to?",
+        "Show endorsements for the consulting service"
+      ]
+    },
+    {
+      "id": "browse-about",
+      "name": "Browse about",
+      "description": "Read the who-is-Phillip-Wessels surface: bio, skills overview, activity, training, and resume.",
+      "tags": ["bio", "resume", "about"],
+      "examples": [
+        "Summarize Phillip's background",
+        "Fetch the HTML resume at /resume.html"
+      ]
+    },
+    {
+      "id": "browse-experiences",
+      "name": "Browse experiences",
+      "description": "Read past and ongoing experiences (jobs, contracts, talks, mentorships, agenda events) at /xp/{id}/. Categories include employment, contracting, consulting, coaching, speaking, mentoring, education, attending, volunteering.",
+      "tags": ["experiences", "career", "agenda"],
+      "examples": [
+        "List all speaking experiences",
+        "Get details for the experience at /xp/{id}/"
+      ]
+    },
+    {
       "id": "subscribe-feeds",
       "name": "Subscribe to RSS feeds",
       "description": "Five RSS feed types: all projects, all logs, featured projects, per-category, and activity.",
@@ -64,6 +94,26 @@
       "examples": [
         "Fetch /feed.xml for all logs",
         "Fetch /feed/activity.xml for the commit heatmap stream"
+      ]
+    },
+    {
+      "id": "send-contact",
+      "name": "Send a contact message",
+      "description": "POST a JSON message to /.netlify/functions/contact with {name, email, subject?, message, token?}. Server-side reCAPTCHA v3 + honeypot anti-abuse, then forwarded to Netlify Forms.",
+      "tags": ["contact", "messaging", "action"],
+      "examples": [
+        "Send Phillip a message about a consulting opportunity",
+        "Reach out about a speaking engagement"
+      ]
+    },
+    {
+      "id": "endorse-experience",
+      "name": "Endorse an experience",
+      "description": "Build a prefilled Airtable URL for leaving an endorsement on a specific past or ongoing experience. Pattern: https://airtable.com/app5WObcR6LNZ9bQv/pagfzcuqMVAgL0FKk/form?prefill_Service={category}&prefill_Skills%20List={skills}&prefill_Experience={id}&hide_Experience=true",
+      "tags": ["endorsement", "airtable", "action"],
+      "examples": [
+        "Generate the endorsement URL for experience id 'role-foo-bar'",
+        "Leave an endorsement for a coaching engagement"
       ]
     }
   ]

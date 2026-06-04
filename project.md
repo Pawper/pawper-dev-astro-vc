@@ -250,14 +250,18 @@ Expected after the next deploy: **a2aAgentCard flips to pass.** Level stays at 2
 
 ## Files touched this session
 
-- `public/.well-known/agent-card.json` *(new — patched to A2A v1.0.0 `supportedInterfaces` shape after first deploy)*
+- `public/.well-known/agent-card.json` *(new; later patched to A2A v1.0.0 `supportedInterfaces`; later expanded 4→9 skills)*
 - `public/.well-known/mcp.json` *(new)*
 - `public/.well-known/ai-agent.json` *(new)*
 - `public/.well-known/oauth-protected-resource` *(new)*
-- `public/llms.txt` *(new)*
+- `public/.well-known/agent-skills/index.json` *(new — agentskills.io 0.2.0)*
+- `public/.well-known/agent-skills/{name}/SKILL.md` × 9 *(new — per-skill instructions)*
+- `public/.well-known/api-catalog` *(new — RFC 9727 linkset+json)*
+- `public/auth.md` *(new — public read-only auth model)*
+- `public/llms.txt` *(new; updated with agent-skills/api-catalog/auth.md)*
 - `public/robots.txt` *(new)*
 - `src/pages/sitemap.xml.ts` *(new)*
-- `netlify.toml` *(edited — three `[[headers]]` blocks, including Link header on `/`)*
+- `netlify.toml` *(edited — 6 `[[headers]]` blocks: CORS on well-known + llms.txt + auth.md; content-type forces on api-catalog + agent-skills/*; Link header on /)*
 - `.gitignore` *(edited — ignore `.netlify` CLI scratch)*
 - `netlify/edge-functions/markdown-negotiation.ts` *(new — Accept: text/markdown handler for `/`)*
 - `project.md` *(this file — updated)*
@@ -267,7 +271,8 @@ Expected after the next deploy: **a2aAgentCard flips to pass.** Level stays at 2
 - `c7fc9e7` — feat: ship agent-discovery layer for isitagentready
 - `e0939b4` — chore: ignore local .netlify directory
 - `4973ec0` — fix: A2A agent-card supportedInterfaces (v1.0.0 required field)
-- *(next)* — feat: markdown content negotiation via Netlify edge function
+- `787bc20` — feat: markdown content negotiation via Netlify edge function
+- *(next)* — feat: agent-skills, api-catalog, auth.md + expand agent-card to 9 skills
 
 ## Markdown content negotiation (next step toward Level 3)
 
@@ -313,3 +318,98 @@ Invoke-WebRequest -Uri "https://pawper.dev/" -Headers @{ Accept = "text/markdown
 # Should return text/html as before
 Invoke-WebRequest -Uri "https://pawper.dev/" -UseBasicParsing | Select-Object -Expand Headers
 ```
+
+---
+
+## Final result (2026-06-04 04:12 UTC) — Level 5 / Agent-Native
+
+**Top of the ladder. Started at Level 0, ended at Level 5.** Composite numeric score: **57 / 100**.
+
+| Category | Score | Passes |
+|---|---|---|
+| Discoverability | 75 | 3 / 4 (`robotsTxt`, `sitemap`, `linkHeaders` pass; `dnsAid` fails — needs a DNS record) |
+| Content Accessibility | 100 | 1 / 1 (`markdownNegotiation`) |
+| Bot Access Control | 100 | 2 / 2 (`robotsTxtAiRules`, `contentSignals`; `webBotAuth` neutral) |
+| API / Auth / MCP / Skill Discovery | 29 | **3 / 7** (`oauthProtectedResource`, `mcpServerCard`, `a2aAgentCard`) |
+| Commerce | n/a | not checked (not a commerce site) |
+
+**9 passes, 5 fails, 5 neutrals.** All four agent-discovery checks the well-known files were aimed at are green.
+
+### What's left and what it would cost
+
+The numeric score is held down almost entirely by the API/Auth/MCP/Skill Discovery category (29 / 100). Five checks still fail:
+
+| Check | What it needs | Effort |
+|---|---|---|
+| `apiCatalog` | `/.well-known/api-catalog` — JSON listing API endpoints (the RSS feeds would qualify) | low |
+| `authMd` | `/auth.md` — plain markdown stating auth model (for pawper, "none, public") | trivial |
+| `agentSkills` | `/.well-known/agent-skills/index.json` per agentskills.io | medium |
+| `webMcp` | JS on `/` calling `navigator.modelContext.registerTool()` | medium |
+| `oauthDiscovery` | `/.well-known/openid-configuration` or `oauth-authorization-server` | skip (no real OIDC backing pawper) |
+
+Out of repo:
+- `dnsAid` — DNS record on pawper.dev, needs registrar access.
+
+The first three (`apiCatalog`, `authMd`, `agentSkills`) are cheap, fully honest for a portfolio, and would lift the API/Auth category from 29 → ~71 and the composite from 57 → ~80. Worth chasing if you want a numeric statement to go with the Level 5 badge.
+
+---
+
+## Composite-score push (uncommitted)
+
+Going after `apiCatalog` + `authMd` + `agentSkills` in one batch. Expanded the agent-card skills array from 4 → 9 at the same time, so the A2A card and the Agent-Skills index describe the same surfaces.
+
+### New files
+
+- `public/.well-known/agent-skills/index.json` — agentskills.io 0.2.0 discovery file with `$schema`, `skills[]` (9 entries), `digest: "sha256:..."` per skill. Digests computed against the LF-normalized SKILL.md bytes via `Get-FileHash` (autocrlf=true on the dev machine, so working-copy LF survives commit-time normalization → Netlify deploys LF → scanner-side digest matches).
+- `public/.well-known/agent-skills/{name}/SKILL.md` × 9 — one per skill, YAML front-matter (`name`, `description`) + body with "When to use", URL patterns, and (for actions) endpoint + schema.
+- `public/.well-known/api-catalog` — RFC 9727 linkset+json. Anchor `https://pawper.dev`. `service-desc` lists the three discovery cards; `service-doc` lists llms.txt + auth.md + agent-skills index; `service-meta` lists oauth-protected-resource; `item` lists sitemap + RSS feeds + robots.txt. No `.json` extension on purpose — the canonical RFC 9727 well-known URI has no suffix.
+- `public/auth.md` — plain-English auth model: site is fully public read-only; no OAuth/OIDC backing; explains why `oauth-protected-resource` still ships (RFC 9728 discoverability with `authorization_servers: []`).
+
+### Edits
+
+- `public/.well-known/agent-card.json` — skills array expanded 4 → 9. Added `browse-services`, `browse-about`, `browse-experiences`, `send-contact`, `endorse-experience`. The two action skills are honest: `send-contact` documents the existing `/.netlify/functions/contact` endpoint with full payload + response schema; `endorse-experience` documents the Airtable URL pattern from `src/components/codex/CXModal.tsx:334-342` (`PUBLIC_ENDORSE_FORM_URL` is already embedded in the deployed JS bundle at `/_astro/App.*.js`, so it is safe to hardcode).
+- `public/llms.txt` — Discovery section gained three new entries (agent-skills index, api-catalog, auth.md).
+- `netlify.toml`:
+  - Forced `Content-Type: application/linkset+json` on `/.well-known/api-catalog` (file has no extension so the default would be wrong).
+  - Forced `Content-Type: text/markdown` on `/.well-known/agent-skills/*` (SKILL.md served as text/plain otherwise).
+  - Added CORS + content-type for `/auth.md`.
+  - Added `api-catalog` link relation to the homepage `Link:` header per RFC 9727.
+
+### Skills list
+
+| id | type | endpoint / pattern |
+|---|---|---|
+| `browse-projects` | read | `/projects/`, `/p/{id}/`, `/feed/projects/featured.xml` |
+| `browse-logs` | read | `/logs/`, `/l/{slug}/`, `/feed.xml`, `/feed/{...}` |
+| `browse-skills` | read | `/skill/{id}/`, `/feed/skills/{skill}.xml` |
+| `browse-services` | read | `/services/`, `/services/{id}/` (6 IDs) |
+| `browse-about` | read | `/about/`, `/about/{bio\|skills\|activity\|training\|resume}/`, `/resume.html`, `/resume.pdf` |
+| `browse-experiences` | read | `/xp/{id}/` enumerated from `/sitemap.xml` |
+| `subscribe-feeds` | read | 5 RSS feed shapes |
+| `send-contact` | **action** | `POST /.netlify/functions/contact` with `{name, email, subject?, message, token?}`; reCAPTCHA action = `contact` |
+| `endorse-experience` | **action** | `https://airtable.com/app5WObcR6LNZ9bQv/pagfzcuqMVAgL0FKk/form?prefill_Service={cat}&prefill_Skills%20List={skills}&prefill_Experience={id}&hide_Experience=true` |
+
+### Expected scanner delta after deploy
+
+| Check | Before | After |
+|---|---|---|
+| `apiCatalog` | fail | **pass** |
+| `authMd` | fail | **pass** |
+| `agentSkills` | fail | **pass** |
+
+That's 9 → 12 passes. Category: API/Auth/MCP/Skill 29 → ~71 (5 of 7 passing — `oauthDiscovery` and `webMcp` still fail by design). Composite forecast: **57 → ~80**. Level stays at 5 (already top of ladder).
+
+### Regenerating digests
+
+If any SKILL.md changes, run:
+
+```powershell
+$base = "public\.well-known\agent-skills"
+"browse-projects","browse-logs","browse-skills","browse-services","browse-about","browse-experiences","subscribe-feeds","send-contact","endorse-experience" | ForEach-Object {
+  $p = Join-Path $base "$_\SKILL.md"
+  $h = (Get-FileHash -Path $p -Algorithm SHA256).Hash.ToLower()
+  "$_`tsha256:$h"
+}
+```
+
+Then hand-paste each `digest` into `index.json`. (Worth a build script if this becomes a maintenance burden.)

@@ -1,0 +1,27 @@
+{
+  "linkset": [
+    {
+      "anchor": "https://pawper.dev",
+      "service-desc": [
+        { "href": "https://pawper.dev/.well-known/agent-card.json", "type": "application/json", "title": "A2A v1.0.0 agent card" },
+        { "href": "https://pawper.dev/.well-known/mcp.json", "type": "application/json", "title": "MCP server card (read-only, points at RSS feeds)" },
+        { "href": "https://pawper.dev/.well-known/ai-agent.json", "type": "application/json", "title": "Aiia manifest" }
+      ],
+      "service-doc": [
+        { "href": "https://pawper.dev/llms.txt", "type": "text/plain", "title": "Markdown sitemap of the site" },
+        { "href": "https://pawper.dev/auth.md", "type": "text/markdown", "title": "Authentication model (none — public read-only)" },
+        { "href": "https://pawper.dev/.well-known/agent-skills/index.json", "type": "application/json", "title": "Agent Skills index" }
+      ],
+      "service-meta": [
+        { "href": "https://pawper.dev/.well-known/oauth-protected-resource", "type": "application/json", "title": "RFC 9728 OAuth Protected Resource Metadata" }
+      ],
+      "item": [
+        { "href": "https://pawper.dev/sitemap.xml", "type": "application/xml", "title": "Full URL sitemap" },
+        { "href": "https://pawper.dev/feed.xml", "type": "application/rss+xml", "title": "All logs RSS feed" },
+        { "href": "https://pawper.dev/feed/activity.xml", "type": "application/rss+xml", "title": "Cross-portfolio commit activity feed" },
+        { "href": "https://pawper.dev/feed/projects/featured.xml", "type": "application/rss+xml", "title": "Featured projects RSS feed" },
+        { "href": "https://pawper.dev/robots.txt", "type": "text/plain", "title": "Crawl rules + AI bot allowances + Content Signals" }
+      ]
+    }
+  ]
+}

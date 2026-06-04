@@ -1,0 +1,68 @@
+{
+  "$schema": "https://schemas.agentskills.io/discovery/0.2.0/schema.json",
+  "skills": [
+    {
+      "name": "browse-projects",
+      "type": "skill-md",
+      "description": "List and read portfolio projects on pawper.dev, pulled live from GitHub at build time, with language stats and commit-history activity.",
+      "url": "/.well-known/agent-skills/browse-projects/SKILL.md",
+      "digest": "sha256:d6e0905fe43ccf399f6fd84d88fa83c2aa5da9b8ec1754f119517ee9a6faa75a"
+    },
+    {
+      "name": "browse-logs",
+      "type": "skill-md",
+      "description": "List and read long-form logs on pawper.dev, organized by kicker categories, series, tags, and skills.",
+      "url": "/.well-known/agent-skills/browse-logs/SKILL.md",
+      "digest": "sha256:de64cbf409bd71778b6e91dd250c3c9291428ff9c0c5215636dfb214f54f417c"
+    },
+    {
+      "name": "browse-skills",
+      "type": "skill-md",
+      "description": "Query the pawper.dev skills taxonomy with distribution charts and per-skill filtering across projects and logs.",
+      "url": "/.well-known/agent-skills/browse-skills/SKILL.md",
+      "digest": "sha256:172618c7821f05e42df40c85276754ed3e79bb6cc46e81bdad3aba223b73d166"
+    },
+    {
+      "name": "browse-services",
+      "type": "skill-md",
+      "description": "List the six service types Phillip Wessels offers (employment, contracting, consulting, coaching, speaking, mentoring), each with status and endorsements.",
+      "url": "/.well-known/agent-skills/browse-services/SKILL.md",
+      "digest": "sha256:1bd0f69756f00ebaee0ca8a53719288cf4b9a3ea89b9d5bc9e968ba551d2db72"
+    },
+    {
+      "name": "browse-about",
+      "type": "skill-md",
+      "description": "Read the who-is-Phillip-Wessels surface: bio, skills overview, activity, training, and resume.",
+      "url": "/.well-known/agent-skills/browse-about/SKILL.md",
+      "digest": "sha256:a973a10c83c2469e67257a6367d1df5ddc4b920a596a477b87fbd7e0897ff6c3"
+    },
+    {
+      "name": "browse-experiences",
+      "type": "skill-md",
+      "description": "Read past and ongoing experiences on pawper.dev — jobs, contracts, talks, mentorships, agenda events. Each /xp/{id} page is one experience record.",
+      "url": "/.well-known/agent-skills/browse-experiences/SKILL.md",
+      "digest": "sha256:0177197f57e070bfc15a8e8e85ec969c01a6387adb677ab1451db201beec51b3"
+    },
+    {
+      "name": "subscribe-feeds",
+      "type": "skill-md",
+      "description": "Subscribe to one of five RSS feed shapes on pawper.dev — all logs, all activity, featured projects, per-category projects, or per-skill/series/kicker logs.",
+      "url": "/.well-known/agent-skills/subscribe-feeds/SKILL.md",
+      "digest": "sha256:051ed3b3a90d5cfcc2b76a5049df9c209719bc79eb3f8672c6deb837627bc98c"
+    },
+    {
+      "name": "send-contact",
+      "type": "skill-md",
+      "description": "Send a contact message to Phillip Wessels via the pawper.dev contact endpoint. Server-side reCAPTCHA + honeypot validation, then forwarded to Netlify Forms.",
+      "url": "/.well-known/agent-skills/send-contact/SKILL.md",
+      "digest": "sha256:b93078f12f5fcc2950b884da4ba9c602e6835bed672b1de054e7b8e3ef388653"
+    },
+    {
+      "name": "endorse-experience",
+      "type": "skill-md",
+      "description": "Build a prefilled Airtable URL to leave an endorsement on a specific past or ongoing experience on pawper.dev.",
+      "url": "/.well-known/agent-skills/endorse-experience/SKILL.md",
+      "digest": "sha256:04d0257ebef04b3f1bfea5d93b94ecbc52245308c93debb9a797b1d578493042"
+    }
+  ]
+}

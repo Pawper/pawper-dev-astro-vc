@@ -8,6 +8,9 @@
 - [/.well-known/mcp.json](https://pawper.dev/.well-known/mcp.json): MCP server card (read-only, points at RSS feeds).
 - [/.well-known/ai-agent.json](https://pawper.dev/.well-known/ai-agent.json): Aiia agent manifest.
 - [/.well-known/oauth-protected-resource](https://pawper.dev/.well-known/oauth-protected-resource): RFC 9728 metadata (no auth required; resource is public).
+- [/.well-known/agent-skills/index.json](https://pawper.dev/.well-known/agent-skills/index.json): Agent Skills index (9 skills, per agentskills.io 0.2.0).
+- [/.well-known/api-catalog](https://pawper.dev/.well-known/api-catalog): RFC 9727 API catalog (linkset+json) tying together every machine-readable surface.
+- [/auth.md](https://pawper.dev/auth.md): Authentication model (none — public read-only).
 
 ## Top-level pages
 
