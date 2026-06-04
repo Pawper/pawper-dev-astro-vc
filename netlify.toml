@@ -5,6 +5,12 @@
 [build.environment]
   NODE_VERSION = "22"
   PUPPETEER_CACHE_DIR = "/opt/build/cache/puppeteer"
+  # AIRTABLE_BASE_ID is embedded in the public Airtable form URL
+  # (`https://airtable.com/{base_id}/{form_id}/form`) and is already
+  # exposed in the deployed JS bundle via `PUBLIC_ENDORSE_FORM_URL`.
+  # Declaring it non-secret keeps it out of the scanner's report.
+  # AIRTABLE_API_KEY is the only real secret and is NOT omitted.
+  SECRETS_SCAN_OMIT_KEYS = "AIRTABLE_BASE_ID"
 
 [functions]
   directory = "netlify/functions"

@@ -399,6 +399,19 @@ Going after `apiCatalog` + `authMd` + `agentSkills` in one batch. Expanded the a
 
 That's 9 → 12 passes. Category: API/Auth/MCP/Skill 29 → ~71 (5 of 7 passing — `oauthDiscovery` and `webMcp` still fail by design). Composite forecast: **57 → ~80**. Level stays at 5 (already top of ladder).
 
+### Netlify secrets-scanner snag (fixed)
+
+First deploy of this batch failed with: `Secret env var "AIRTABLE_BASE_ID"'s value detected: found value at line 390 in project.md`. The Airtable form URL hardcoded in the `endorse-experience` skill (`https://airtable.com/{AIRTABLE_BASE_ID}/{form_id}/form`) is intentionally public — same value lives in the deployed `/_astro/App.*.js` bundle via `PUBLIC_ENDORSE_FORM_URL`, and in `public/.well-known/agent-card.json` + the `endorse-experience/SKILL.md`. Removing the value from `project.md` alone wouldn't fix it; the next scan would find the same string in the public/ tree.
+
+Fix: declared the key non-secret via netlify.toml:
+
+```toml
+[build.environment]
+  SECRETS_SCAN_OMIT_KEYS = "AIRTABLE_BASE_ID"
+```
+
+`AIRTABLE_API_KEY` (the only real secret) stays scanned. Per [Netlify docs](https://ntl.fyi/configure-secrets-scanning), `SECRETS_SCAN_OMIT_KEYS` accepts a comma-separated list — add more keys here if other PUBLIC_-prefixed values get flagged.
+
 ### Regenerating digests
 
 If any SKILL.md changes, run:
