@@ -189,33 +189,68 @@ Why one header with commas instead of multiple `Link:` lines: Netlify's TOML `[[
 
 **Lights up:** `linkHeaders`.
 
-### Forecast after deploy
+### Actual post-deploy result
 
-Going into this round of edits, baseline was 0 / 8 Discovery passes. After the well-known files **and** these Level-1 additions deploy, the per-check delta should look like:
+Deployed `c7fc9e7` + `e0939b4` to Netlify and re-scanned at 2026-06-04 03:50 UTC. **Level 0 → Level 2 "Bot-Aware"** — beat the forecast.
 
-| Check | Before | After deploy |
-|---|---|---|
-| robotsTxt | fail | **pass** |
-| sitemap | fail | **pass** |
-| linkHeaders | fail | **pass** |
-| robotsTxtAiRules | fail | **pass** |
-| contentSignals | fail | **pass** |
-| a2aAgentCard | fail | **pass** |
-| mcpServerCard | fail | **pass** |
-| oauthProtectedResource | fail | **pass** |
-| dnsAid | fail | fail (DNS-AID is a DNS record, out of scope tonight) |
-| markdownNegotiation | fail | fail (requires server-side content negotiation, not trivial on Astro static) |
-| apiCatalog | fail | fail (no `/.well-known/api-catalog` shipped) |
-| oauthDiscovery | fail | fail (no `/.well-known/openid-configuration`) |
-| authMd | fail | fail (no `/auth.md`) |
-| agentSkills | fail | fail (no Agent Skills index) |
-| webMcp | fail | fail (no WebMCP tools registered on `/`) |
+| Check | Before | After deploy | Notes |
+|---|---|---|---|
+| robotsTxt | fail | **pass** | "robots.txt exists with valid format" |
+| sitemap | fail | **pass** | "sitemap.xml exists with valid structure" |
+| linkHeaders | fail | **pass** | "Found agent-useful Link relations: service-doc, alternate" |
+| robotsTxtAiRules | fail | **pass** | scanner saw 13 AI bot rules (gptbot, chatgpt-user, google-extended, ccbot, anthropic-ai, claude-web, bytespider, perplexitybot, cohere-ai, applebot-extended, amazonbot, meta-externalagent, diffbot) |
+| contentSignals | fail | **pass** | "Content Signals found in robots.txt" |
+| oauthProtectedResource | fail | **pass** | "OAuth Protected Resource Metadata found (well-known)" |
+| mcpServerCard | fail | **pass** | "MCP Server Card found at /.well-known/mcp.json" |
+| **a2aAgentCard** | fail | **fail** | **"Invalid A2A Agent Card: Missing or empty required field `supportedInterfaces`"** — see fix below |
+| dnsAid | fail | fail | needs a DNS record (`_a2a` / DNS-AID), out of repo |
+| markdownNegotiation | fail | fail | Astro static doesn't do content negotiation; would need an edge function |
+| apiCatalog | fail | fail | no `/.well-known/api-catalog` shipped |
+| oauthDiscovery | fail | fail | no `/.well-known/openid-configuration` (and no real OIDC) |
+| authMd | fail | fail | no `/auth.md` |
+| agentSkills | fail | fail | no Agent Skills index (`/.well-known/agent-skills/index.json`) |
+| webMcp | fail | fail | no `navigator.modelContext.registerTool()` calls on `/` |
+| webBotAuth | neutral | neutral | informational only |
+| Commerce row | neutral | neutral | not a commerce site |
 
-Expected jump: **Level 0 → Level 1 minimum, possibly Level 2** depending on how the ladder weights the freshly-passing Discovery/Bot Access checks.
+**Score: 7 fresh passes, 1 fixable spec-error fail, 6 known-out-of-scope fails, 5 neutrals.**
+
+### Fix in this commit: A2A v1.0.0 `supportedInterfaces`
+
+The original card had a top-level `"url": "https://pawper.dev"` field. **A2A v1.0.0 requires `supportedInterfaces` instead** — an ordered array of `{url, protocolBinding}` entries. Cross-checked against the canonical proto at [github.com/a2aproject/A2A `specification/a2a.proto`](https://github.com/a2aproject/A2A/blob/main/specification/a2a.proto):
+
+```proto
+message AgentCard {
+  string name = 1 [(google.api.field_behavior) = REQUIRED];
+  string description = 2 [(google.api.field_behavior) = REQUIRED];
+  // Ordered list of supported interfaces. The first entry is preferred.
+  repeated AgentInterface supported_interfaces = 3 [(google.api.field_behavior) = REQUIRED];
+  ...
+}
+message AgentInterface {
+  string url = 1 [(google.api.field_behavior) = REQUIRED];
+  // The protocol binding supported at this URL. ... The core ones officially
+  // supported are `JSONRPC`, `GRPC` and `HTTP+JSON`.
+  string protocol_binding = 2 [(google.api.field_behavior) = REQUIRED];
+  ...
+}
+```
+
+Proto → JSON convention is snake_case → camelCase, so the JSON keys are `supportedInterfaces` and `protocolBinding`. Replaced the top-level `url` with:
+
+```json
+"supportedInterfaces": [
+  { "url": "https://pawper.dev", "protocolBinding": "HTTP+JSON" }
+]
+```
+
+Pawper.dev does not run a real A2A endpoint — this points the interface at the site itself with `HTTP+JSON` (the closest match for a static HTTP resource). The card is now structurally valid; a real agent would still find no JSON-RPC method-mapping at `/`. That's a separate problem and not in scope.
+
+Expected after the next deploy: **a2aAgentCard flips to pass.** Level stays at 2 (Level 3 "Agent-Readable" needs more — likely markdownNegotiation + agentSkills + webMcp combined).
 
 ## Files touched this session
 
-- `public/.well-known/agent-card.json` *(new)*
+- `public/.well-known/agent-card.json` *(new — patched to A2A v1.0.0 `supportedInterfaces` shape after first deploy)*
 - `public/.well-known/mcp.json` *(new)*
 - `public/.well-known/ai-agent.json` *(new)*
 - `public/.well-known/oauth-protected-resource` *(new)*
@@ -223,4 +258,11 @@ Expected jump: **Level 0 → Level 1 minimum, possibly Level 2** depending on ho
 - `public/robots.txt` *(new)*
 - `src/pages/sitemap.xml.ts` *(new)*
 - `netlify.toml` *(edited — three `[[headers]]` blocks, including Link header on `/`)*
+- `.gitignore` *(edited — ignore `.netlify` CLI scratch)*
 - `project.md` *(this file — updated)*
+
+## Commit log
+
+- `c7fc9e7` — feat: ship agent-discovery layer for isitagentready
+- `e0939b4` — chore: ignore local .netlify directory
+- *(next)* — fix: A2A agent-card supportedInterfaces (v1.0.0 required field)

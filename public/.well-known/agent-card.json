@@ -1,8 +1,13 @@
 {
   "name": "pawper.dev",
   "description": "Phillip A. Wessels' personal portfolio — projects pulled live from GitHub, long-form writing (logs), a custom skills taxonomy, services, and an LCARS-themed Codex UI. Read-only, public, statically generated with Astro.",
-  "url": "https://pawper.dev",
   "version": "1.0.0",
+  "supportedInterfaces": [
+    {
+      "url": "https://pawper.dev",
+      "protocolBinding": "HTTP+JSON"
+    }
+  ],
   "provider": {
     "organization": "Phillip A. Wessels",
     "url": "https://pawper.dev/about/"
