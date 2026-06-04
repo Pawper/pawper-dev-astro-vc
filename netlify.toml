@@ -10,6 +10,33 @@
   directory = "netlify/functions"
   node_bundler = "esbuild"
 
+# ---- Agent-discovery headers ---------------------------------------------
+# The five well-known files (and llms.txt) need permissive CORS so browser-
+# based agents can read them. Spec content types per A2A v1.0.0 / SEP-2127 /
+# Aiia / RFC 9728. See project.md for the why.
+[[headers]]
+  for = "/.well-known/*"
+  [headers.values]
+    Access-Control-Allow-Origin = "*"
+    Access-Control-Allow-Methods = "GET, OPTIONS"
+    Cache-Control = "public, max-age=300"
+
+[[headers]]
+  for = "/llms.txt"
+  [headers.values]
+    Access-Control-Allow-Origin = "*"
+    Access-Control-Allow-Methods = "GET, OPTIONS"
+    Content-Type = "text/plain; charset=utf-8"
+    Cache-Control = "public, max-age=300"
+
+# ---- Link headers on the homepage (RFC 8288) ----------------------------
+# Point agents at the machine-readable surfaces. The isitagentready scanner
+# requires Link headers on / to pass the `linkHeaders` check.
+[[headers]]
+  for = "/"
+  [headers.values]
+    Link = '''</llms.txt>; rel="service-doc"; type="text/plain", </.well-known/agent-card.json>; rel="https://a2a-protocol.org/rel/agent-card"; type="application/json", </.well-known/mcp.json>; rel="https://modelcontextprotocol.io/rel/server-card"; type="application/json", </.well-known/ai-agent.json>; rel="https://aiia.dev/rel/manifest"; type="application/json", </.well-known/oauth-protected-resource>; rel="oauth-protected-resource"; type="application/json", </feed.xml>; rel="alternate"; type="application/rss+xml", </sitemap.xml>; rel="sitemap"; type="application/xml"'''
+
 [[redirects]]
   from = "/l/faq-editors-ides-vs-code-3fp0"
   to   = "/l/editors-ides-installing-vs-code"

@@ -1,0 +1,26 @@
+{
+  "name": "pawper.dev",
+  "description": "Personal portfolio and writing site for Phillip A. Wessels: projects, logs, a skills taxonomy, services, endorsements, and a resume. Statically generated, read-only, fully public.",
+  "url": "https://pawper.dev",
+  "version": "1.0.0",
+  "author": {
+    "name": "Phillip A. Wessels",
+    "url": "https://pawper.dev/about/",
+    "email": "phillip.a.wessels@gmail.com"
+  },
+  "license": "All content © Phillip A. Wessels. Code is open source per repository licenses on GitHub.",
+  "protocols": ["a2a", "mcp"],
+  "endpoints": {
+    "agent-card": "https://pawper.dev/.well-known/agent-card.json",
+    "mcp": "https://pawper.dev/.well-known/mcp.json",
+    "llms": "https://pawper.dev/llms.txt",
+    "rss": "https://pawper.dev/feed.xml"
+  },
+  "auth": {
+    "type": "none",
+    "description": "Public, read-only static site. No authentication required for any surface."
+  },
+  "contacts": ["phillip.a.wessels@gmail.com"],
+  "categories": ["portfolio", "personal-website", "writing", "open-source"],
+  "languages": ["en"]
+}

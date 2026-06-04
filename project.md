@@ -1,0 +1,226 @@
+# project.md — agent-readiness implementation
+
+Memory of the agent-discovery work on pawper.dev. Generated against VCN #35 "Well-Known" (vcn-35-well-known.vercel.app), scored against [isitagentready.com](https://isitagentready.com).
+
+---
+
+## Baseline scan (before any changes)
+
+- **Scanner:** `POST https://isitagentready.com/api/scan` with body `{"url":"https://pawper.dev"}`. Returns JSON. Reported back as a tiered **level 0–5**, not a 0–100 score.
+- **Result:** **Level 0 — "Not Ready"** (2026-06-04 03:23 UTC).
+- **Next target:** Level 1 "Basic Web Presence" (needs `robotsTxt`, `sitemap`, `linkHeaders`).
+
+### Per-check baseline (every category)
+
+| Category | Check | Status |
+|---|---|---|
+| Discoverability | robotsTxt | fail (not found) |
+| Discoverability | sitemap | fail (not found) |
+| Discoverability | linkHeaders | fail (none on homepage) |
+| Discoverability | dnsAid | fail (no DNS-AID record) |
+| Content Accessibility | markdownNegotiation | fail (no MD content negotiation) |
+| Bot Access | robotsTxtAiRules | fail (no robots.txt) |
+| Bot Access | contentSignals | fail (no robots.txt) |
+| Bot Access | webBotAuth | neutral (informational) |
+| Discovery | apiCatalog | fail (not found) |
+| Discovery | oauthDiscovery | fail (no OIDC metadata) |
+| Discovery | **oauthProtectedResource** | fail (not found) |
+| Discovery | authMd | fail (not found) |
+| Discovery | **mcpServerCard** | fail (not found) |
+| Discovery | **a2aAgentCard** | fail (not found) |
+| Discovery | agentSkills | fail (no skills index) |
+| Discovery | webMcp | unableToCheck (browser timeout) |
+| Commerce | x402 / mpp / ucp / acp / ap2 | neutral (not a commerce site) |
+
+Raw JSON saved to `%TEMP%\iar-pawper-before.json`. Reproduce with:
+
+```sh
+curl -sX POST -H "Content-Type: application/json" \
+  -d '{"url":"https://pawper.dev"}' \
+  https://isitagentready.com/api/scan
+```
+
+Note: Windows curl 8.8 with the in-shell heredoc form refused the body on this machine (`STATUS:000`); PowerShell's `Invoke-WebRequest` worked. Stick with PowerShell for re-runs:
+
+```powershell
+$body = @{ url = "https://pawper.dev" } | ConvertTo-Json -Compress
+Invoke-WebRequest -Uri "https://isitagentready.com/api/scan" `
+  -Method POST -Body $body -ContentType "application/json" -TimeoutSec 90 -UseBasicParsing
+```
+
+---
+
+## What got shipped
+
+Five well-known files plus CORS headers. All new, no rewrites.
+
+### 1. `public/.well-known/agent-card.json` — A2A v1.0.0
+
+The agent's business card. Holds the three-field minimum (`name`, `description`, `url`) plus the recommended A2A v1.0.0 fields (`provider`, `capabilities`, `defaultInputModes`, `defaultOutputModes`, `securitySchemes`, `skills`).
+
+Four skills declared, all read-only, matching what's actually on the site:
+- `browse-projects` — projects pulled live from GitHub at build time
+- `browse-logs` — long-form writing in Astro content collections
+- `browse-skills` — the custom skills taxonomy
+- `subscribe-feeds` — the five RSS feeds
+
+`securitySchemes.none` is set on purpose — explicitly noAuth, not implicitly public. Closes the "auth-default trap" the VCN deck warned about.
+
+**Lights up:** `a2aAgentCard` check (currently failing).
+
+### 2. `public/.well-known/mcp.json` — SEP-2127
+
+MCP server discovery card. Honest framing: pawper.dev does **not** run an MCP server. The card advertises the public RSS feeds (`/feed/projects/featured.xml`, `/feed.xml`, `/feed/activity.xml`) as the actual machine-readable endpoints. `transport: "http"`, `url: "https://pawper.dev"`, `schema_version: "2025-06-18"`.
+
+**Lights up:** `mcpServerCard` check (currently failing). Card fewer than 15 sites on earth ship, per the Cloudflare 2026-04 readiness study.
+
+### 3. `public/.well-known/ai-agent.json` — Aiia (2026-03-28)
+
+Aiia working group's manifest. Required `name` + `description`, plus the optional cross-reference fields: `protocols: ["a2a", "mcp"]`, `endpoints` pointing at the other four well-known files and the RSS feed root, `auth: { type: "none" }`, `contacts`, `categories`, `languages`.
+
+**Caveat:** the VCN #35 deck claimed `ai-agent.json` is "wired into the isitagentready scanner." That is **not** what the live scanner actually checks — there is no `aiAgent` check id in the API response. The closest checks are `mcpServerCard`, `a2aAgentCard`, `oauthProtectedResource`, `agentSkills`. Ship it anyway: it's a valid Aiia manifest, it'll cross-reference the other four files, and it costs nothing.
+
+### 4. `public/.well-known/oauth-protected-resource` — RFC 9728
+
+OAuth Protected Resource Metadata. Pawper.dev is fully public and read-only, so:
+- `resource: "https://pawper.dev"`
+- `authorization_servers: []` (RFC 9728 makes this OPTIONAL)
+- `bearer_methods_supported: []`
+- `scopes_supported: []`
+- `resource_documentation` points at `/llms.txt`
+
+No `.json` suffix — that's intentional per the RFC.
+
+**Lights up:** `oauthProtectedResource` check (currently failing).
+
+### 5. `public/llms.txt` — Jeremy Howard format (2024-09-03)
+
+Markdown sitemap. **At the root, not under `.well-known/`** — most common mix-up. H1, blockquote summary, then H2 sections: Discovery, Top-level pages, Projects, Logs, Skills, Services, RSS feeds, Stack, Optional.
+
+Hand-curated. The Astro walk-back (2026-05-04) is the cautionary tale: an auto-generated llms.txt with no human looking at it drifts stale and turns negative.
+
+### 6. `netlify.toml` — CORS headers
+
+Two new `[[headers]]` blocks:
+- `/.well-known/*` → `Access-Control-Allow-Origin: *`, `Methods: GET, OPTIONS`, `Cache-Control: public, max-age=300`
+- `/llms.txt` → same, plus `Content-Type: text/plain; charset=utf-8`
+
+Browser-based agents do CORS preflight before reading well-known paths; curl skips it, which is why missing CORS bites in prod and not in your terminal.
+
+---
+
+## Re-scan after deploy
+
+The scanner reads from the **live** `pawper.dev`. Re-running it right now will return identical baseline results because nothing has been deployed yet. The flow is:
+
+1. **Commit** the changes (CLAUDE.md says ask before committing — so this is on you).
+2. **Push** to `main`; Netlify auto-deploys from `main`.
+3. **Re-scan** with the same `POST /api/scan` call above.
+4. Expected wins: `mcpServerCard`, `a2aAgentCard`, `oauthProtectedResource` flip to pass. That should not move the **level** yet, because levels are gated on the earlier checks (robots.txt, sitemap, link headers).
+
+### Honest forecast
+
+Five well-known files **alone do not move the level off 0**. The scanner's level ladder is:
+
+- **Level 1 — Basic Web Presence:** robots.txt + sitemap.xml + Link headers.
+- **Level 2+:** layers Markdown negotiation, AI-bot rules, MCP/A2A/OAuth discovery on top.
+
+So shipping just the five wins the Discovery category but stays Level 0 until the basics are in. Per-check `fail → pass` count should drop from 14 to about 11.
+
+### Next moves to actually climb levels (not in scope tonight)
+
+1. **`public/robots.txt`** with explicit `User-agent` directives, AI-bot rules (per Cloudflare's bot-rules guidance), and a `Sitemap:` line.
+2. **`@astrojs/sitemap`** integration (adds `/sitemap-index.xml` + `/sitemap-0.xml` at build).
+3. **Link response headers** on `/` (Netlify `[[headers]]` block — point at `/.well-known/api-catalog` or `/llms.txt` via `rel="service-doc"`).
+4. **Markdown negotiation** — serve `.md` versions of pages when `Accept: text/markdown` is requested. This is the bigger lift (Astro doesn't do it out of the box).
+5. **Agent Skills index** — `/.well-known/agent-skills/index.json` per the agentskills.io spec; would also light up the `agentSkills` check.
+
+---
+
+## What surprised me
+
+- The scanner uses a **5-level ladder**, not a 0–100 number. The VCN #35 deck talks about "the score climbs" — that's loose language for what's actually a tier jump.
+- **`ai-agent.json` is not a scanner check.** The deck overstated this. The closest real checks are `mcpServerCard` and `a2aAgentCard`.
+- `webBotAuth` and the entire **Commerce** row return `neutral` for non-commerce sites — they don't count against you. Good.
+- The scanner's `a2aAgentCard` check is **off by default** in the customize panel (the only one) but still runs in the no-args API call.
+- Cloudflare exposes per-check **skill files** at `https://isitagentready.com/.well-known/agent-skills/{check}/SKILL.md` — usable as copy-paste prompts for an agent (Cursor / Claude Code / etc).
+
+---
+
+## Level-1 add-on: robots.txt, sitemap.xml, Link headers
+
+Shipped immediately after the five well-known files to satisfy Level 1 "Basic Web Presence" gates.
+
+### `public/robots.txt`
+
+Explicit allow rules for every AI/agent crawler the scanner inspects (GPTBot, ChatGPT-User, OAI-SearchBot, ClaudeBot, Claude-Web, anthropic-ai, PerplexityBot, Perplexity-User, Google-Extended, Applebot-Extended, CCBot, cohere-ai, Bytespider, Amazonbot, Meta-ExternalAgent/Fetcher, DuckAssistBot, Diffbot, ImagesiftBot, Timpibot, YouBot). One `Content-Signal: search=yes, ai-train=yes, ai-input=yes` line for the Cloudflare Content Signals draft. Sitemap reference at the bottom.
+
+Also disallows `/api/`, `/edit`, `/_assets/` to keep dev-only routes out of the index.
+
+**Lights up:** `robotsTxt`, `robotsTxtAiRules`, `contentSignals`.
+
+### `src/pages/sitemap.xml.ts`
+
+Astro endpoint following the existing `feed.xml.ts` pattern — no new dependencies. Enumerates:
+- 9 static routes (`/`, `/about/`, `/contact/`, `/agenda/`, `/logs/`, `/projects/`, `/projects/featured/`, `/services/`, `/resume.html`)
+- 5 `/about/[entry]/` paths
+- `/services/overview/` + every `SERVICES` id
+- Every `SKILLS` item, with slashes → dashes per the route's slug rule
+- Every `PROJECTS` id
+- Every `EXPERIENCES` + `AGENDA_EVENTS` id (deduped via `Set`)
+- Every log in the `logs` collection
+
+Built at `astro build` time, served at `/sitemap.xml` with `Content-Type: application/xml`.
+
+**Lights up:** `sitemap`.
+
+### `netlify.toml` — Link headers on `/`
+
+One `[[headers]]` block for `/`. Single `Link:` header (per RFC 8288) advertising:
+- `</llms.txt>; rel="service-doc"; type="text/plain"`
+- `</.well-known/agent-card.json>; rel="https://a2a-protocol.org/rel/agent-card"`
+- `</.well-known/mcp.json>; rel="https://modelcontextprotocol.io/rel/server-card"`
+- `</.well-known/ai-agent.json>; rel="https://aiia.dev/rel/manifest"`
+- `</.well-known/oauth-protected-resource>; rel="oauth-protected-resource"`
+- `</feed.xml>; rel="alternate"; type="application/rss+xml"`
+- `</sitemap.xml>; rel="sitemap"; type="application/xml"`
+
+Why one header with commas instead of multiple `Link:` lines: Netlify's TOML `[[headers]]` syntax takes one value per key — and per RFC 8288, comma-separating link-values inside a single header is equivalent. Toml triple-single-quoted string keeps the double quotes intact.
+
+**Lights up:** `linkHeaders`.
+
+### Forecast after deploy
+
+Going into this round of edits, baseline was 0 / 8 Discovery passes. After the well-known files **and** these Level-1 additions deploy, the per-check delta should look like:
+
+| Check | Before | After deploy |
+|---|---|---|
+| robotsTxt | fail | **pass** |
+| sitemap | fail | **pass** |
+| linkHeaders | fail | **pass** |
+| robotsTxtAiRules | fail | **pass** |
+| contentSignals | fail | **pass** |
+| a2aAgentCard | fail | **pass** |
+| mcpServerCard | fail | **pass** |
+| oauthProtectedResource | fail | **pass** |
+| dnsAid | fail | fail (DNS-AID is a DNS record, out of scope tonight) |
+| markdownNegotiation | fail | fail (requires server-side content negotiation, not trivial on Astro static) |
+| apiCatalog | fail | fail (no `/.well-known/api-catalog` shipped) |
+| oauthDiscovery | fail | fail (no `/.well-known/openid-configuration`) |
+| authMd | fail | fail (no `/auth.md`) |
+| agentSkills | fail | fail (no Agent Skills index) |
+| webMcp | fail | fail (no WebMCP tools registered on `/`) |
+
+Expected jump: **Level 0 → Level 1 minimum, possibly Level 2** depending on how the ladder weights the freshly-passing Discovery/Bot Access checks.
+
+## Files touched this session
+
+- `public/.well-known/agent-card.json` *(new)*
+- `public/.well-known/mcp.json` *(new)*
+- `public/.well-known/ai-agent.json` *(new)*
+- `public/.well-known/oauth-protected-resource` *(new)*
+- `public/llms.txt` *(new)*
+- `public/robots.txt` *(new)*
+- `src/pages/sitemap.xml.ts` *(new)*
+- `netlify.toml` *(edited — three `[[headers]]` blocks, including Link header on `/`)*
+- `project.md` *(this file — updated)*

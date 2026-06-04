@@ -1,0 +1,25 @@
+{
+  "schema_version": "2025-06-18",
+  "name": "pawper-dev",
+  "description": "Read-only MCP card advertising the discoverable surface of pawper.dev. The site is a static portfolio; in lieu of a live MCP server, this card points agents at the public RSS feeds and content URLs that already act as machine-readable endpoints.",
+  "transport": "http",
+  "url": "https://pawper.dev",
+  "documentation": "https://pawper.dev/llms.txt",
+  "tools": [
+    {
+      "name": "list_projects_feed",
+      "description": "Fetch the full RSS feed of portfolio projects.",
+      "endpoint": "https://pawper.dev/feed/projects/featured.xml"
+    },
+    {
+      "name": "list_logs_feed",
+      "description": "Fetch the full RSS feed of long-form logs.",
+      "endpoint": "https://pawper.dev/feed.xml"
+    },
+    {
+      "name": "list_activity_feed",
+      "description": "Fetch the cross-portfolio commit activity feed.",
+      "endpoint": "https://pawper.dev/feed/activity.xml"
+    }
+  ]
+}

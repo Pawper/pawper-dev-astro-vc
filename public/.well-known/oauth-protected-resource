@@ -1,0 +1,9 @@
+{
+  "resource": "https://pawper.dev",
+  "authorization_servers": [],
+  "bearer_methods_supported": [],
+  "scopes_supported": [],
+  "resource_documentation": "https://pawper.dev/llms.txt",
+  "resource_name": "pawper.dev",
+  "resource_policy_uri": "https://pawper.dev/about/"
+}

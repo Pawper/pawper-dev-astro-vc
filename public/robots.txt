@@ -1,0 +1,84 @@
+# robots.txt for pawper.dev
+# Public, read-only portfolio. Everything is indexable.
+
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /edit
+Disallow: /_assets/
+
+# ---- AI / agent crawlers -------------------------------------------------
+# Explicit allow rules so the scanner can see we have AI bot rules at all.
+# This is a portfolio: all content is meant to be read, cited, and indexed
+# by human search and AI answer engines alike. Per-bot opt-outs go here if
+# that ever changes.
+
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Perplexity-User
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+User-agent: cohere-ai
+Allow: /
+
+User-agent: Bytespider
+Allow: /
+
+User-agent: Amazonbot
+Allow: /
+
+User-agent: Meta-ExternalAgent
+Allow: /
+
+User-agent: Meta-ExternalFetcher
+Allow: /
+
+User-agent: DuckAssistBot
+Allow: /
+
+User-agent: Diffbot
+Allow: /
+
+User-agent: ImagesiftBot
+Allow: /
+
+User-agent: Timpibot
+Allow: /
+
+User-agent: YouBot
+Allow: /
+
+# ---- Content Signals (Cloudflare draft) ---------------------------------
+# Plain-English statement of intent for AI training and answer engines.
+# See https://blog.cloudflare.com/content-signals/ for the proposal.
+Content-Signal: search=yes, ai-train=yes, ai-input=yes
+
+Sitemap: https://pawper.dev/sitemap.xml

@@ -1,0 +1,65 @@
+{
+  "name": "pawper.dev",
+  "description": "Phillip A. Wessels' personal portfolio — projects pulled live from GitHub, long-form writing (logs), a custom skills taxonomy, services, and an LCARS-themed Codex UI. Read-only, public, statically generated with Astro.",
+  "url": "https://pawper.dev",
+  "version": "1.0.0",
+  "provider": {
+    "organization": "Phillip A. Wessels",
+    "url": "https://pawper.dev/about/"
+  },
+  "documentationUrl": "https://pawper.dev/llms.txt",
+  "capabilities": {
+    "streaming": false,
+    "pushNotifications": false
+  },
+  "defaultInputModes": ["text/plain"],
+  "defaultOutputModes": ["text/plain", "text/html", "application/rss+xml"],
+  "securitySchemes": {
+    "none": {
+      "type": "noAuth",
+      "description": "Public, read-only portfolio. All content is unauthenticated."
+    }
+  },
+  "skills": [
+    {
+      "id": "browse-projects",
+      "name": "Browse projects",
+      "description": "List or read portfolio projects pulled from GitHub at build time, with language stats and activity history.",
+      "tags": ["portfolio", "projects", "github"],
+      "examples": [
+        "List all featured projects",
+        "Read details for the project at /p/pawper-dev-astro-vc"
+      ]
+    },
+    {
+      "id": "browse-logs",
+      "name": "Browse logs",
+      "description": "Read long-form writing organized by series, kicker categories, and skills.",
+      "tags": ["writing", "blog", "logs"],
+      "examples": [
+        "List logs in the React series",
+        "Read the log at /l/operating-systems-terminals-shells"
+      ]
+    },
+    {
+      "id": "browse-skills",
+      "name": "Browse skills",
+      "description": "Query the custom skills taxonomy with distribution charts and per-skill filtering across projects and logs.",
+      "tags": ["skills", "taxonomy"],
+      "examples": [
+        "List skills tagged with TypeScript",
+        "Get the skill at /skill/astro"
+      ]
+    },
+    {
+      "id": "subscribe-feeds",
+      "name": "Subscribe to RSS feeds",
+      "description": "Five RSS feed types: all projects, all logs, featured projects, per-category, and activity.",
+      "tags": ["rss", "feeds"],
+      "examples": [
+        "Fetch /feed.xml for all logs",
+        "Fetch /feed/activity.xml for the commit heatmap stream"
+      ]
+    }
+  ]
+}
