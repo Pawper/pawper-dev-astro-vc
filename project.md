@@ -399,6 +399,27 @@ Going after `apiCatalog` + `authMd` + `agentSkills` in one batch. Expanded the a
 
 That's 9 → 12 passes. Category: API/Auth/MCP/Skill 29 → ~71 (5 of 7 passing — `oauthDiscovery` and `webMcp` still fail by design). Composite forecast: **57 → ~80**. Level stays at 5 (already top of ladder).
 
+### Post-deploy verification (sub-agent, 2026-06-04)
+
+After all five batches deployed (last commit `000e93e` cleared the secrets-scan block), a read-only sub-agent verified all the new paths return 200 and ran a fresh scan. **Level still 5 "Agent-Native"**. Discovery moved **3/7 → 5/7** — partial hit on the +3 forecast.
+
+| Newly passing | Newly failing |
+|---|---|
+| `apiCatalog` (5 APIs listed in the linkset) | — |
+| `agentSkills` (valid JSON parsed despite mis-tagged Content-Type) | — |
+| **Did NOT pass:** `authMd` — file 200/text-markdown, but the scanner requires an H1 heading containing the literal string `auth.md` (e.g. `# auth.md` or `# Example auth.md`). My original heading was `# Authentication — pawper.dev`. |  |
+
+### Two follow-up fixes (uncommitted)
+
+1. **`public/auth.md`** — change H1 from `# Authentication — pawper.dev` to `# auth.md — pawper.dev` to match the scanner's required pattern (`# auth.md` or any H1 variant containing the literal `auth.md`). Source: https://isitagentready.com/.well-known/agent-skills/auth-md/SKILL.md.
+2. **`netlify.toml`** — narrow the `Content-Type: text/markdown` glob from `/.well-known/agent-skills/*` to `/.well-known/agent-skills/*/SKILL.md` so the index.json isn't mis-tagged. The scanner happens to parse by content (so `agentSkills` passed anyway), but the wrong header could cause issues with stricter validators.
+
+Forecast after these land: `authMd` flips to pass → **6/7 in Discovery → composite ~85.**
+
+### Notes on the API surface
+
+The scanner's POST `/api/scan` response includes `level`, `levelName`, and per-check `status` — but **no numeric composite or per-category scores**. The 57 / 75 / 100 / 100 / 29 / n.c numbers from the screenshot are computed in the scanner's web UI from check statuses, not exposed in the API. Re-running after the auth.md fix will need to be re-checked from the web UI if you want the exact composite number.
+
 ### Netlify secrets-scanner snag (fixed)
 
 First deploy of this batch failed with: `Secret env var "AIRTABLE_BASE_ID"'s value detected: found value at line 390 in project.md`. The Airtable form URL hardcoded in the `endorse-experience` skill (`https://airtable.com/{AIRTABLE_BASE_ID}/{form_id}/form`) is intentionally public — same value lives in the deployed `/_astro/App.*.js` bundle via `PUBLIC_ENDORSE_FORM_URL`, and in `public/.well-known/agent-card.json` + the `endorse-experience/SKILL.md`. Removing the value from `project.md` alone wouldn't fix it; the next scan would find the same string in the public/ tree.

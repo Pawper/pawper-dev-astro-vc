@@ -34,9 +34,11 @@
   [headers.values]
     Content-Type = "application/linkset+json; charset=utf-8"
 
-# Agent-Skills SKILL.md files are markdown.
+# Agent-Skills SKILL.md files are markdown. Scope to the SKILL.md filename so
+# the glob does NOT match /.well-known/agent-skills/index.json (which must
+# stay application/json).
 [[headers]]
-  for = "/.well-known/agent-skills/*"
+  for = "/.well-known/agent-skills/*/SKILL.md"
   [headers.values]
     Content-Type = "text/markdown; charset=utf-8"
 

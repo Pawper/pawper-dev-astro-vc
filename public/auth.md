@@ -1,4 +1,4 @@
-# Authentication — pawper.dev
+# auth.md — pawper.dev
 
 pawper.dev is a fully **public, read-only static site**. There is no authentication on any public-facing route, and there is no token issuance, login endpoint, or API key surface.
 
