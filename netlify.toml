@@ -34,6 +34,14 @@
   [headers.values]
     Content-Type = "application/linkset+json; charset=utf-8"
 
+# RFC 9728 — oauth-protected-resource also has no extension; Netlify serves
+# extensionless files as text/plain by default, which fails the scanner's
+# Protected Resource Metadata validation. Force application/json.
+[[headers]]
+  for = "/.well-known/oauth-protected-resource"
+  [headers.values]
+    Content-Type = "application/json; charset=utf-8"
+
 # Agent-Skills SKILL.md files are markdown. Scope to the SKILL.md filename so
 # the glob does NOT match /.well-known/agent-skills/index.json (which must
 # stay application/json).
