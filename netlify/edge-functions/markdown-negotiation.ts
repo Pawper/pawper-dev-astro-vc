@@ -20,7 +20,7 @@ import type { Context, Config } from "@netlify/edge-functions";
 
 const HOMEPAGE_MD = `---
 title: "pawper.dev"
-description: "Phillip A. Wessels' personal portfolio: projects pulled live from GitHub, long-form logs, a custom skills taxonomy, services, endorsements, and a resume. LCARS-themed Codex UI. Astro 6 + React 18, static, deployed to Netlify."
+description: "Phillip A. Wessels' personal portfolio: projects pulled live from GitHub, long-form logs, a custom skills taxonomy, services, endorsements, and a resume. LCARS-themed Codex UI. Astro 6 + React 19, static, deployed to Netlify."
 url: "https://pawper.dev"
 author: "Phillip A. Wessels"
 license: "Content (c) Phillip A. Wessels. Source code per repo licenses on GitHub."

@@ -1,0 +1,5 @@
+# Agent-skills integrity: the sha256 digests in
+# public/.well-known/agent-skills/index.json are computed over the LF-normalized
+# SKILL.md bytes (see project.md). Pin these files to LF so a CRLF working copy
+# (e.g. on Windows) can never be committed and silently invalidate the digests.
+public/.well-known/agent-skills/**/SKILL.md text eol=lf

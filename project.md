@@ -447,3 +447,12 @@ $base = "public\.well-known\agent-skills"
 ```
 
 Then hand-paste each `digest` into `index.json`. (Worth a build script if this becomes a maintenance burden.)
+
+### Agent-readiness review fixes — 2026-06-23 (anthropic-web-producer branch)
+
+Review of the agent surfaces surfaced four issues; fixes applied (uncommitted at time of writing):
+
+1. **`/resume.html` 404 risk (high).** Six agent surfaces + the sitemap advertise `/resume.html`, but the build emits `/resume/` only (`trailingSlash: 'always'`, directory format) — no `resume.html` file or redirect existed, so the advertised URL would 404 in production. Added a `netlify.toml` rewrite `from "/resume.html" → to "/resume/" status 200` so every advertised reference resolves with the resume HTML. (Confirm with `curl -I https://pawper.dev/resume.html` post-deploy.)
+2. **Stale "React 18" claim.** `package.json` is React 19; corrected `llms.txt` (×2) and the `markdown-negotiation.ts` homepage MD to "React 19". (README still says 18 — out of agent scope.)
+3. **`mcp.json` wording.** `list_projects_feed` described "the full RSS feed of portfolio projects" but points at `feed/projects/featured.xml`; reworded to "featured portfolio projects".
+4. **Digest line-ending hardening.** No `.gitattributes` was pinning the SKILL.md files to LF, so a CRLF commit (e.g. from a Windows editor) could silently invalidate the `index.json` digests. Added `.gitattributes` with `public/.well-known/agent-skills/**/SKILL.md text eol=lf`. (Digests verified correct: local CRLF working copy LF-normalizes to the committed LF digests.)

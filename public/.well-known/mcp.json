@@ -8,7 +8,7 @@
   "tools": [
     {
       "name": "list_projects_feed",
-      "description": "Fetch the full RSS feed of portfolio projects.",
+      "description": "Fetch the RSS feed of featured portfolio projects.",
       "endpoint": "https://pawper.dev/feed/projects/featured.xml"
     },
     {
