@@ -1,6 +1,8 @@
 # project.md — agent-readiness implementation
 
-Memory of the agent-discovery work on pawper.dev. Generated against VCN #35 "Well-Known" (vcn-35-well-known.vercel.app), scored against [isitagentready.com](https://isitagentready.com).
+Engineering notes from making pawper.dev discoverable and usable by AI agents — a hands-on implementation of the emerging agent-web standards on a static site: A2A v1.0.0 agent cards, MCP server cards (SEP-2127), the Aiia manifest, `llms.txt`, WebMCP in-page tools, Cloudflare "Markdown for Agents" content negotiation, and the relevant IETF RFCs (9728 OAuth Protected Resource Metadata, 9727 API Catalog, 8288 Link headers).
+
+Progress was measured against the [isitagentready.com](https://isitagentready.com) scanner (Level 0 → Level 5 "Agent-Native"), which is used throughout as a yardstick. The goal was *correct, honest* implementations of these specs — not checkbox theater. Where a surface is descriptive rather than backed by a live server (a static portfolio has no real MCP/A2A/OAuth endpoint), this doc says so explicitly, and notes where the scanner's claims diverge from what it actually checks.
 
 ---
 
@@ -113,7 +115,7 @@ Browser-based agents do CORS preflight before reading well-known paths; curl ski
 
 The scanner reads from the **live** `pawper.dev`. Re-running it right now will return identical baseline results because nothing has been deployed yet. The flow is:
 
-1. **Commit** the changes (CLAUDE.md says ask before committing — so this is on you).
+1. **Commit** the changes.
 2. **Push** to `main`; Netlify auto-deploys from `main`.
 3. **Re-scan** with the same `POST /api/scan` call above.
 4. Expected wins: `mcpServerCard`, `a2aAgentCard`, `oauthProtectedResource` flip to pass. That should not move the **level** yet, because levels are gated on the earlier checks (robots.txt, sitemap, link headers).
@@ -127,7 +129,7 @@ Five well-known files **alone do not move the level off 0**. The scanner's level
 
 So shipping just the five wins the Discovery category but stays Level 0 until the basics are in. Per-check `fail → pass` count should drop from 14 to about 11.
 
-### Next moves to actually climb levels (not in scope tonight)
+### Next moves to actually climb levels (future work)
 
 1. **`public/robots.txt`** with explicit `User-agent` directives, AI-bot rules (per Cloudflare's bot-rules guidance), and a `Sitemap:` line.
 2. **`@astrojs/sitemap`** integration (adds `/sitemap-index.xml` + `/sitemap-0.xml` at build).
