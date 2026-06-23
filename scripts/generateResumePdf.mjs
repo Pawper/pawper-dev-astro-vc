@@ -50,19 +50,30 @@ console.log("✓ Resume preview generated: dist/resume-preview.png");
 
 await browser.close();
 
-// Upload to Cloudinary
+// Upload to Cloudinary when configured. In local/CI contexts without secrets, keep the
+// build green and point the preview card at the freshly generated local assets.
+const hasCloudinary = process.env.CLOUDINARY_URL || process.env.CLOUDINARY_CLOUD_NAME;
+
+if (!hasCloudinary) {
+  writeFileSync(assetsOut, JSON.stringify({
+    pdfUrl: "/resume.pdf",
+    previewUrl: "/resume-preview.png",
+  }, null, 2));
+  console.log("⚠ Cloudinary not configured — using local dist resume assets");
+  console.log("✓ Wrote src/data/resume-assets.json");
+  process.exit(0);
+}
+
 const cloudinary = require("cloudinary").v2;
 if (process.env.CLOUDINARY_URL) {
   cloudinary.config({ secure: true });
-} else if (process.env.CLOUDINARY_CLOUD_NAME) {
+} else {
   cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
     api_key:    process.env.CLOUDINARY_KEY,
     api_secret: process.env.CLOUDINARY_SECRET,
     secure:     true,
   });
-} else {
-  throw new Error("Cloudinary not configured — set CLOUDINARY_URL or CLOUDINARY_CLOUD_NAME in env");
 }
 
 const [pdfResult, previewResult] = await Promise.all([
