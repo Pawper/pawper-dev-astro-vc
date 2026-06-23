@@ -1,6 +1,6 @@
 # pawper.dev
 
-> Personal portfolio and writing site for Phillip A. Wessels — projects pulled live from GitHub, long-form logs in a custom LCARS-themed UI ("Codex"), a skills taxonomy, services, endorsements, and a resume. Astro 6 + React 18, statically generated, deployed to Netlify. Fully public and read-only.
+> Personal portfolio and writing site for Phillip A. Wessels — projects pulled live from GitHub, long-form logs in a custom LCARS-themed UI ("Codex"), a skills taxonomy, services, endorsements, and a resume. Astro 6 + React 19, statically generated, deployed to Netlify. Fully public and read-only.
 
 ## Discovery
 
@@ -54,7 +54,7 @@
 ## Stack
 
 - Framework: Astro 6 (static output).
-- Components: React 18 (islands).
+- Components: React 19 (islands).
 - Language: TypeScript (strict).
 - Styling: CSS custom properties + an LCARS-inspired design system called "Codex".
 - Data: GitHub API (Octokit), Airtable, Astro Content Collections.

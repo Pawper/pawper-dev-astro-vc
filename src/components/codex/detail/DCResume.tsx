@@ -19,8 +19,8 @@ export default function DCResume() {
           </h2>
         </div>
         <p style={{ fontSize: 14, color: "var(--ink-soft)", lineHeight: 1.6, margin: 0, maxWidth: "46ch" }}>
-          Platform architect and AI-augmented developer with 12 years building
-          at the intersection of web technology, API integration, and operations.
+          Web producer and CMS operations specialist — twelve years across structured content,
+          publishing workflows, QA, and documentation, with platform-architecture and API-integration depth behind it.
         </p>
       </div>
 

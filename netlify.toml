@@ -74,6 +74,15 @@
   [headers.values]
     Link = '''</llms.txt>; rel="service-doc"; type="text/plain", </.well-known/api-catalog>; rel="api-catalog"; type="application/linkset+json", </.well-known/agent-card.json>; rel="https://a2a-protocol.org/rel/agent-card"; type="application/json", </.well-known/mcp.json>; rel="https://modelcontextprotocol.io/rel/server-card"; type="application/json", </.well-known/ai-agent.json>; rel="https://aiia.dev/rel/manifest"; type="application/json", </.well-known/oauth-protected-resource>; rel="oauth-protected-resource"; type="application/json", </feed.xml>; rel="alternate"; type="application/rss+xml", </sitemap.xml>; rel="sitemap"; type="application/xml"'''
 
+# The HTML resume builds to /resume/ (trailingSlash: 'always'), but agent
+# surfaces (agent-card, llms.txt, agent-skills, api-catalog via sitemap) and the
+# sitemap advertise /resume.html. Rewrite so that advertised URL serves the
+# resume HTML with a 200 instead of 404ing in production.
+[[redirects]]
+  from = "/resume.html"
+  to   = "/resume/"
+  status = 200
+
 [[redirects]]
   from = "/l/faq-editors-ides-vs-code-3fp0"
   to   = "/l/editors-ides-installing-vs-code"

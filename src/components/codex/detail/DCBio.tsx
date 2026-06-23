@@ -27,15 +27,16 @@ export default function DCBio({ onService }: { onService: (entryId: string) => v
           {PROFILE.intro}
         </p>
         <p style={{ fontSize: 15, lineHeight: 1.65, color: "var(--ink-soft)", margin: 0, textWrap: "pretty" } as React.CSSProperties}>
-          I made my own college major because no existing program connected what I was after —
-          the unifying theory across art, media, and interactive experience. That creative
-          literacy still shapes how I approach interfaces, systems, and communication.
+          The most relevant thread for web production roles is Classic Vacations: a custom
+          WordPress CMS, structured destination/hotel/itinerary content, reusable templates,
+          image/content coverage reporting, editor support, and documentation for repeatable publishing.
         </p>
         <p style={{ fontSize: 15, lineHeight: 1.65, color: "var(--ink-soft)", margin: 0, textWrap: "pretty" } as React.CSSProperties}>
-          Right now I'm going deep on AI and agentic workflows — not just AI-assisted work,
-          but how agentic systems are designed, composed, and deployed. The design choices
-          being made right now are shaping the future of human agency, and that's worth
-          being serious about.
+          In parallel I'm going deep on AI and agentic workflows — not just AI-assisted work,
+          but how agentic systems are designed, composed, and deployed. In the publishing work
+          they stay where they belong: multipliers for documentation, implementation, and review,
+          never a replacement for judgment or QA. The design choices being made right now are
+          shaping the future of human agency, and that's worth being serious about.
         </p>
       </div>
 

@@ -13,21 +13,23 @@
   },
   {
     "id": "classic-vacations-architect-2022",
-    "title": "Web Producer",
+    "title": "Web Producer / Platform Architect",
     "organization": "Classic Vacations",
     "period": "2022–2026",
     "category": "employment",
-    "description": "Sole architect of the WordPress CMS; custom post types, REST API, external API integration, design system.",
+    "description": "Owned WordPress CMS publishing architecture, structured content models, templated pages, QA tooling, editor enablement, and API integrations.",
     "longDescription": [
       "Architected and implemented a custom WordPress CMS from the ground up — custom post types, taxonomies, relational content models (Toolset), JetMenu megamenu, and Elementor page templates — serving thousands of destination, hotel, and itinerary pages used daily by 6+ editors across Marketing and Solutions.",
       "Built a REST API endpoint delivering destination images to client travel statements: hierarchical lookup with parent fallback, custom image sizing, Toolset custom fields for external location IDs, and a coverage-reporting view coordinated with Marketing for gap resolution.",
       "Engineered a TBO API integration layer on hotel property pages — custom import UI with live JSON store, per-field content-source toggles between internal and third-party data, and a photo gallery — enabling real-time content switching without developer intervention.",
       "Owned all templated product and taxonomy pages; designed full content architecture for destination, hotel, and itinerary content types site-wide.",
       "Reduced Marketing dependency on developers for content publishing through structured CMS design, enabling self-service page creation for 6+ non-technical editors.",
+      "Managed recurring web content needs by translating stakeholder requests into scalable CMS fields, templates, workflows, documentation, and governance patterns.",
+      "Supported launch and update readiness through QA of page templates, copy, formatting, links, imagery, structured fields, and rendering behavior.",
       "Leveraged AI coding assistance (ChatGPT, Copilot, Claude) as a core development practice; explicitly recognized by management for incorporating AI into workflow."
     ],
     "featured": true,
-    "skills": ["WordPress", "PHP", "JavaScript", "TypeScript", "REST APIs"],
+    "skills": ["WordPress", "CMS Publishing", "Web QA", "PHP", "JavaScript", "TypeScript", "REST APIs"],
     "endorsementIds": ["lauren-brown"]
   },
   {

@@ -6,119 +6,38 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Phillip Wessels — Resume</title>
+<title>Phillip Wessels — Web Producer & CMS Operations Resume</title>
+<meta name="description" content="Phillip Wessels — Web Producer and CMS Operations Specialist. CMS publishing, web QA, structured content, documentation, training, and stakeholder enablement.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
 <style is:global>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root { color-scheme: light; }
-  html, body {
-    background: #eeece7;
-    min-height: 100%;
-  }
-  body {
-    font-family: 'Jost', sans-serif;
-    font-size: 13.5px;
-    line-height: 1.6;
-    color: #1a1a1a;
-    padding: 3rem 2rem 5rem;
-  }
-  .page {
-    max-width: 780px;
-    margin: 0 auto;
-    background: #fff;
-    padding: 2.5rem 3rem;
-    box-shadow: 0 2px 24px rgba(0,0,0,0.10);
-  }
-  .name {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 36px;
-    font-weight: 500;
-    letter-spacing: 0.02em;
-    line-height: 1.1;
-    color: #1a1a1a;
-  }
-  .title {
-    font-size: 11.5px;
-    font-weight: 400;
-    letter-spacing: 0.13em;
-    text-transform: uppercase;
-    color: #666;
-    margin-top: 5px;
-  }
-  .contact {
-    font-size: 12px;
-    color: #666;
-    margin-top: 7px;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0 18px;
-  }
+  html, body { background: #eeece7; min-height: 100%; }
+  body { font-family: 'Jost', sans-serif; font-size: 13.2px; line-height: 1.55; color: #1a1a1a; padding: 3rem 2rem 5rem; }
+  .page { max-width: 780px; margin: 0 auto; background: #fff; padding: 2.25rem 2.75rem; box-shadow: 0 2px 24px rgba(0,0,0,0.10); }
+  .name { font-family: 'Cormorant Garamond', serif; font-size: 35px; font-weight: 500; letter-spacing: 0.02em; line-height: 1.1; color: #1a1a1a; }
+  .title { font-size: 11.5px; font-weight: 400; letter-spacing: 0.13em; text-transform: uppercase; color: #666; margin-top: 5px; }
+  .contact { font-size: 12px; color: #666; margin-top: 7px; display: flex; flex-wrap: wrap; gap: 0 18px; }
   .contact a { color: #666; text-decoration: none; }
   .contact a:hover { color: #1a1a1a; }
-  hr {
-    border: none;
-    border-top: 0.5px solid #d0d0d0;
-    margin: 18px 0;
-  }
-  .section-label {
-    font-size: 10px;
-    font-weight: 500;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    color: #888;
-    margin-bottom: 10px;
-  }
-  .summary {
-    font-size: 13.5px;
-    color: #1a1a1a;
-    line-height: 1.75;
-    font-weight: 300;
-  }
-  .skills-grid {
-    display: grid;
-    grid-template-columns: auto 1fr;
-    gap: 5px 18px;
-    font-size: 12.5px;
-  }
+  hr { border: none; border-top: 0.5px solid #d0d0d0; margin: 15px 0; }
+  .section-label { font-size: 10px; font-weight: 500; letter-spacing: 0.15em; text-transform: uppercase; color: #888; margin-bottom: 9px; }
+  .summary { font-size: 13.3px; color: #1a1a1a; line-height: 1.68; font-weight: 300; }
+  .skills-grid { display: grid; grid-template-columns: auto 1fr; gap: 4px 16px; font-size: 12.25px; }
   .skill-cat { font-weight: 500; color: #1a1a1a; white-space: nowrap; padding-top: 1px; }
   .skill-val { color: #555; font-weight: 300; }
-  .job { margin-bottom: 22px; }
+  .job { margin-bottom: 18px; }
   .job-company { font-weight: 500; font-size: 14px; color: #1a1a1a; }
   .job-company-sub { font-weight: 300; font-size: 12px; color: #555; }
-  .job-title-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    flex-wrap: wrap;
-    gap: 2px 12px;
-    margin-top: 2px;
-    margin-bottom: 8px;
-  }
+  .job-title-row { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 2px 12px; margin-top: 2px; margin-bottom: 7px; }
   .job-title { font-size: 12.5px; color: #666; font-weight: 300; font-style: italic; }
   .job-dates { font-size: 11.5px; color: #888; white-space: nowrap; }
   ul { padding-left: 14px; }
-  li {
-    font-size: 13px;
-    font-weight: 300;
-    color: #1a1a1a;
-    margin-bottom: 5px;
-    line-height: 1.65;
-  }
+  li { font-size: 12.8px; font-weight: 300; color: #1a1a1a; margin-bottom: 4px; line-height: 1.55; }
   li::marker { color: #aaa; font-size: 10px; }
-  .sub-role {
-    margin-top: 15px;
-    padding-top: 15px;
-    border-top: 0.5px solid #e0e0e0;
-  }
-  .edu-line {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    flex-wrap: wrap;
-    gap: 2px 12px;
-    font-size: 13px;
-  }
+  .sub-role { margin-top: 13px; padding-top: 13px; border-top: 0.5px solid #e0e0e0; }
+  .edu-line { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 2px 12px; font-size: 13px; }
   .edu-degree { font-weight: 500; color: #1a1a1a; }
   .edu-year { font-size: 11.5px; color: #888; }
   .edu-school { color: #666; font-weight: 300; font-size: 12.5px; margin-top: 2px; }
@@ -134,12 +53,12 @@
   }
 
   @media print {
-    @page { margin: 0.75in 0.85in; size: letter; }
+    @page { margin: 0.7in 0.8in; size: letter; }
     html, body { background: #fff; padding: 0; }
     .page { box-shadow: none; padding: 0; max-width: 100%; font-size: 11.5px; }
     .name { font-size: 30px; }
     li { margin-bottom: 3px; }
-    .job { margin-bottom: 16px; }
+    .job { margin-bottom: 15px; }
     a { color: #666 !important; text-decoration: none !important; }
   }
 </style>
@@ -148,7 +67,7 @@
 <div class="page">
 
 <div class="name">Phillip Wessels</div>
-<div class="title">Solutions Engineer &nbsp;&middot;&nbsp; Platform Architect &nbsp;&middot;&nbsp; Agentic Systems Builder<br>AI × Human Flourishing &nbsp;&middot;&nbsp; Wellness Coach in Training</div>
+<div class="title">Web Producer &amp; CMS Operations Specialist &nbsp;&middot;&nbsp; Web Development &nbsp;&middot;&nbsp; Platform Architecture<br>Agentic Systems &nbsp;&middot;&nbsp; AI &times; Human Flourishing</div>
 <div class="contact">
   <span>hello@pawper.dev</span>
   <span>408-644-6963</span>
@@ -160,19 +79,17 @@
 <hr>
 
 <div class="section-label">Summary</div>
-<p class="summary">Platform architect and AI-augmented developer with 12 years building systems at the intersection of web technology, API integration, and business operations. Designed and delivered a full-stack WordPress CMS from the ground up; built REST API endpoints, a TBO API integration layer, and a PowerShell reporting platform serving two departments and cross-functional stakeholders. Now expanding into agentic AI systems and multi-agent orchestration as a core technical discipline. Parallel to the technical track, pursuing professional certification in positive psychology and wellness coaching — engaging the intersection of human agency and agentic systems.</p>
+<p class="summary">Web producer and CMS operations specialist with twelve years across web production, structured content, API-enabled CMS architecture, QA, and business operations — and twenty years on the web overall. Built and maintained a custom WordPress CMS supporting thousands of templated pages and 6+ editors; created REST API tools, publishing workflows, documentation, and reporting automations that improved content quality and reduced dependency on developer bottlenecks. Known for detail-oriented QA, clear communication with nontechnical partners, and translating recurring content requests into scalable publishing systems. Extends that platform-architecture foundation into agentic AI systems and multi-agent workflows.</p>
 
 <hr>
 
 <div class="section-label">Skills</div>
 <div class="skills-grid">
-  <span class="skill-cat">Platform &amp; CMS</span><span class="skill-val">WordPress (CPTs, taxonomies, Toolset, Elementor, REST API), PHP</span>
-  <span class="skill-cat">Languages</span><span class="skill-val">JavaScript, React, SQL, PowerShell, Python, Node.js</span>
-  <span class="skill-cat">APIs &amp; Integration</span><span class="skill-val">REST API design &amp; implementation, TBO API, JSON, Postman</span>
-  <span class="skill-cat">DevOps &amp; Tooling</span><span class="skill-val">Git/GitHub, Docker, WSL/Linux, Netlify, Cloudinary, Windows Task Scheduler</span>
-  <span class="skill-cat">AI &amp; Agentic</span><span class="skill-val">Claude (Code/Cowork), ChatGPT (Codex), GitHub Copilot, OpenClaw, CLAUDE.md/AGENTS.md, Skills</span>
-  <span class="skill-cat">Operations</span><span class="skill-val">Zoho Desk, Excel/VBA, Smartsheet, technical documentation &amp; training</span>
-  <span class="skill-cat">Coaching</span><span class="skill-val">PERMA framework for flourishing, VIA Inventory of Strengths, Positive Interventions</span>
+  <span class="skill-cat">CMS / Web Production</span><span class="skill-val">WordPress CMS, custom post types, taxonomies, Toolset, Elementor, templated page assembly, structured content models, content collections, publishing workflows</span>
+  <span class="skill-cat">Web QA / Content Ops</span><span class="skill-val">Staging/production review, copy/formatting/link/rendering checks, request triage, stakeholder coordination, editor enablement, documentation/training, publishing governance, SEO metadata</span>
+  <span class="skill-cat">Technical</span><span class="skill-val">HTML/CSS, JavaScript/TypeScript, PHP, REST APIs, SQL, PowerShell, Python, React, Node.js, Astro, Git/GitHub, Docker, WSL/Linux, Netlify, Cloudinary</span>
+  <span class="skill-cat">Tools / Operations</span><span class="skill-val">Zoho Desk, Smartsheet, Excel/VBA, Postman, Windows Task Scheduler, technical documentation, training materials</span>
+  <span class="skill-cat">AI / Automation</span><span class="skill-val">Claude, ChatGPT, Gemini, Ollama, OpenRouter; agentic orchestration (OpenClaw, Hermes Agent); multi-agent workflows, AGENTS.md/CLAUDE.md, Skills, and MCP/WebMCP agent-ready surfaces — used to improve workflow reliability, documentation, and review, not as a substitute for judgment</span>
 </div>
 
 <hr>
@@ -186,12 +103,13 @@
     <span class="job-dates">Oct 2022 – May 2026</span>
   </div>
   <ul>
-    <li>Architected and implemented a custom WordPress CMS from the ground up — custom post types, taxonomies, relational content models (Toolset), JetMenu megamenu, and Elementor page templates — serving thousands of destination, hotel, and itinerary pages used daily by 6+ editors across Marketing and Solutions</li>
-    <li>Built a REST API endpoint delivering destination images to client travel statements: hierarchical lookup with parent fallback, custom image sizing, Toolset custom fields for external location IDs, and a coverage-reporting view coordinated with Marketing for gap resolution</li>
-    <li>Engineered a TBO API integration layer on hotel property pages — custom import UI with live JSON store, per-field content-source toggles between internal and third-party data, and a photo gallery — enabling real-time content switching without developer intervention</li>
-    <li>Owned all templated product and taxonomy pages; designed full content architecture for destination, hotel, and itinerary content types site-wide</li>
-    <li>Reduced Marketing dependency on developers for content publishing through structured CMS design, enabling self-service page creation for 6+ non-technical editors</li>
-    <li>Leveraged AI coding assistance (ChatGPT, Copilot, Claude) as a core development practice; explicitly recognized by management for incorporating AI into workflow</li>
+    <li>Owned CMS production architecture for a WordPress platform serving thousands of structured destination, hotel, itinerary, product, and taxonomy pages across 6+ editorial users.</li>
+    <li>Built custom post types, taxonomies, relational content models, Elementor templates, and reusable publishing patterns that helped nontechnical teams assemble and maintain content consistently.</li>
+    <li>Managed recurring web content needs by translating stakeholder requests into scalable CMS fields, templates, workflows, documentation, and governance patterns.</li>
+    <li>Created REST API endpoints and reporting views to audit image coverage, content completeness, fallback behavior, and publishing readiness across large page collections.</li>
+    <li>Supported content updates and launch readiness through QA of page templates, copy, formatting, links, imagery, structured fields, and rendering behavior.</li>
+    <li>Integrated external TBO hotel/property data into CMS-managed pages through an import UI, live JSON store, field-level source toggles, and photo gallery workflow while preserving editorial control.</li>
+    <li>Reduced Marketing dependency on developer intervention by improving CMS usability, enabling self-service publishing, training editors, and documenting repeatable processes.</li>
   </ul>
 
   <div class="sub-role">
@@ -200,11 +118,11 @@
       <span class="job-dates">Feb 2019 – Oct 2022</span>
     </div>
     <ul>
-      <li>Designed and deployed a centralized reporting automation platform — consolidating hundreds of individual scheduled tasks into a maintainable PowerShell + SQL + Windows Task Scheduler system generating recurring QA, booking, and operational reports for two teams and cross-departmental stakeholders</li>
-      <li>Took over and corrected production-critical SQL queries (originally broken by another team) powering QA and booking-travel reports; documented and maintained the query library</li>
-      <li>Built a custom Excel VBA add-in that turned a neglected CSV report (source of recurring financial loss) into a one-click pivot table dashboard, driving consistent adoption</li>
-      <li>Engineered PowerShell scripts replacing a multi-step error-prone manual process with a single automated workflow; successfully advocated for the software update required to enable it</li>
-      <li>Led team adoption of GitHub for version control, replacing email-based code sharing and manual backups; trained new hires and authored process and workflow documentation</li>
+      <li>Performed high-volume content/data QA, copy review, booking/product review, and operational reporting for cross-functional travel product workflows.</li>
+      <li>Designed and maintained a PowerShell + SQL + Windows Task Scheduler reporting platform that centralized recurring QA, booking, and operational reports for two teams and cross-department stakeholders.</li>
+      <li>Took over and corrected production-critical SQL queries powering QA and booking-travel reports; documented and maintained a query library for repeatable use.</li>
+      <li>Built an Excel/VBA dashboard that converted a neglected CSV report into a reusable one-click review workflow for recurring operational issues.</li>
+      <li>Led team adoption of GitHub for version control and process visibility, replacing email-based code sharing/manual backups; trained new hires and authored workflow documentation.</li>
     </ul>
   </div>
 
@@ -227,12 +145,6 @@
   <span class="edu-year">2008–2011, 2013</span>
 </div>
 <div class="edu-school">California State University, Fresno</div>
-
-<div class="edu-line" style="margin-top: 10px;">
-  <span class="edu-degree">Positive Psychology: Martin E. P. Seligman's Visionary Science</span>
-  <span class="edu-year">Feb 2026</span>
-</div>
-<div class="edu-school">University of Pennsylvania (Coursera) · Credential ID PTEV8VSOB4IV</div>
 
 </div>
 </body>
