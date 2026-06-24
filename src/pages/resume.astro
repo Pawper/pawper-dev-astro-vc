@@ -63,6 +63,9 @@
     li { margin-bottom: 2px; line-height: 1.45; }
     .job { margin-bottom: 10px; }
     .sub-role { margin-top: 9px; padding-top: 9px; }
+    /* Start the QA & Training sub-role on a fresh page (avoids a heading orphan
+       at the bottom of page 1); drop the divider so the page top stays clean. */
+    .break-page { break-before: page; page-break-before: always; border-top: none; margin-top: 0; padding-top: 0; }
     a { color: #666 !important; text-decoration: none !important; }
   }
 </style>
@@ -116,7 +119,7 @@
     <li>Reduced Marketing dependency on developer intervention by improving CMS usability, enabling self-service publishing, training editors, and documenting repeatable processes.</li>
   </ul>
 
-  <div class="sub-role">
+  <div class="sub-role break-page">
     <div class="job-title-row">
       <span class="job-title">Product Operations Admin — QA &amp; Training</span>
       <span class="job-dates">Feb 2019 – Oct 2022</span>
