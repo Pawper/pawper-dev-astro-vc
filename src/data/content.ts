@@ -334,6 +334,7 @@ export function getLogsForCategory(catId: string): Log[] {
 
 export const SKILLS: Array<{ label: string; items: string[] }> = [
   { label: "AI",           items: ["OpenClaw", "Hermes", "Claude", "ChatGPT", "Gemini", "Antigravity", "OpenRouter", "Ollama", "ngrok", "Discord", "Telegram"] },
+  { label: "Agents",       items: ["Agentic Systems", "MCP", "A2A", "WebMCP", "Agent Memory"] },
   { label: "Frontend",     items: ["HTML", "CSS", "SCSS", "JavaScript", "TypeScript", "React", "Astro", "Tailwind", "Bootstrap", "EJS"] },
   { label: "Backend",      items: ["Node", "Python", "SQL", "PHP", "REST APIs", "PowerShell", "Bash"] },
   { label: "Tooling",      items: ["Git", "Webpack", "Vite", "Netlify", "Puppeteer", "Octokit", "Cloudinary", "Docker", "VS Code", "Terminal", "WSL", "Containers", "Deployment", "Syncthing"] },
@@ -361,6 +362,11 @@ export const SKILL_ALIASES: Record<string, string[]> = {
   "Testing":       ["quality assurance", "qa"],
   "VS Code":       ["vscode"],
   "Discord":       ["discord bots", "discord bot"],
+  "Agentic Systems": ["agentic ai", "ai agents", "agentic systems design"],
+  "Agent Memory":  ["memory"],
+  "MCP":           ["model context protocol"],
+  "A2A":           ["agent-to-agent", "agent to agent"],
+  "WebMCP":        ["web mcp"],
 };
 
 export function canonicalizeSkill(name: string): string {
