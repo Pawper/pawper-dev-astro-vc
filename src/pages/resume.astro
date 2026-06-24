@@ -53,12 +53,16 @@
   }
 
   @media print {
-    @page { margin: 0.7in 0.8in; size: letter; }
+    @page { margin: 0.55in 0.75in; size: letter; }
     html, body { background: #fff; padding: 0; }
-    .page { box-shadow: none; padding: 0; max-width: 100%; font-size: 11.5px; }
-    .name { font-size: 30px; }
-    li { margin-bottom: 3px; }
-    .job { margin-bottom: 15px; }
+    .page { box-shadow: none; padding: 0; max-width: 100%; font-size: 11px; }
+    .name { font-size: 28px; }
+    .summary { line-height: 1.5; }
+    hr { margin: 9px 0; }
+    .section-label { margin-bottom: 6px; }
+    li { margin-bottom: 2px; line-height: 1.45; }
+    .job { margin-bottom: 10px; }
+    .sub-role { margin-top: 9px; padding-top: 9px; }
     a { color: #666 !important; text-decoration: none !important; }
   }
 </style>
@@ -79,7 +83,7 @@
 <hr>
 
 <div class="section-label">Summary</div>
-<p class="summary">Web producer and CMS operations specialist with twelve years across web production, structured content, API-enabled CMS architecture, QA, and business operations — and twenty years on the web overall. Built and maintained a custom WordPress CMS supporting thousands of templated pages and 6+ editors; created REST API tools, publishing workflows, documentation, and reporting automations that improved content quality and reduced dependency on developer bottlenecks. Known for detail-oriented QA, clear communication with nontechnical partners, and translating recurring content requests into scalable publishing systems. Extends that platform-architecture foundation into agentic AI systems and multi-agent workflows.</p>
+<p class="summary">Web producer and CMS operations specialist with twelve years across web production, structured content, API-enabled CMS architecture, QA, and business operations — and twenty years on the web overall. Built and maintained a custom WordPress CMS supporting thousands of templated pages and 6+ editors; created REST API tools, publishing workflows, documentation, and reporting automations that improved content quality and reduced dependency on developer bottlenecks. Independently designs and ships pawper.dev — a structured-content Astro site with an automated build-and-publish pipeline — and regularly writes and teaches on modern web and agentic workflows. Known for detail-oriented QA, clear communication with nontechnical partners, and turning recurring content requests into scalable publishing systems.</p>
 
 <hr>
 
@@ -135,6 +139,36 @@
       <li>Supported product contracting operations through QA review, data entry, copy editing, and Excel-based reporting.</li>
     </ul>
   </div>
+</div>
+
+<hr>
+
+<div class="section-label">Selected Projects</div>
+
+<div class="job">
+  <div class="job-company">pawper.dev <span class="job-company-sub">— Personal portfolio &amp; publishing platform</span></div>
+  <div class="job-title-row">
+    <span class="job-title">Astro 6 &middot; React &middot; TypeScript &middot; Netlify</span>
+    <span class="job-dates">pawper.dev</span>
+  </div>
+  <ul>
+    <li>Designed and ship a structured-content site on Astro Content Collections — a headless-style content model with reusable templates for projects, writing, skills, and experiences, assembled into pages at build time.</li>
+    <li>Built an automated publish pipeline: build-time generators pull content from GitHub, Airtable, and Dev.to and emit Open Graph images, RSS feeds, an XML sitemap, and a print-ready resume PDF on every Netlify deploy.</li>
+    <li>Own SEO and cross-publishing end to end — canonical URLs for Dev.to cross-posts, per-page meta and Open Graph, and machine-readable discovery surfaces (llms.txt, agent cards) — QA'ing each release across staging and production.</li>
+    <li><span style="font-weight: 500;">Earlier builds</span> (all live, linked on pawper.dev): a dynamic EJS/Octokit portfolio with Puppeteer screenshot automation, plus React and semantic-HTML/SCSS projects.</li>
+  </ul>
+</div>
+
+<hr>
+
+<div class="section-label">Speaking, Teaching &amp; Writing</div>
+
+<div class="job">
+  <ul>
+    <li><span style="font-weight: 500;">Speaking</span> — ClawCamp &amp; Dual Tech Summit (San Francisco, 2026): "Beyond Assistants: The Agentic Personal OS," "Your Claw, Every Device," and "Augmenting &amp; Alignment: A2H, A2A, H2H."</li>
+    <li><span style="font-weight: 500;">Teaching</span> — Mentor at ClawCamp; lead recurring hands-on beginner workshops (developer onboarding: command line, WSL, Docker, agent setup), turning technical setup into approachable, repeatable guidance for newcomers.</li>
+    <li><span style="font-weight: 500;">Writing</span> — Author of the multi-part "Foundations of Digital Agency" tutorial series (11+ articles on pawper.dev, cross-posted to Dev.to with canonical URLs) — onboarding and documentation across web tooling, DevOps, security, and AI/agentic workflows.</li>
+  </ul>
 </div>
 
 <hr>
