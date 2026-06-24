@@ -88,6 +88,38 @@ A model by itself is brilliant but amnesiac. Memory is the notebook it keeps —
 
 Most "agent memory" products are really about #2 and #3: a durable place to put facts, plus a way to pull the relevant ones back when they matter. Cognee is one of those, built around a knowledge graph.
 
+### What OpenClaw memory gives you (out of the box)
+
+OpenClaw ships with native memory that handles the core problem: **continuity across sessions without surveillance.** You get:
+
+**Two-layer architecture:**
+- **Layer 1: Daily logs** (`memory/YYYY-MM-DD.md`) — raw, transient notes you write. Allowed to be messy.
+- **Layer 2: Durable memory** (`MEMORY.md`) — facts, decisions, preferences you've deliberately promoted. This is what survives and gets retrieved.
+
+**Active Memory plugin** (2026.4.10+) — Before answering, the agent runs a sub-routine that queries relevant preferences, historical decisions, and prior session context. It's built-in pre-population: the agent automatically reaches for what matters without you having to paste it every time.
+
+**People-aware features** (2026.4.29+) — Person cards, aliases, relationship graphs. So when you ask "what do I know about X?", the agent can surface not just snippets but *connections* — who introduced you, what they work on, what you decided together.
+
+**Hybrid search** — Vector similarity + temporal decay, so newer memories rank higher and you get both "what's similar?" and "what was true on this date?"
+
+**The capture policy is yours.** Memory doesn't auto-ingest everything. You write the daily log, promote the note to durable memory when it matters, and the agent retrieves from there. Surveillance is opt-in, never automatic.
+
+> **OpenClaw's native memory is a solid foundation.** It solves continuity and respects the A2H edge. Many workflows stop here and never need more.
+
+### What Cognee adds on top
+
+When OpenClaw's memory starts to strain — when you have hundreds of notes and need to ask "how are these three decisions connected?" or "what was the context six months ago when we chose this approach?" — Cognee layers on the next level:
+
+**Knowledge graph extraction** — Cognee reads your notes and *automatically* extracts entities, relationships, and timestamps. You don't write the graph; Cognee infers it from the natural language you already wrote.
+
+**Relationship traversal** — Instead of just "find similar notes," you can ask questions like "what decisions led to this one?" or "who else was involved in this project?" and Cognee traverses the graph to answer.
+
+**Provenance tracking** — Every fact in Cognee's graph points back to its source note. When the agent surfaces a memory, you see where it came from, so you can verify or correct it.
+
+**Time-aware queries** — Graph + timestamps let you ask "what was true on this date?" or "how did this relationship evolve?" — things vector search alone can't reliably answer.
+
+**The trade-off in one line:** OpenClaw's native memory is simpler and faster; Cognee's graph is more powerful at understanding *how things are connected* — but it adds complexity and a new tool to maintain.
+
 ### What's RAG?
 
 **RAG = Retrieval-Augmented Generation.** Before the model answers, you *search a store* for the most relevant chunks of text and paste them into the prompt. It's how an agent "looks things up" instead of relying only on what it memorized during training.
