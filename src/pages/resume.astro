@@ -6,8 +6,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Phillip Wessels — Web Producer & CMS Operations Resume</title>
-<meta name="description" content="Phillip Wessels — Web Producer and CMS Operations Specialist. CMS publishing, web QA, structured content, documentation, training, and stakeholder enablement.">
+<title>Phillip Wessels — Web Platforms & Digital Experience Resume</title>
+<meta name="description" content="Phillip Wessels — Web Platforms &amp; Digital Experience. CMS architecture (WordPress, Drupal), web production, QA and accessibility, SEO and AI discoverability, AI-enabled tools and automation.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
 <style is:global>
@@ -53,19 +53,22 @@
   }
 
   @media print {
-    @page { margin: 0.55in 0.75in; size: letter; }
+    @page { margin: 0.5in 0.7in; size: letter; }
     html, body { background: #fff; padding: 0; }
     .page { box-shadow: none; padding: 0; max-width: 100%; font-size: 11px; }
     .name { font-size: 28px; }
     .summary { line-height: 1.5; }
-    hr { margin: 9px 0; }
+    hr { margin: 8px 0; }
     .section-label { margin-bottom: 6px; }
-    li { margin-bottom: 2px; line-height: 1.45; }
+    li { margin-bottom: 2px; line-height: 1.42; font-size: 11.6px; }
+    .summary { font-size: 12px; }
+    .skills-grid { font-size: 11.4px; gap: 3px 14px; }
+    .job-title-row { margin-bottom: 4px; }
     .job { margin-bottom: 10px; }
     .sub-role { margin-top: 9px; padding-top: 9px; }
-    /* Start the QA & Training sub-role on a fresh page (avoids a heading orphan
-       at the bottom of page 1); drop the divider so the page top stays clean. */
-    .break-page { break-before: page; page-break-before: always; border-top: none; margin-top: 0; padding-top: 0; }
+    /* Keep headings with the content that follows them and bullets whole across page breaks. */
+    .section-label, .job-company, .job-title-row { break-after: avoid; page-break-after: avoid; }
+    li, .edu-line, .edu-school { break-inside: avoid; page-break-inside: avoid; }
     a { color: #666 !important; text-decoration: none !important; }
   }
 </style>
@@ -74,7 +77,7 @@
 <div class="page">
 
 <div class="name">Phillip Wessels</div>
-<div class="title">Web Producer &amp; CMS Operations Specialist &nbsp;&middot;&nbsp; Web Development &nbsp;&middot;&nbsp; Platform Architecture<br>Agentic Systems &nbsp;&middot;&nbsp; AI &times; Human Flourishing</div>
+<div class="title">Web Platforms &amp; Digital Experience &nbsp;&middot;&nbsp; CMS Architecture (WordPress, Drupal) &nbsp;&middot;&nbsp; AI-Enabled Tools &amp; Automation</div>
 <div class="contact">
   <span>hello@pawper.dev</span>
   <span>408-644-6963</span>
@@ -86,17 +89,19 @@
 <hr>
 
 <div class="section-label">Summary</div>
-<p class="summary">Web producer and CMS operations specialist with twelve years across web production, structured content, API-enabled CMS architecture, QA, and business operations — and twenty years on the web overall. Built and maintained a custom WordPress CMS supporting thousands of templated pages and 6+ editors; created REST API tools, publishing workflows, documentation, and reporting automations that improved content quality and reduced dependency on developer bottlenecks. Independently designs and ships pawper.dev — a structured-content Astro site with an automated build-and-publish pipeline — and regularly writes and teaches on modern web and agentic workflows. Known for detail-oriented QA, clear communication with nontechnical partners, and turning recurring content requests into scalable publishing systems.</p>
+<p class="summary">Web platform owner who takes a site from legacy to modern and keeps it running: strategy, architecture, build, QA, launch, and governance. Twelve years at Classic Vacations (Expedia Group); maintained and published on the company's Drupal platform, then led its modernization onto WordPress as the sole web resource: designed the content architecture, built the template system, integrated third-party property data, and guided six-plus distributed content contributors across Marketing and Solutions so publishing no longer waited on a developer. Pre-launch QA discipline from nine years in product operations. Leads the evaluation and adoption of AI-enabled tools and automation in web work: AI-assisted development (Claude, Cursor, Codex) as a production practice since 2023, agentic workflows and MCP integrations, and sites built to be discoverable by AI search and agents (GEO/AEO, WebMCP, structured data); recognized by management for bringing AI into the team's workflow. Reported to the VP of Technology &amp; Operations.</p>
 
 <hr>
 
 <div class="section-label">Skills</div>
 <div class="skills-grid">
-  <span class="skill-cat">CMS / Web Production</span><span class="skill-val">WordPress CMS, custom post types, taxonomies, Toolset, Elementor, templated page assembly, structured content models, content collections, publishing workflows</span>
-  <span class="skill-cat">Web QA / Content Ops</span><span class="skill-val">Staging/production review, copy/formatting/link/rendering checks, request triage, stakeholder coordination, editor enablement, documentation/training, publishing governance, SEO metadata</span>
-  <span class="skill-cat">Technical</span><span class="skill-val">HTML/CSS, JavaScript/TypeScript, PHP, REST APIs, SQL, PowerShell, Python, React, Node.js, Astro, Git/GitHub, Docker, WSL/Linux, Netlify, Cloudinary</span>
-  <span class="skill-cat">Tools / Operations</span><span class="skill-val">Zoho Desk, Smartsheet, Excel/VBA, Postman, Windows Task Scheduler, technical documentation, training materials</span>
-  <span class="skill-cat">AI / Automation</span><span class="skill-val">Claude, ChatGPT, Gemini, Ollama, OpenRouter; agentic orchestration (OpenClaw, Hermes Agent); multi-agent workflows, AGENTS.md/CLAUDE.md, Skills, and MCP/WebMCP agent-ready surfaces — used to improve workflow reliability, documentation, and review, not as a substitute for judgment</span>
+  <span class="skill-cat">Web production</span><span class="skill-val">Request intake to launch; reusable templates and components; publishing workflows and editorial calendars; content migration and site consolidation; redirects and URL governance; launch documentation and runbooks; parallel requests across stakeholders</span>
+  <span class="skill-cat">CMS platforms</span><span class="skill-val">WordPress (custom post types, taxonomies, relational content models, Elementor, Toolset, REST API); Drupal (content publishing and editorial operations, hand-coded HTML/CSS/JS page builds, legacy platform maintenance, and migration off it; not module or theme development); Astro content collections, structured-content and headless CMS patterns; platform ownership including updates, patching, access, and staging</span>
+  <span class="skill-cat">QA, accessibility &amp; site health</span><span class="skill-val">Pre-launch QA checklists (content, links, forms, responsive, cross-browser, accessibility, SEO, tracking, brand); WCAG 2.1/2.2 review with axe and keyboard passes; security and update hygiene for a public platform; Core Web Vitals and Lighthouse; audit tooling for completeness and fallback behavior; bug reproduction and clear fix proposals</span>
+  <span class="skill-cat">SEO, analytics &amp; AI discoverability</span><span class="skill-val">Technical SEO, schema/structured data, sitemaps, redirects; GA4, Google Tag Manager, Search Console; GEO/AEO (LLM discoverability): llms.txt, agent cards, WebMCP, agent-readable site surfaces</span>
+  <span class="skill-cat">Agentic AI</span><span class="skill-val">Builds and teaches agentic systems: Claude Code, MCP servers and WebMCP, OpenClaw and Hermes agent orchestration, agent memory files (CLAUDE.md / AGENTS.md), structured prompting; AI-assisted development (Claude, Cursor, Codex) as a production practice since 2023; human review kept in the loop</span>
+  <span class="skill-cat">Technical</span><span class="skill-val">HTML/CSS, JavaScript, PHP, REST APIs, JSON, SQL, Git/GitHub (branching, PRs, reviews), Terminal/Bash, PowerShell, Docker, WSL/Linux, Netlify, Vercel, Cloudinary</span>
+  <span class="skill-cat">Stakeholders &amp; enablement</span><span class="skill-val">Editor training and self-service enablement; technical documentation and onboarding guides; translating marketing, sales, and leadership requests into specs; scheduled reporting for non-technical stakeholders</span>
 </div>
 
 <hr>
@@ -104,42 +109,41 @@
 <div class="section-label">Experience</div>
 
 <div class="job">
-  <div class="job-company">Classic Vacations <span class="job-company-sub">(Expedia Group, acquired by TBO)</span></div>
+  <div class="job-company">Classic Vacations <span class="job-company-sub">(Expedia Group; acquired by TBO)</span></div>
   <div class="job-title-row">
     <span class="job-title">Web Producer / Web Platform Architect</span>
     <span class="job-dates">Oct 2022 – May 2026</span>
   </div>
   <ul>
-    <li>Owned CMS production architecture for a WordPress platform serving thousands of structured destination, hotel, itinerary, product, and taxonomy pages across 6+ editorial users.</li>
-    <li>Built custom post types, taxonomies, relational content models, Elementor templates, and reusable publishing patterns that helped nontechnical teams assemble and maintain content consistently.</li>
-    <li>Managed recurring web content needs by translating stakeholder requests into scalable CMS fields, templates, workflows, documentation, and governance patterns.</li>
-    <li>Created REST API endpoints and reporting views to audit image coverage, content completeness, fallback behavior, and publishing readiness across large page collections.</li>
-    <li>Supported content updates and launch readiness through QA of page templates, copy, formatting, links, imagery, structured fields, and rendering behavior.</li>
-    <li>Integrated external TBO hotel/property data into CMS-managed pages through an import UI, live JSON store, field-level source toggles, and photo gallery workflow while preserving editorial control.</li>
-    <li>Reduced Marketing dependency on developer intervention by improving CMS usability, enabling self-service publishing, training editors, and documenting repeatable processes.</li>
+    <li>Owned the company's WordPress web platform end to end as the sole web resource: intake, build, QA, launch, updates, access, and documentation. Reported to the VP of Technology &amp; Operations and drove adoption of platform, reporting, and workflow recommendations with leadership.</li>
+    <li>Designed the content architecture for the company's product content (custom post types, taxonomies, and relational content models for destinations, hotels, and itineraries) and the reusable template system that publishes thousands of structured pages from it.</li>
+    <li>Guided and supervised the work of 6+ distributed content contributors across Marketing and Solutions for four years: set priorities and publishing standards, assigned and reviewed page work, trained the editors, and wrote the process documentation, so day-to-day publishing no longer waited on a developer.</li>
+    <li>Designed the TBO integration layer: third-party property data imported through a custom UI, a live JSON store, and per-field source toggles, so editors could switch between internal and partner content without a developer and without manual re-entry.</li>
+    <li>Ran pre-launch QA across templates, copy, links, imagery, structured fields, responsive rendering, and accessibility; built audit views and a REST endpoint that surfaced completeness gaps and fallback behavior across large page collections before they reached customers.</li>
+    <li>Owned the platform modernization strategy: assessed a decade-old Drupal site with heavy technical debt, planned the phased cutover (landing pages first, then home page and navigation, then structured product content), delivered the public switch on a two-month timeline, and reduced Drupal to login-only pages with redirects in place.</li>
+    <li>Coordinated with the tech team, cloud infrastructure, and the acquirer's engineers (TBO) on hosting, integration, and data.</li>
   </ul>
 
-  <div class="sub-role break-page">
+  <div class="sub-role">
     <div class="job-title-row">
-      <span class="job-title">Product Operations Admin — QA &amp; Training</span>
+      <span class="job-title">Product Operations Admin (QA &amp; Training)</span>
       <span class="job-dates">Feb 2019 – Oct 2022</span>
     </div>
     <ul>
-      <li>Performed high-volume content/data QA, copy review, booking/product review, and operational reporting for cross-functional travel product workflows.</li>
-      <li>Designed and maintained a PowerShell + SQL + Windows Task Scheduler reporting platform that centralized recurring QA, booking, and operational reports for two teams and cross-department stakeholders.</li>
-      <li>Took over and corrected production-critical SQL queries powering QA and booking-travel reports; documented and maintained a query library for repeatable use.</li>
-      <li>Built an Excel/VBA dashboard that converted a neglected CSV report into a reusable one-click review workflow for recurring operational issues.</li>
-      <li>Led team adoption of GitHub for version control and process visibility, replacing email-based code sharing/manual backups; trained new hires and authored workflow documentation.</li>
+      <li>Performed high-volume content, data, and booking QA where missed inconsistencies carried a direct financial cost; documented recurring failure modes and the fixes.</li>
+      <li>Designed and maintained a PowerShell + SQL + Task Scheduler reporting platform that consolidated hundreds of individual scheduled tasks into one maintainable system for two teams and cross-department stakeholders.</li>
+      <li>Built Excel/VBA tools that made high-volume reports such as the Inventory report faster to process and verify; took over and corrected production-critical SQL and maintained the query library.</li>
+      <li>Led the team's move to GitHub for version control, replacing email-based file sharing and manual backups; trained new hires and authored the workflow documentation.</li>
     </ul>
   </div>
 
   <div class="sub-role">
     <div class="job-title-row">
-      <span class="job-title">Product Operations Admin <span style="font-style: normal; font-weight: 300; font-size: 11.5px; color: #aaa;">· contracted via Volt Workforce Solutions, Oct 2013 – Jul 2014</span></span>
+      <span class="job-title">Product Operations Admin</span>
       <span class="job-dates">Oct 2013 – Feb 2019</span>
     </div>
     <ul>
-      <li>Supported product contracting operations through QA review, data entry, copy editing, and Excel-based reporting.</li>
+      <li>Supported product contracting operations through QA review, data entry accuracy, copy editing, and Excel-based reporting across a high-volume travel product catalog.</li>
     </ul>
   </div>
 </div>
@@ -149,28 +153,37 @@
 <div class="section-label">Selected Projects</div>
 
 <div class="job">
-  <div class="job-company">pawper.dev <span class="job-company-sub">— Personal portfolio &amp; publishing platform</span></div>
+  <div class="job-company">drawabit.app <span class="job-company-sub">— drawing-practice web app, live in production</span></div>
   <div class="job-title-row">
-    <span class="job-title">Astro 6 &middot; React &middot; TypeScript &middot; Netlify</span>
-    <span class="job-dates">pawper.dev</span>
+    <span class="job-title">Next.js &middot; React &middot; TypeScript &middot; Supabase &middot; Stripe &middot; Vercel</span>
+    <span class="job-dates"><a href="https://github.com/Pawper/drawabit">github.com/Pawper/drawabit</a></span>
   </div>
   <ul>
-    <li>Designed and ship a structured-content site on Astro Content Collections — a headless-style content model with reusable templates for projects, writing, skills, and experiences, assembled into pages at build time.</li>
-    <li>Built an automated publish pipeline: build-time generators pull content from GitHub, Airtable, and Dev.to and emit Open Graph images, RSS feeds, an XML sitemap, and a print-ready resume PDF on every Netlify deploy.</li>
-    <li>Own SEO and cross-publishing end to end — canonical URLs for Dev.to cross-posts, per-page meta and Open Graph, and machine-readable discovery surfaces (llms.txt, agent cards) — QA'ing each release across staging and production.</li>
-    <li><span style="font-weight: 500;">Earlier builds</span> (all live, linked on pawper.dev): a dynamic EJS/Octokit portfolio with Puppeteer screenshot automation, plus React and semantic-HTML/SCSS projects.</li>
+    <li>Built and shipped an AI-assisted web application end to end using a Claude Code agentic workflow: spec-driven development (22 feature specs with plan and task files), 526 commits and 850+ tracked issues and pull requests, 58 database migrations, and a GitHub Actions CI pipeline with ESLint, type checks, Vitest unit tests, and Playwright browser tests including axe accessibility checks.</li>
+    <li>Owns production: Vercel hosting and DNS, Supabase Postgres with Realtime for live multi-user sessions, email-link sign-in, Stripe subscriptions verified with a live purchase and refund, privacy and terms pages, an admin console, and a status document of what is built, verified, and not done.</li>
+  </ul>
+</div>
+
+<div class="job">
+  <div class="job-company">pawper.dev <span class="job-company-sub">— structured-content site and agent-ready publishing platform</span></div>
+  <div class="job-title-row">
+    <span class="job-title">Astro &middot; Netlify &middot; GitHub</span>
+    <span class="job-dates"><a href="https://pawper.dev">pawper.dev</a></span>
+  </div>
+  <ul>
+    <li>Designed a template-driven content system with reusable content models; the build pipeline pulls from GitHub, Airtable, and Dev.to and emits Open Graph images, feeds, a sitemap, and a resume PDF on every deploy, QA'd across deploy previews and production.</li>
+    <li>Built for AI discoverability (GEO/AEO): llms.txt, agent cards, structured data, and WebMCP tools that expose site content to AI agents; maintained with Claude Code and CLAUDE.md conventions.</li>
   </ul>
 </div>
 
 <hr>
 
-<div class="section-label">Speaking, Teaching &amp; Writing</div>
+<div class="section-label">Teaching &amp; Writing</div>
 
 <div class="job">
   <ul>
-    <li><span style="font-weight: 500;">Speaking</span> — ClawCamp &amp; Dual Tech Summit (San Francisco, 2026): "Beyond Assistants: The Agentic Personal OS," "Your Claw, Every Device," and "Augmenting &amp; Alignment: A2H, A2A, H2H."</li>
-    <li><span style="font-weight: 500;">Teaching</span> — Mentor at ClawCamp; lead recurring hands-on beginner workshops (developer onboarding: command line, WSL, Docker, agent setup), turning technical setup into approachable, repeatable guidance for newcomers.</li>
-    <li><span style="font-weight: 500;">Writing</span> — Author of the multi-part "Foundations of Digital Agency" tutorial series (11+ articles on pawper.dev, cross-posted to Dev.to with canonical URLs) — onboarding and documentation across web tooling, DevOps, security, and AI/agentic workflows.</li>
+    <li><span style="font-weight: 500;">Mentor at ClawCamp</span> (San Francisco, 2026): led recurring hands-on workshops on developer onboarding and agent tooling (command line, Git, WSL, Docker, agent setup), turning technical setup into repeatable guidance for non-engineers.</li>
+    <li><span style="font-weight: 500;">Author</span> of the 11-part "Foundations of Digital Agency" series (pawper.dev, cross-posted to Dev.to): step-by-step documentation across web tooling, DevOps, and AI-assisted workflows. Speaker at ClawCamp and Dual Tech Summit, 2026.</li>
   </ul>
 </div>
 
@@ -181,7 +194,7 @@
   <span class="edu-degree">B.A., Special Major — Interactive Intermedia</span>
   <span class="edu-year">2008–2011, 2013</span>
 </div>
-<div class="edu-school">California State University, Fresno</div>
+<div class="edu-school">California State University, Fresno &nbsp;&middot;&nbsp; Self-designed program unifying art, media, and interactive experience</div>
 
 </div>
 </body>
