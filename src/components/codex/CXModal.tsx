@@ -533,7 +533,7 @@ function ModalFooterButtons({ modal, proj, primaryHex, secondaryHex, isDark, onN
 
   // Count the buttons this footer will render; only stretch to fill (fluid) when crowded (4+).
   const buttonCount =
-    (modal.kind === "project" && proj ? (proj.webURL ? 4 : 3) : 0) +
+    (modal.kind === "project" && proj ? (proj.webURL && proj.githubURL ? 4 : 3) : 0) +
     (modal.kind === "series" ? (continueLog ? 4 : 3) : 0) +
     (skillHasContent ? 2 : 0);
   const useFluid = buttonCount >= 4;
@@ -545,8 +545,8 @@ function ModalFooterButtons({ modal, proj, primaryHex, secondaryHex, isDark, onN
           {proj.webURL
             ? <CXBtn num="01" label="Open project" href={proj.webURL} primary bgHex={primaryHex} isDark={isDark} />
             : <CXBtn num="01" label="View source"  href={proj.githubURL} primary bgHex={primaryHex} isDark={isDark} />}
-          {proj.webURL && <CXBtn num="02" label="View source" href={proj.githubURL} bgHex={secondaryHex} isDark={isDark} />}
-          <CXBtn num={proj.webURL ? "03" : "02"} label="Feedback" bgHex={secondaryHex} isDark={isDark} icon={null}
+          {proj.webURL && proj.githubURL && <CXBtn num="02" label="View source" href={proj.githubURL} bgHex={secondaryHex} isDark={isDark} />}
+          <CXBtn num={proj.webURL && proj.githubURL ? "03" : "02"} label="Feedback" bgHex={secondaryHex} isDark={isDark} icon={null}
             onClick={() => onNavigateToContact?.(`Feedback on "${proj.title}"`)} />
           <SharePopover
             shareUrl={`https://pawper.dev/p/${modal.id}`}

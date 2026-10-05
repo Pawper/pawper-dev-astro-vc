@@ -270,7 +270,8 @@ async function main() {
     name: repo.name,
     title: toTitle(repo.name),
     description: repo.description ?? "",
-    githubURL: repo.html_url,
+    // A private repo has no public source to link; the live site is the only door.
+    githubURL: repo.private ? "" : repo.html_url,
     webURL: repo.homepage ?? "",
     topics: repo.topics ?? [],
     languages: {},
