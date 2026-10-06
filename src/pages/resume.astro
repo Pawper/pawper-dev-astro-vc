@@ -53,12 +53,12 @@
   }
 
   @media print {
-    @page { margin: 0.5in 0.7in; size: letter; }
+    @page { margin: 0.45in 0.65in; size: letter; }
     html, body { background: #fff; padding: 0; }
     .page { box-shadow: none; padding: 0; max-width: 100%; font-size: 11px; }
     .name { font-size: 28px; }
     .summary { line-height: 1.5; }
-    hr { margin: 8px 0; }
+    hr { margin: 7px 0; }
     .section-label { margin-bottom: 6px; }
     li { margin-bottom: 2px; line-height: 1.42; font-size: 11.6px; }
     .summary { font-size: 12px; }
@@ -109,6 +109,19 @@
 <div class="section-label">Experience</div>
 
 <div class="job">
+  <div class="job-company">Bitblitzin Softworks <span class="job-company-sub">(independent studio) &middot; <a href="https://bitblitzin.com">bitblitzin.com</a></span></div>
+  <div class="job-title-row">
+    <span class="job-title">Founder</span>
+    <span class="job-dates">Jun 2026 – Present</span>
+  </div>
+  <ul>
+    <li><span style="font-weight: 500;">Draw A Bit</span> (drawabit.app, live): shipped a drawing-practice web app end to end with a Claude Code agentic workflow: 22 feature specs, 850+ tracked issues and pull requests, 58 database migrations, and CI with type checks, Vitest, and Playwright tests including axe accessibility checks.</li>
+    <li>Runs Draw A Bit in production: Vercel hosting and DNS, Supabase Postgres with Realtime for live multi-user sessions, email-link sign-in, Stripe subscriptions verified with a live purchase and refund, and an admin console.</li>
+    <li><span style="font-weight: 500;">At Station</span> (atstation.app, in development): a station-based daily schedule for Wear OS, Android, and the web, specified with Spec Kit and built by coordinated coding agents against a shared Kotlin engine, a Next.js web app, and Supabase.</li>
+  </ul>
+</div>
+
+<div class="job">
   <div class="job-company">Classic Vacations <span class="job-company-sub">(Expedia Group; acquired by TBO)</span></div>
   <div class="job-title-row">
     <span class="job-title">Web Producer / Web Platform Architect</span>
@@ -153,18 +166,6 @@
 <div class="section-label">Selected Projects</div>
 
 <div class="job">
-  <div class="job-company">drawabit.app <span class="job-company-sub">— drawing-practice web app, live in production</span></div>
-  <div class="job-title-row">
-    <span class="job-title">Next.js &middot; React &middot; TypeScript &middot; Supabase &middot; Stripe &middot; Vercel</span>
-    <span class="job-dates"><a href="https://github.com/Pawper/drawabit">github.com/Pawper/drawabit</a></span>
-  </div>
-  <ul>
-    <li>Built and shipped an AI-assisted web application end to end using a Claude Code agentic workflow: spec-driven development (22 feature specs with plan and task files), 526 commits and 850+ tracked issues and pull requests, 58 database migrations, and a GitHub Actions CI pipeline with ESLint, type checks, Vitest unit tests, and Playwright browser tests including axe accessibility checks.</li>
-    <li>Owns production: Vercel hosting and DNS, Supabase Postgres with Realtime for live multi-user sessions, email-link sign-in, Stripe subscriptions verified with a live purchase and refund, privacy and terms pages, an admin console, and a status document of what is built, verified, and not done.</li>
-  </ul>
-</div>
-
-<div class="job">
   <div class="job-company">pawper.dev <span class="job-company-sub">— structured-content site and agent-ready publishing platform</span></div>
   <div class="job-title-row">
     <span class="job-title">Astro &middot; Netlify &middot; GitHub</span>
@@ -191,10 +192,9 @@
 
 <div class="section-label">Education</div>
 <div class="edu-line">
-  <span class="edu-degree">B.A., Special Major — Interactive Intermedia</span>
+  <span><span class="edu-degree">B.A., Special Major — Interactive Intermedia</span> <span class="edu-school">&nbsp;&middot;&nbsp; California State University, Fresno</span></span>
   <span class="edu-year">2008–2011, 2013</span>
 </div>
-<div class="edu-school">California State University, Fresno &nbsp;&middot;&nbsp; Self-designed program unifying art, media, and interactive experience</div>
 
 </div>
 </body>
