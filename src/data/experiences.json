@@ -24,8 +24,7 @@
     "category": "employment",
     "description": "Independent studio making small apps for getting a little better every day: Draw A Bit, live at drawabit.app, and At Station, in development.",
     "longDescription": [
-      "Draw A Bit (drawabit.app, live): shipped a drawing-practice web app end to end with a Claude Code agentic workflow: 22 feature specs, 850+ tracked issues and pull requests, 58 database migrations, and CI with type checks, Vitest, and Playwright tests including axe accessibility checks.",
-      "Runs Draw A Bit in production: Vercel hosting and DNS, Supabase Postgres with Realtime for live multi-user sessions, email-link sign-in, Stripe subscriptions verified with a live purchase and refund, and an admin console.",
+      "Draw A Bit (drawabit.app, live): shipped and runs a drawing-practice web app built end to end with a Claude Code agentic workflow: 22 feature specs, 850+ tracked issues and pull requests, and CI with type checks, Vitest, and Playwright tests including axe accessibility checks; in production on Vercel with Supabase Postgres and Realtime for live multi-user sessions, email-link sign-in, and Stripe subscriptions verified with a live purchase and refund.",
       "At Station (atstation.app, in development): a station-based daily schedule for Wear OS, Android, and the web, specified with Spec Kit and built by coordinated coding agents against a shared Kotlin engine, a Next.js web app, and Supabase.",
       "More at bitblitzin.com."
     ],
